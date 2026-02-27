@@ -7,6 +7,7 @@ import type { User } from '@supabase/supabase-js';
 interface AuthState {
     user: User | null;
     role: 'admin' | 'employee' | null;
+    status: 'active' | 'inactive' | null;
     displayName: string | null;
     loading: boolean;
     signIn: (email: string, password: string) => Promise<{ error: string | null }>;
@@ -17,6 +18,7 @@ interface AuthState {
 const AuthContext = createContext<AuthState>({
     user: null,
     role: null,
+    status: null,
     displayName: null,
     loading: true,
     signIn: async () => ({ error: null }),
@@ -31,6 +33,7 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [role, setRole] = useState<'admin' | 'employee' | null>(null);
+    const [status, setStatus] = useState<'active' | 'inactive' | null>(null);
     const [displayName, setDisplayName] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -40,12 +43,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const fetchRole = async (userId: string, userEmail: string) => {
         const { data } = await supabase
             .from('user_roles')
-            .select('role, display_name')
+            .select('role, display_name, status')
             .eq('user_id', userId)
             .single();
 
         if (data) {
+            // **New:** Check if the user is explicitly inactivated.
+            if (data.status === 'inactive') {
+                console.warn('User account is inactive. Logging out.');
+                await supabase.auth.signOut();
+                setUser(null);
+                setRole(null);
+                setStatus('inactive');
+                setDisplayName(null);
+                setLoading(false);
+                return;
+            }
+
             setRole(data.role as 'admin' | 'employee');
+            setStatus(data.status as 'active' | 'inactive');
             setDisplayName(data.display_name || userEmail);
         } else {
             // First user becomes admin, others default to employee
@@ -59,10 +75,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 user_id: userId,
                 email: userEmail,
                 role: assignedRole,
+                status: 'active',
                 display_name: userEmail.split('@')[0],
             });
 
             setRole(assignedRole);
+            setStatus('active');
             setDisplayName(userEmail.split('@')[0]);
         }
     };
@@ -85,6 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             } else {
                 setUser(null);
                 setRole(null);
+                setStatus(null);
                 setDisplayName(null);
             }
             setLoading(false);
@@ -108,11 +127,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await supabase.auth.signOut();
         setUser(null);
         setRole(null);
+        setStatus(null);
         setDisplayName(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, role, displayName, loading, signIn, signUp, signOut }}>
+        <AuthContext.Provider value={{ user, role, status, displayName, loading, signIn, signUp, signOut }}>
             {children}
         </AuthContext.Provider>
     );

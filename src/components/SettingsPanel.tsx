@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/lib/supabase';
-import { UserPlus, Trash2, ShieldCheck, UserCheck, Mail, AlertCircle, CheckCircle, Loader2, Send } from 'lucide-react';
+import { UserPlus, ShieldCheck, UserCheck, Mail, AlertCircle, CheckCircle, Loader2, Send, Ban, CheckCircle2 } from 'lucide-react';
 
 interface UserRole {
     id: string;
     user_id: string;
     email: string;
     role: 'admin' | 'employee';
+    status: 'active' | 'inactive';
     display_name: string | null;
     created_at: string;
 }
@@ -47,16 +48,22 @@ export default function SettingsPanel() {
     if (role !== 'admin') return null;
 
     const fetchUsers = async () => {
-        setLoading(true);
-        const { data, error } = await supabase
-            .from('user_roles')
-            .select('*')
-            .order('created_at', { ascending: true });
+        try {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('user_roles')
+                .select('*')
+                .order('created_at', { ascending: true });
 
-        if (data && !error) {
-            setUsers(data as UserRole[]);
+            if (data && !error) {
+                setUsers(data as UserRole[]);
+            }
+            setLoading(false);
+        } catch (err) {
+            console.error("Error fetching users:", err);
+            setMessage({ type: 'error', text: 'Грешка при вчитување на корисници.' });
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const inviteEmployee = async (e: React.FormEvent) => {
@@ -106,22 +113,27 @@ export default function SettingsPanel() {
         setInviting(false);
     };
 
-    const removeUser = async (userId: string, email: string) => {
+    const toggleStatus = async (userId: string, email: string, currentStatus: string) => {
         if (email === user?.email) {
-            setMessage({ type: 'error', text: 'Не можете да се избришете себеси!' });
+            setMessage({ type: 'error', text: 'Не можете да се деактивирате себеси!' });
             return;
         }
 
-        if (!confirm(`Дали сте сигурни дека сакате да го отстраните ${email}?`)) return;
+        const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+        const actionText = newStatus === 'inactive' ? 'деактивирате' : 'активирате';
+
+        if (!confirm(`Дали сте сигурни дека сакате да го ${actionText} ${email}?`)) return;
 
         const { error } = await supabase
             .from('user_roles')
-            .delete()
+            .update({ status: newStatus })
             .eq('id', userId);
 
         if (!error) {
-            setMessage({ type: 'success', text: `${email} е отстранет.` });
+            setMessage({ type: 'success', text: `Статусот на ${email} е променет.` });
             fetchUsers();
+        } else {
+            setMessage({ type: 'error', text: 'Грешка при промена на статус.' });
         }
     };
 
@@ -216,7 +228,12 @@ export default function SettingsPanel() {
                                         {(u.display_name || u.email).charAt(0).toUpperCase()}
                                     </div>
                                     <div>
-                                        <div className="font-medium text-gray-900 text-sm">{u.display_name || u.email}</div>
+                                        <div className="font-medium text-gray-900 text-sm flex items-center gap-2">
+                                            {u.display_name || u.email}
+                                            {u.status === 'inactive' && (
+                                                <span className="text-[10px] uppercase font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-100">Деактивиран</span>
+                                            )}
+                                        </div>
                                         <div className="text-xs text-gray-400">{u.email}</div>
                                     </div>
                                 </div>
@@ -242,11 +259,14 @@ export default function SettingsPanel() {
                                                 <ShieldCheck size={14} />
                                             </button>
                                             <button
-                                                onClick={() => removeUser(u.id, u.email)}
-                                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Отстрани"
+                                                onClick={() => toggleStatus(u.id, u.email, u.status)}
+                                                className={`p-2 transition-colors rounded-lg flex items-center justify-center ${u.status === 'active'
+                                                        ? 'text-gray-400 hover:text-red-500 hover:bg-red-50'
+                                                        : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
+                                                    }`}
+                                                title={u.status === 'active' ? 'Деактивирај' : 'Активирај'}
                                             >
-                                                <Trash2 size={14} />
+                                                {u.status === 'active' ? <Ban size={14} /> : <CheckCircle2 size={14} />}
                                             </button>
                                         </>
                                     )}
