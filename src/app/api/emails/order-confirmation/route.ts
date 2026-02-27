@@ -4,22 +4,22 @@ import { NextRequest, NextResponse } from 'next/server';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface OrderItem {
-    name: string;
-    price: number;
-    quantity: number;
+  name: string;
+  price: number;
+  quantity: number;
 }
 
 export async function POST(req: NextRequest) {
-    try {
-        const { orderId, customerName, customerEmail, items, subtotal, deliveryAddress, deliveryCity } = await req.json();
+  try {
+    const { orderId, customerName, customerEmail, items, subtotal, deliveryAddress, deliveryCity } = await req.json();
 
-        if (!customerEmail || !orderId) {
-            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-        }
+    if (!customerEmail || !orderId) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
 
-        const shortId = orderId.slice(0, 8).toUpperCase();
+    const shortId = orderId.slice(0, 8).toUpperCase();
 
-        const itemsHtml = (items as OrderItem[]).map(item => `
+    const itemsHtml = (items as OrderItem[]).map(item => `
       <tr>
         <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: #333;">
           ${item.name}
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       </tr>
     `).join('');
 
-        const html = `
+    const html = `
     <!DOCTYPE html>
     <html>
     <head><meta charset="utf-8"></head>
@@ -116,21 +116,21 @@ export async function POST(req: NextRequest) {
     </html>
     `;
 
-        const { error } = await resend.emails.send({
-            from: 'ИНТЕР СТАР ЏАМБО <onboarding@resend.dev>',
-            to: customerEmail,
-            subject: `Нарачка #${shortId} — Потврда | Интер Стар Џамбо`,
-            html,
-        });
+    const { error } = await resend.emails.send({
+      from: 'Интер Стар Џамбо <naracki@interstarjumbo.com>',
+      to: customerEmail,
+      subject: `Нарачка #${shortId} — Потврда | Интер Стар Џамбо`,
+      html,
+    });
 
-        if (error) {
-            console.error('Resend error:', error);
-            return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
-        }
-
-        return NextResponse.json({ success: true });
-    } catch (err) {
-        console.error('Email error:', err);
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    if (error) {
+      console.error('Resend error:', error);
+      return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
     }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('Email error:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
