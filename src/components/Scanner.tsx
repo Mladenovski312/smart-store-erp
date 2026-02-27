@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import { Camera, ImageUp, Wand2, CheckCircle, Upload } from 'lucide-react';
+import { Camera, ImageUp, Wand2, CheckCircle, Upload, Eraser } from 'lucide-react';
 import { CATEGORIES } from '@/lib/types';
 import { saveProduct } from '@/lib/store';
 
@@ -11,7 +11,10 @@ interface ScannerProps {
 
 export default function Scanner({ onProductSaved }: ScannerProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [originalUrl, setOriginalUrl] = useState<string | null>(null);
+    const [showOriginal, setShowOriginal] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isRemovingBg, setIsRemovingBg] = useState(false);
     const [saved, setSaved] = useState(false);
     const cameraInputRef = useRef<HTMLInputElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -27,9 +30,15 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        setPreviewUrl(URL.createObjectURL(file));
+        const objectUrl = URL.createObjectURL(file);
+        setPreviewUrl(objectUrl);
+        setOriginalUrl(objectUrl);
+        setShowOriginal(false);
         setSaved(false);
-        await processImageWithAI(file);
+
+        // Run AI recognition and background removal in parallel
+        processImageWithAI(file);
+        removeBackground(file);
     };
 
     const processImageWithAI = async (file: File) => {
@@ -52,6 +61,24 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
             console.warn('AI recognition unavailable – enter details manually.');
         } finally {
             setIsProcessing(false);
+        }
+    };
+
+    const removeBackground = async (file: File) => {
+        setIsRemovingBg(true);
+        try {
+            const { removeBackground: removeBg } = await import('@imgly/background-removal');
+            const blob = await removeBg(file, {
+                progress: (key: string, current: number, total: number) => {
+                    console.log(`BG Removal [${key}]: ${Math.round((current / total) * 100)}%`);
+                },
+            });
+            const cleanUrl = URL.createObjectURL(blob);
+            setPreviewUrl(cleanUrl);
+        } catch (err) {
+            console.warn('Background removal failed, keeping original image:', err);
+        } finally {
+            setIsRemovingBg(false);
         }
     };
 
@@ -97,6 +124,8 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
             setSellingPrice('');
             setStockQuantity('1');
             setPreviewUrl(null);
+            setOriginalUrl(null);
+            setShowOriginal(false);
             setSaved(false);
         }, 1500);
     };
@@ -130,9 +159,11 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
                 {/* Left Col: Image Upload & Preview */}
                 <div className="space-y-4">
                     {/* Image Preview Area */}
-                    <div className={`w-full aspect-square rounded-xl border-2 flex flex-col items-center justify-center overflow-hidden transition-all ${previewUrl ? 'border-jumbo-blue/30 bg-gray-50' : 'border-gray-200 bg-gray-50'}`}>
+                    <div className={`relative w-full aspect-square rounded-xl border-2 flex flex-col items-center justify-center overflow-hidden transition-all ${previewUrl ? 'border-jumbo-blue/30' : 'border-gray-200 bg-gray-50'}`}
+                        style={previewUrl ? { backgroundImage: 'repeating-conic-gradient(#f0f0f0 0% 25%, white 0% 50%)', backgroundSize: '20px 20px' } : undefined}
+                    >
                         {previewUrl ? (
-                            <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
+                            <img src={showOriginal ? (originalUrl || previewUrl) : previewUrl} alt="Preview" className="w-full h-full object-contain" />
                         ) : (
                             <div className="text-center p-6 text-gray-400">
                                 <Camera className="w-12 h-12 mx-auto mb-2 opacity-50" />
@@ -140,7 +171,27 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
                                 <p className="text-xs mt-1">Користете ги копчињата подолу</p>
                             </div>
                         )}
+
+                        {/* BG removal loading overlay */}
+                        {isRemovingBg && (
+                            <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center">
+                                <Eraser className="w-8 h-8 text-jumbo-blue animate-bounce mb-2" />
+                                <p className="text-sm font-semibold text-jumbo-blue">Се отстранува позадина...</p>
+                                <p className="text-xs text-gray-400 mt-1">Првиот пат трае малку подолго</p>
+                            </div>
+                        )}
                     </div>
+
+                    {/* Original/Clean toggle */}
+                    {originalUrl && previewUrl && originalUrl !== previewUrl && !isRemovingBg && (
+                        <button
+                            type="button"
+                            onClick={() => setShowOriginal(!showOriginal)}
+                            className="w-full text-xs font-medium text-gray-500 hover:text-jumbo-blue transition-colors py-1"
+                        >
+                            {showOriginal ? '🖼️ Покажи без позадина' : '📷 Покажи оригинал'}
+                        </button>
+                    )}
 
                     {/* Two clear buttons: Camera and File */}
                     <div className="grid grid-cols-2 gap-3">
