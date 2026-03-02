@@ -29,14 +29,13 @@ interface Order {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-    pending: { label: 'Нова', color: 'bg-yellow-100 text-yellow-700 border-yellow-200', icon: <Clock size={14} /> },
-    processing: { label: 'Во обработка', color: 'bg-blue-100 text-jumbo-blue border-blue-200', icon: <Package size={14} /> },
+    pending: { label: 'За обработка', color: 'bg-yellow-100 text-yellow-700 border-yellow-200', icon: <Package size={14} /> },
     shipped: { label: 'Испратена', color: 'bg-purple-100 text-purple-700 border-purple-200', icon: <Truck size={14} /> },
     delivered: { label: 'Доставена', color: 'bg-green-100 text-green-700 border-green-200', icon: <CheckCircle size={14} /> },
     cancelled: { label: 'Откажана', color: 'bg-red-100 text-red-700 border-red-200', icon: <XCircle size={14} /> },
 };
 
-const STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+const STATUSES = ['pending', 'shipped', 'delivered', 'cancelled'];
 
 export default function OrdersPanel() {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -107,8 +106,7 @@ export default function OrdersPanel() {
             <div className="flex flex-wrap gap-2">
                 {[
                     { value: 'all', label: `Сите (${orders.length})` },
-                    { value: 'pending', label: `Нови (${pendingCount})` },
-                    { value: 'processing', label: 'Во обработка' },
+                    { value: 'pending', label: `За обработка (${pendingCount})` },
                     { value: 'shipped', label: 'Испратени' },
                     { value: 'delivered', label: 'Доставени' },
                     { value: 'cancelled', label: 'Откажани' },
