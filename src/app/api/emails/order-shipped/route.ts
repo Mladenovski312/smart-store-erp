@@ -70,15 +70,15 @@ export async function POST(req: NextRequest) {
           </div>
 
           <p style="margin: 24px 0 0; font-size: 13px; color: #888; text-align: center; line-height: 1.5;">
-            За дополнителни прашања, контактирајте не на <strong>075 288 395</strong>.
+            За дополнителни прашања, контактирајте не на <strong>+389 31 422 656</strong>.
           </p>
         </div>
 
         <!-- Footer -->
         <div style="text-align: center; margin-top: 32px; font-size: 12px; color: #999; line-height: 1.6;">
           <p style="margin: 0;">ИНТЕР СТАР ЏАМБО</p>
-          <p style="margin: 4px 0;">ул. Борис Кидрич бр. 1, Велес</p>
-          <p style="margin: 4px 0;">📞 075 288 395</p>
+          <p style="margin: 4px 0;">Народна Револуција 43, Куманово</p>
+          <p style="margin: 4px 0;">📞 +389 31 422 656</p>
         </div>
       </div>
     </body>

@@ -42,6 +42,7 @@ export default function OrdersPanel() {
     const [loading, setLoading] = useState(true);
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [filter, setFilter] = useState('all');
+    const [confirmAction, setConfirmAction] = useState<{ id: string, status: string, label: string } | null>(null);
     const supabase = createClient();
 
     const fetchOrders = async () => {
@@ -199,24 +200,67 @@ export default function OrdersPanel() {
                                         </div>
 
                                         {/* Status Change */}
-                                        <div className="flex flex-wrap gap-2">
-                                            <span className="text-xs text-gray-500 self-center mr-1">Промени статус:</span>
-                                            {STATUSES.map(s => {
-                                                const sc = STATUS_CONFIG[s];
-                                                return (
-                                                    <button
-                                                        key={s}
-                                                        onClick={() => updateStatus(order.id, s)}
-                                                        disabled={order.status === s}
-                                                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${order.status === s
-                                                            ? sc.color + ' cursor-default'
-                                                            : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
-                                                            }`}
-                                                    >
-                                                        {sc.label}
-                                                    </button>
-                                                );
-                                            })}
+                                        <div className="mt-6 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                                            <p className="text-sm font-bold text-gray-900 mb-3">Промени статус на нарачка:</p>
+                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                                {STATUSES.map(s => {
+                                                    const sc = STATUS_CONFIG[s];
+                                                    const isCurrent = order.status === s;
+                                                    return (
+                                                        <button
+                                                            key={s}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setConfirmAction({ id: order.id, status: s, label: sc.label });
+                                                            }}
+                                                            disabled={isCurrent}
+                                                            className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all ${isCurrent
+                                                                ? sc.color + ' border-transparent shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] cursor-default ring-2 ring-white'
+                                                                : 'bg-white border-gray-200 text-gray-600 shadow-sm hover:border-jumbo-blue hover:text-jumbo-blue hover:shadow-md hover:-translate-y-0.5'
+                                                                }`}
+                                                        >
+                                                            {sc.icon}
+                                                            <span className="text-xs font-bold">{sc.label}</span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            {/* Confirmation Dialog */}
+                                            {confirmAction?.id === order.id && (
+                                                <div className="mt-4 p-4 bg-jumbo-blue/5 border border-jumbo-blue/20 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in zoom-in-95 duration-200">
+                                                    <div>
+                                                        <p className="text-sm font-bold text-gray-900 leading-tight">Потврда за промена</p>
+                                                        <p className="text-xs text-gray-600 mt-1">Сигурно сакате да го промените статусот во <strong className="text-gray-900">{confirmAction.label}</strong>?</p>
+                                                        {confirmAction.status === 'shipped' && (
+                                                            <p className="text-xs text-red-600 font-semibold mt-1.5">
+                                                                ⚠️ Внимание: Ова ќе испрати емаил известување до купувачот.
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex gap-2 w-full sm:w-auto">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setConfirmAction(null);
+                                                            }}
+                                                            className="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+                                                        >
+                                                            Откажи
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                updateStatus(order.id, confirmAction.status);
+                                                                setConfirmAction(null);
+                                                            }}
+                                                            className="flex-1 px-4 py-2 bg-jumbo-blue text-white rounded-lg text-xs font-bold hover:bg-blue-800 transition-colors"
+                                                        >
+                                                            ПОТВРДИ
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 )}
