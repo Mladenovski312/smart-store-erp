@@ -141,7 +141,9 @@ export default function CheckoutPage() {
             }));
 
             // 2. Create order
+            const generatedOrderId = crypto.randomUUID();
             const orderData = {
+                id: generatedOrderId,
                 customer_name: `${firstName.trim()} ${lastName.trim()}`,
                 customer_first_name: firstName.trim(),
                 customer_last_name: lastName.trim(),
@@ -164,26 +166,24 @@ export default function CheckoutPage() {
                 payment_method: 'cod',
             };
 
-            const { data: order, error } = await supabase
+            const { error } = await supabase
                 .from('orders')
-                .insert(orderData)
-                .select('id')
-                .single();
+                .insert(orderData);
 
             if (error) throw error;
 
-            setOrderId(order?.id || '');
+            setOrderId(generatedOrderId);
             clearCart();
             setOrderComplete(true);
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             // Send confirmation email (fire-and-forget)
-            if (order?.id) {
+            if (generatedOrderId) {
                 fetch('/api/emails/order-confirmation', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        orderId: order.id,
+                        orderId: generatedOrderId,
                         customerName: `${firstName.trim()} ${lastName.trim()}`,
                         customerEmail: email.trim().toLowerCase(),
                         items: items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
