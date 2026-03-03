@@ -38,6 +38,7 @@ export function addToCart(item: Omit<CartItem, 'quantity'>, quantity = 1): void 
         cart.push({ ...item, quantity });
     }
     writeCart(cart);
+    window.dispatchEvent(new Event('cart-item-added'));
 }
 
 export function updateCartQuantity(productId: string, quantity: number): void {

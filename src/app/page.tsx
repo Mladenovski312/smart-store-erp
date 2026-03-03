@@ -21,8 +21,13 @@ export default function StorefrontHome() {
         setMounted(true);
         getProducts().then(all => setProducts(all.filter(p => p.stockQuantity > 0)));
         refreshCartCount();
+        const openCart = () => setCartOpen(true);
         window.addEventListener('cart-updated', refreshCartCount);
-        return () => window.removeEventListener('cart-updated', refreshCartCount);
+        window.addEventListener('cart-item-added', openCart);
+        return () => {
+            window.removeEventListener('cart-updated', refreshCartCount);
+            window.removeEventListener('cart-item-added', openCart);
+        };
     }, []);
 
     const featured = products.slice(0, 8);

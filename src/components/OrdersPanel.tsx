@@ -64,6 +64,19 @@ export default function OrdersPanel() {
     }, []);
 
     const updateStatus = async (orderId: string, newStatus: string) => {
+        // Restore stock when cancelling an order
+        if (newStatus === 'cancelled') {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                const stockItems = order.items.map(i => ({ id: i.productId, quantity: i.quantity }));
+                const { error: restoreError } = await supabase.rpc('restore_order_stock', { items: stockItems });
+                if (restoreError) {
+                    console.error('Failed to restore stock for cancelled order:', orderId, restoreError);
+                    // Don't block the cancellation — admin must always be able to cancel
+                }
+            }
+        }
+
         await supabase
             .from('orders')
             .update({ status: newStatus })

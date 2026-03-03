@@ -140,7 +140,15 @@ export default function CheckoutPage() {
                 street: street.trim(),
             }));
 
-            // 2. Create order
+            // 2. Atomically deduct stock — must happen before order insert so no orphan orders are created on failure
+            const stockItems = items.map(i => ({ id: i.productId, quantity: i.quantity }));
+            const { error: stockError } = await supabase.rpc('process_checkout_stock', { items: stockItems });
+            if (stockError) {
+                setErrors(['Еден или повеќе производи не се достапни во бараната количина. Проверете ја вашата кошничка и обидете се повторно.']);
+                return;
+            }
+
+            // 3. Create order
             const generatedOrderId = crypto.randomUUID();
             const orderData = {
                 id: generatedOrderId,

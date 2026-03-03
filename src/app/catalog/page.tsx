@@ -24,14 +24,19 @@ export default function CatalogPage() {
         setMounted(true);
         getProducts().then(all => setProducts(all.filter(p => p.stockQuantity > 0)));
         refreshCartCount();
+        const openCart = () => setCartOpen(true);
         window.addEventListener('cart-updated', refreshCartCount);
+        window.addEventListener('cart-item-added', openCart);
 
         // Read category from URL if present
         const params = new URLSearchParams(window.location.search);
         const cat = params.get('category');
         if (cat) setSelectedCategory(cat);
 
-        return () => window.removeEventListener('cart-updated', refreshCartCount);
+        return () => {
+            window.removeEventListener('cart-updated', refreshCartCount);
+            window.removeEventListener('cart-item-added', openCart);
+        };
     }, []);
 
     const filtered = products
