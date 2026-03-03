@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+function esc(text: string | number): string {
+  return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { orderId, customerName, customerEmail, deliveryCity, trackingNumber } = await req.json();
@@ -41,7 +45,7 @@ export async function POST(req: NextRequest) {
             Вашата нарачка е испратена!
           </h1>
           <p style="margin: 0 0 24px; font-size: 14px; color: #666; text-align: center; line-height: 1.5;">
-            Здраво ${customerName}, сакаме да ве известиме дека вашата нарачка <strong>#${shortId}</strong> е предадена на курирска служба и е на пат кон вас.
+            Здраво ${esc(customerName)}, сакаме да ве известиме дека вашата нарачка <strong>#${shortId}</strong> е предадена на курирска служба и е на пат кон вас.
           </p>
 
           <!-- Delivery Info -->
@@ -53,7 +57,7 @@ export async function POST(req: NextRequest) {
               </tr>
               <tr>
                 <td style="font-size: 13px; color: #888; padding: 6px 0; font-weight: 600;">Град</td>
-                <td style="font-size: 14px; color: #333; padding: 6px 0; text-align: right;">${deliveryCity || 'Македонија'}</td>
+                <td style="font-size: 14px; color: #333; padding: 6px 0; text-align: right;">${esc(deliveryCity || 'Македонија')}</td>
               </tr>
               <tr>
                 <td style="font-size: 13px; color: #888; padding: 6px 0; font-weight: 600;">Плаќање</td>
@@ -61,7 +65,7 @@ export async function POST(req: NextRequest) {
               </tr>
               ${trackingNumber ? `<tr>
                 <td style="font-size: 13px; color: #888; padding: 6px 0; font-weight: 600;">Број за следење</td>
-                <td style="font-size: 14px; color: #333; padding: 6px 0; text-align: right; font-weight: 600;">${trackingNumber}</td>
+                <td style="font-size: 14px; color: #333; padding: 6px 0; text-align: right; font-weight: 600;">${esc(trackingNumber)}</td>
               </tr>` : ''}
             </table>
           </div>
