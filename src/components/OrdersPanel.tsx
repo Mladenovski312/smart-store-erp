@@ -65,10 +65,10 @@ export default function OrdersPanel() {
     }, []);
 
     const updateStatus = async (orderId: string, newStatus: string, trackingNum?: string) => {
-        // Restore stock when cancelling an order
+        // Restore stock when cancelling — but only if not already cancelled (prevents double restore)
         if (newStatus === 'cancelled') {
             const order = orders.find(o => o.id === orderId);
-            if (order) {
+            if (order && order.status !== 'cancelled') {
                 const stockItems = order.items.map(i => ({ id: i.productId, quantity: i.quantity }));
                 const { error: restoreError } = await supabase.rpc('restore_order_stock', { items: stockItems });
                 if (restoreError) {

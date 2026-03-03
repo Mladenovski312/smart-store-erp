@@ -9,6 +9,10 @@ interface OrderItem {
   quantity: number;
 }
 
+function esc(text: string | number): string {
+  return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { orderId, customerName, customerEmail, items, subtotal, deliveryAddress, deliveryCity } = await req.json();
@@ -22,8 +26,8 @@ export async function POST(req: NextRequest) {
     const itemsHtml = (items as OrderItem[]).map(item => `
       <tr>
         <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: #333;">
-          ${item.name}
-          <span style="color: #888; font-size: 12px;"> × ${item.quantity}</span>
+          ${esc(item.name)}
+          <span style="color: #888; font-size: 12px;"> × ${esc(item.quantity)}</span>
         </td>
         <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: #333; text-align: right; white-space: nowrap;">
           ${(item.price * item.quantity).toLocaleString()} ден
@@ -59,7 +63,7 @@ export async function POST(req: NextRequest) {
             Нарачката е примена!
           </h1>
           <p style="margin: 0 0 24px; font-size: 14px; color: #666; text-align: center;">
-            Ви благодариме, ${customerName}. Вашата нарачка #${shortId} е успешно регистрирана.
+            Ви благодариме, ${esc(customerName)}. Вашата нарачка #${shortId} е успешно регистрирана.
           </p>
 
           <!-- Order Details -->
@@ -88,8 +92,8 @@ export async function POST(req: NextRequest) {
               Адреса за испорака
             </h3>
             <p style="margin: 0; font-size: 14px; color: #333;">
-              ${deliveryAddress}<br>
-              ${deliveryCity}
+              ${esc(deliveryAddress)}<br>
+              ${esc(deliveryCity)}
             </p>
           </div>
 
