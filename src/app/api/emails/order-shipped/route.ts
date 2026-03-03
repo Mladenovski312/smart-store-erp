@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
   try {
-    const { orderId, customerName, customerEmail, deliveryCity } = await req.json();
+    const { orderId, customerName, customerEmail, deliveryCity, trackingNumber } = await req.json();
 
     if (!customerEmail || !orderId) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -59,6 +59,10 @@ export async function POST(req: NextRequest) {
                 <td style="font-size: 13px; color: #888; padding: 6px 0; font-weight: 600;">Плаќање</td>
                 <td style="font-size: 14px; color: #333; padding: 6px 0; text-align: right;">При достава (COD)</td>
               </tr>
+              ${trackingNumber ? `<tr>
+                <td style="font-size: 13px; color: #888; padding: 6px 0; font-weight: 600;">Број за следење</td>
+                <td style="font-size: 14px; color: #333; padding: 6px 0; text-align: right; font-weight: 600;">${trackingNumber}</td>
+              </tr>` : ''}
             </table>
           </div>
 

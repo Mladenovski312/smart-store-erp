@@ -43,6 +43,7 @@ export default function OrdersPanel() {
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [filter, setFilter] = useState('all');
     const [confirmAction, setConfirmAction] = useState<{ id: string, status: string, label: string } | null>(null);
+    const [trackingNumber, setTrackingNumber] = useState('');
     const supabase = createClient();
 
     const fetchOrders = async () => {
@@ -63,7 +64,7 @@ export default function OrdersPanel() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const updateStatus = async (orderId: string, newStatus: string) => {
+    const updateStatus = async (orderId: string, newStatus: string, trackingNum?: string) => {
         // Restore stock when cancelling an order
         if (newStatus === 'cancelled') {
             const order = orders.find(o => o.id === orderId);
@@ -72,14 +73,16 @@ export default function OrdersPanel() {
                 const { error: restoreError } = await supabase.rpc('restore_order_stock', { items: stockItems });
                 if (restoreError) {
                     console.error('Failed to restore stock for cancelled order:', orderId, restoreError);
-                    // Don't block the cancellation — admin must always be able to cancel
                 }
             }
         }
 
+        const updateData: Record<string, string> = { status: newStatus };
+        if (trackingNum) updateData.tracking_number = trackingNum;
+
         await supabase
             .from('orders')
-            .update({ status: newStatus })
+            .update(updateData)
             .eq('id', orderId);
 
         // Send email when marked as shipped
@@ -94,6 +97,7 @@ export default function OrdersPanel() {
                         customerName: order.customer_name,
                         customerEmail: order.customer_email,
                         deliveryCity: order.delivery_city,
+                        trackingNumber: trackingNum || null,
                     }),
                 }).catch(() => { /* email failure shouldn't block status update */ });
             }
@@ -246,9 +250,19 @@ export default function OrdersPanel() {
                                                         <p className="text-sm font-bold text-gray-900 leading-tight">Потврда за промена</p>
                                                         <p className="text-xs text-gray-600 mt-1">Сигурно сакате да го промените статусот во <strong className="text-gray-900">{confirmAction.label}</strong>?</p>
                                                         {confirmAction.status === 'shipped' && (
-                                                            <p className="text-xs text-red-600 font-semibold mt-1.5">
-                                                                ⚠️ Внимание: Ова ќе испрати емаил известување до купувачот.
-                                                            </p>
+                                                            <>
+                                                                <p className="text-xs text-red-600 font-semibold mt-1.5">
+                                                                    ⚠️ Внимание: Ова ќе испрати емаил известување до купувачот.
+                                                                </p>
+                                                                <input
+                                                                    type="text"
+                                                                    value={trackingNumber}
+                                                                    onChange={e => setTrackingNumber(e.target.value)}
+                                                                    onClick={e => e.stopPropagation()}
+                                                                    placeholder="Број за следење (опционално)"
+                                                                    className="mt-2 w-full px-3 py-2 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-jumbo-blue/20 focus:border-jumbo-blue outline-none"
+                                                                />
+                                                            </>
                                                         )}
                                                     </div>
                                                     <div className="flex gap-2 w-full sm:w-auto">
@@ -256,6 +270,7 @@ export default function OrdersPanel() {
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 setConfirmAction(null);
+                                                                setTrackingNumber('');
                                                             }}
                                                             className="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
                                                         >
@@ -264,8 +279,9 @@ export default function OrdersPanel() {
                                                         <button
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                updateStatus(order.id, confirmAction.status);
+                                                                updateStatus(order.id, confirmAction.status, trackingNumber || undefined);
                                                                 setConfirmAction(null);
+                                                                setTrackingNumber('');
                                                             }}
                                                             className="flex-1 px-4 py-2 bg-jumbo-blue text-white rounded-lg text-xs font-bold hover:bg-blue-800 transition-colors"
                                                         >
