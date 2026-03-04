@@ -21,9 +21,9 @@ export default function CatalogPage() {
     const refreshCartCount = () => setCartCount(getCartCount());
 
     useEffect(() => {
-        setMounted(true);
+        setTimeout(() => setMounted(true), 0);
         getProducts().then(all => setProducts(all.filter(p => p.stockQuantity > 0)));
-        refreshCartCount();
+        setTimeout(() => setCartCount(getCartCount()), 0);
         const openCart = () => setCartOpen(true);
         window.addEventListener('cart-updated', refreshCartCount);
         window.addEventListener('cart-item-added', openCart);
@@ -90,67 +90,70 @@ export default function CatalogPage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Каталог на играчки</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Каталог на играчки - Интер Стар Џамбо</h1>
                     <p className="text-gray-500">
+                        Најголем асортиман на квалитетни играчки достапни во нашата продавница во Куманово и онлајн со достава низ цела Македонија.
                         {filtered.length} {filtered.length === 1 ? 'артикл' : 'артикли'} на залиха
                     </p>
                 </div>
 
                 {/* Filters Bar */}
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-8">
-                    <div className="flex flex-col sm:flex-row gap-3">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                            <input
-                                type="text"
-                                placeholder="Пребарај играчки..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue text-sm"
-                            />
-                        </div>
-
-                        <div className="flex gap-3">
-                            <div className="relative">
-                                <SlidersHorizontal className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                                <select
-                                    value={selectedCategory}
-                                    onChange={(e) => setSelectedCategory(e.target.value)}
-                                    className="pl-10 pr-8 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue text-sm appearance-none"
-                                >
-                                    <option value="">Сите категории</option>
-                                    {CATEGORIES.map(c => (
-                                        <option key={c.value} value={c.value}>{c.label}</option>
-                                    ))}
-                                </select>
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                <input
+                                    type="text"
+                                    placeholder="Пребарај играчки..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue text-sm transition-shadow"
+                                />
                             </div>
 
-                            <select
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
-                                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue text-sm appearance-none"
-                            >
-                                <option value="newest">Најнови</option>
-                                <option value="price-asc">Цена ↑</option>
-                                <option value="price-desc">Цена ↓</option>
-                                <option value="name">Име А-Ш</option>
-                            </select>
+                            <div className="flex gap-3">
+                                <div className="relative shrink-0">
+                                    <SlidersHorizontal className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none" />
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) => setSortBy(e.target.value)}
+                                        className="pl-9 pr-8 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue text-sm font-medium appearance-none cursor-pointer hover:border-gray-300 transition-colors"
+                                    >
+                                        <option value="newest">Најнови</option>
+                                        <option value="price-asc">Цена: Ниска до Висока</option>
+                                        <option value="price-desc">Цена: Висока до Ниска</option>
+                                        <option value="name">Име А-Ш</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Active category chip */}
-                    {selectedCategory && (
-                        <div className="mt-3 flex items-center gap-2">
-                            <span className="text-xs text-gray-400">Филтер:</span>
+                        {/* Interactive Category Chips */}
+                        <div className="flex items-center gap-2 flex-wrap">
                             <button
                                 onClick={() => setSelectedCategory('')}
-                                className="inline-flex items-center gap-1 bg-jumbo-blue-light text-jumbo-blue text-xs font-medium px-3 py-1.5 rounded-full hover:bg-blue-200 transition-colors"
+                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === ''
+                                    ? 'bg-jumbo-blue text-white shadow-md'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+                                    }`}
                             >
-                                {getCategoryLabel(selectedCategory)}
-                                <span className="text-jumbo-blue/60 ml-1">✕</span>
+                                Сите категории
                             </button>
+                            {CATEGORIES.map(c => (
+                                <button
+                                    key={c.value}
+                                    onClick={() => setSelectedCategory(c.value)}
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === c.value
+                                        ? 'bg-jumbo-blue text-white shadow-md'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+                                        }`}
+                                >
+                                    {c.label}
+                                </button>
+                            ))}
                         </div>
-                    )}
+                    </div>
                 </div>
 
                 {/* Product Grid */}
@@ -161,16 +164,20 @@ export default function CatalogPage() {
                                 key={product.id}
                                 className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                             >
-                                <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-3">
-                                    {product.imageUrl ? (
-                                        <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
-                                    ) : (
-                                        <Package className="w-12 h-12 text-gray-200" />
-                                    )}
-                                </div>
+                                <Link href={`/produkt/${product.id}`}>
+                                    <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-3 cursor-pointer">
+                                        {product.imageUrl ? (
+                                            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                                        ) : (
+                                            <Package className="w-12 h-12 text-gray-200" />
+                                        )}
+                                    </div>
+                                </Link>
                                 <div className="p-4">
                                     <p className="text-xs text-gray-400 mb-1">{getCategoryLabel(product.category)}</p>
-                                    <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 mb-2 min-h-[2.5rem]">{product.name}</h3>
+                                    <Link href={`/produkt/${product.id}`}>
+                                        <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 mb-2 min-h-[2.5rem] hover:text-jumbo-blue transition-colors cursor-pointer">{product.name}</h3>
+                                    </Link>
                                     <div className="flex items-end justify-between mb-3">
                                         <span className="text-lg font-bold text-jumbo-blue">
                                             {product.sellingPrice.toLocaleString()} <span className="text-xs font-normal text-gray-400">ден</span>
@@ -192,13 +199,28 @@ export default function CatalogPage() {
                     </div>
                 ) : (
                     <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center">
-                        <Package className="w-14 h-14 text-gray-300 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Нема резултати</h3>
-                        <p className="text-gray-500 text-sm max-w-sm mx-auto">
+                        <div className="relative w-24 h-24 mx-auto mb-6">
+                            <div className="absolute inset-0 bg-jumbo-blue/5 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
+                            <div className="relative w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center">
+                                <Package className="w-12 h-12 text-gray-300" />
+                            </div>
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                            {searchTerm ? 'Ништо не е пронајдено' : 'Нема артикли во оваа категорија'}
+                        </h3>
+                        <p className="text-gray-500 text-sm max-w-sm mx-auto mb-6">
                             {searchTerm
-                                ? `Нема пронајдено артикли за „${searchTerm}".`
-                                : 'Моментално нема артикли во оваа категорија.'}
+                                ? `Не пронајдовме артикли за „${searchTerm}". Обидете се со друг термин.`
+                                : 'Моментално нема артикли во оваа категорија. Проверете повторно наскоро!'}
                         </p>
+                        {(searchTerm || selectedCategory) && (
+                            <button
+                                onClick={() => { setSearchTerm(''); setSelectedCategory(''); }}
+                                className="inline-flex items-center gap-2 bg-jumbo-blue text-white px-6 py-2.5 rounded-xl font-medium text-sm hover:bg-blue-700 transition-colors"
+                            >
+                                Покажи ги сите играчки
+                            </button>
+                        )}
                     </div>
                 )}
             </div>
@@ -206,6 +228,6 @@ export default function CatalogPage() {
             <Footer />
 
             <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-        </div>
+        </div >
     );
 }

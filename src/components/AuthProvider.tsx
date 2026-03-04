@@ -10,8 +10,10 @@ interface AuthState {
     status: 'active' | 'inactive' | null;
     displayName: string | null;
     loading: boolean;
+    needsPasswordSetup: boolean;
     signIn: (email: string, password: string) => Promise<{ error: string | null }>;
     signUp: (email: string, password: string) => Promise<{ error: string | null }>;
+    setPassword: (password: string) => Promise<{ error: string | null }>;
     signOut: () => Promise<void>;
 }
 
@@ -21,8 +23,10 @@ const AuthContext = createContext<AuthState>({
     status: null,
     displayName: null,
     loading: true,
+    needsPasswordSetup: false,
     signIn: async () => ({ error: null }),
     signUp: async () => ({ error: null }),
+    setPassword: async () => ({ error: null }),
     signOut: async () => { },
 });
 
@@ -36,6 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [status, setStatus] = useState<'active' | 'inactive' | null>(null);
     const [displayName, setDisplayName] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [needsPasswordSetup, setNeedsPasswordSetup] = useState(false);
 
     const supabase = createClient();
 
@@ -86,6 +91,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
+        // Detect invite/recovery tokens in URL hash
+        const hash = window.location.hash;
+        if (hash && hash.includes('access_token')) {
+            const params = new URLSearchParams(hash.substring(1));
+            const type = params.get('type');
+            if (type === 'invite' || type === 'signup' || type === 'recovery') {
+                setNeedsPasswordSetup(true);
+            }
+        }
+
         // Check active session
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (session?.user) {
@@ -123,16 +138,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: error?.message || null };
     };
 
+    const setPassword = async (password: string) => {
+        const { error } = await supabase.auth.updateUser({ password });
+        if (!error) {
+            setNeedsPasswordSetup(false);
+            // Clean up the URL hash
+            window.history.replaceState(null, '', window.location.pathname);
+        }
+        return { error: error?.message || null };
+    };
+
     const signOut = async () => {
         await supabase.auth.signOut();
         setUser(null);
         setRole(null);
         setStatus(null);
         setDisplayName(null);
+        setNeedsPasswordSetup(false);
     };
 
     return (
-        <AuthContext.Provider value={{ user, role, status, displayName, loading, signIn, signUp, signOut }}>
+        <AuthContext.Provider value={{ user, role, status, displayName, loading, needsPasswordSetup, signIn, signUp, setPassword, signOut }}>
             {children}
         </AuthContext.Provider>
     );

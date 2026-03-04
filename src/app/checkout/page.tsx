@@ -35,8 +35,10 @@ export default function CheckoutPage() {
     const supabase = createClient();
 
     useEffect(() => {
-        setMounted(true);
-        setItems(getCart());
+        Promise.resolve().then(() => {
+            setMounted(true);
+            setItems(getCart());
+        });
 
         // Try to auto-fill from saved customer
         const saved = localStorage.getItem('jumbo_customer');

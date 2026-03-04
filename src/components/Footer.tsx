@@ -7,8 +7,8 @@ export default function Footer() {
     return (
         <footer className="bg-gray-900 text-white">
             {/* Main Footer */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
                     {/* Brand */}
                     <div>
                         <Link href="/" className="inline-block mb-4">
@@ -26,10 +26,10 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Contact */}
-                    <div>
-                        <h4 className="font-bold text-sm uppercase tracking-wider mb-4">Контакт</h4>
-                        <ul className="space-y-3 text-sm">
+                    {/* Contact - Center */}
+                    <div className="md:mx-auto">
+                        <h4 className="font-bold text-sm uppercase tracking-wider mb-5 text-gray-400">Контакт</h4>
+                        <ul className="space-y-4 text-sm inline-block text-left text-gray-300">
                             <li className="flex items-start gap-2.5 text-gray-400">
                                 <MapPin size={16} className="text-jumbo-red mt-0.5 shrink-0" />
                                 <span>Народна Револуција 43, Куманово</span>
@@ -52,10 +52,10 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Quick Links */}
+                    {/* Quick Links - Left aligned */}
                     <div>
-                        <h4 className="font-bold text-sm uppercase tracking-wider mb-4">Навигација</h4>
-                        <ul className="space-y-2 text-sm">
+                        <h4 className="font-bold text-sm uppercase tracking-wider mb-5 text-gray-400">Навигација</h4>
+                        <ul className="space-y-4 text-sm inline-block text-left text-gray-300">
                             <li><Link href="/" className="text-gray-400 hover:text-white transition-colors">Почетна</Link></li>
                             <li><Link href="/catalog" className="text-gray-400 hover:text-white transition-colors">Каталог</Link></li>
                             <li><Link href="/uslovi-za-isporaka" className="text-gray-400 hover:text-white transition-colors">Услови за испорака</Link></li>
@@ -67,13 +67,10 @@ export default function Footer() {
 
             {/* Bottom Bar */}
             <div className="border-t border-white/10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-                    <p className="text-xs text-gray-500">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-center">
+                    <p className="text-sm text-gray-400">
                         © {new Date().getFullYear()} Интер Стар Џамбо. Сите права задржани.
                     </p>
-                    <div className="flex gap-4 text-xs text-gray-500">
-                        <Link href="/uslovi-za-isporaka" className="hover:text-white transition-colors">Услови за испорака</Link>
-                    </div>
                 </div>
             </div>
         </footer>

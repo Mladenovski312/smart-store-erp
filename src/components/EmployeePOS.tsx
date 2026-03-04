@@ -43,7 +43,7 @@ export default function EmployeePOS({ products, onSaleComplete }: EmployeePOSPro
             {justSold && (
                 <div className="mb-6 bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl flex items-center gap-3 animate-in fade-in">
                     <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-                    <span className="font-medium">„{justSold}" е продаден!</span>
+                    <span className="font-medium">&bdquo;{justSold}&ldquo; е продаден!</span>
                 </div>
             )}
 
@@ -100,7 +100,7 @@ export default function EmployeePOS({ products, onSaleComplete }: EmployeePOSPro
                 <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
                     <ShoppingCart className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                     <p className="text-gray-500 font-medium">
-                        {searchTerm ? `Нема резултати за „${searchTerm}"` : 'Нема артикли на залиха'}
+                        {searchTerm ? `Нема резултати за &bdquo;${searchTerm}&ldquo;` : 'Нема артикли на залиха'}
                     </p>
                 </div>
             )}
