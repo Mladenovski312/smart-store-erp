@@ -18,6 +18,7 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
     const [saved, setSaved] = useState(false);
     const cameraInputRef = useRef<HTMLInputElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const selectedFileRef = useRef<File | null>(null);
 
     // Form State
     const [name, setName] = useState('');
@@ -36,9 +37,11 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
         setShowOriginal(false);
         setSaved(false);
 
-        // Run AI recognition and background removal in parallel
+        // Store file for optional background removal later
+        selectedFileRef.current = file;
+
+        // Run only AI recognition automatically
         processImageWithAI(file);
-        removeBackground(file);
     };
 
     const processImageWithAI = async (file: File) => {
@@ -80,6 +83,10 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
         } finally {
             setIsRemovingBg(false);
         }
+    };
+
+    const handleRemoveBgClick = () => {
+        if (selectedFileRef.current) removeBackground(selectedFileRef.current);
     };
 
     const [validationErrors, setValidationErrors] = useState<string[]>([]);
@@ -127,6 +134,7 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
             setOriginalUrl(null);
             setShowOriginal(false);
             setSaved(false);
+            selectedFileRef.current = null;
         }, 1500);
     };
 
@@ -181,6 +189,18 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
                             </div>
                         )}
                     </div>
+
+                    {/* Remove Background button — only shown when image is loaded and BG hasn't been removed yet */}
+                    {previewUrl && !isRemovingBg && originalUrl === previewUrl && (
+                        <button
+                            type="button"
+                            onClick={handleRemoveBgClick}
+                            className="w-full flex items-center justify-center gap-2 bg-jumbo-blue/10 text-jumbo-blue hover:bg-jumbo-blue hover:text-white py-2.5 px-4 rounded-xl text-sm font-semibold transition-colors"
+                        >
+                            <Eraser size={16} />
+                            Отстрани позадина
+                        </button>
+                    )}
 
                     {/* Original/Clean toggle */}
                     {originalUrl && previewUrl && originalUrl !== previewUrl && !isRemovingBg && (
