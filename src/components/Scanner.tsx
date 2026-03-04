@@ -22,6 +22,7 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
 
     // Form State
     const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
     const [purchasePrice, setPurchasePrice] = useState('');
     const [sellingPrice, setSellingPrice] = useState('');
@@ -113,6 +114,7 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
 
         await saveProduct({
             name: name.trim(),
+            description: description.trim() || undefined,
             category,
             imageUrl: previewUrl || undefined,
             purchasePrice: parseFloat(purchasePrice) || 0,
@@ -126,6 +128,7 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
         // Reset form after short delay
         setTimeout(() => {
             setName('');
+            setDescription('');
             setCategory('');
             setPurchasePrice('');
             setSellingPrice('');
@@ -233,7 +236,7 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
                         </button>
                     </div>
                     <p className="text-xs text-gray-400 text-center">
-                        💡 Камера работи само на телефон. На компјутер, користете „Датотека".
+                        💡 Камера работи само на телефон. На компјутер, користете &bdquo;Датотека&ldquo;.
                     </p>
 
                     {/* Hidden file inputs */}
@@ -289,6 +292,17 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
                                     <option key={c.value} value={c.value}>{c.label}</option>
                                 ))}
                             </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Опис (за продуктна страница)</label>
+                            <textarea
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                placeholder="Внесете опис на производот... (секој ред на нова линија ќе биде посебен параграф)"
+                                rows={4}
+                                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-jumbo-blue focus:border-jumbo-blue outline-none transition-all resize-y"
+                            />
                         </div>
 
                         <div>

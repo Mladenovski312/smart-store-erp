@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/lib/supabase';
-import { UserPlus, ShieldCheck, UserCheck, Mail, AlertCircle, CheckCircle, Loader2, Send, Ban, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, UserCheck, Mail, AlertCircle, CheckCircle, Loader2, Send, Ban, CheckCircle2 } from 'lucide-react';
 
 interface UserRole {
     id: string;
@@ -261,8 +261,8 @@ export default function SettingsPanel() {
                                             <button
                                                 onClick={() => toggleStatus(u.id, u.email, u.status)}
                                                 className={`p-2 transition-colors rounded-lg flex items-center justify-center ${u.status === 'active'
-                                                        ? 'text-gray-400 hover:text-red-500 hover:bg-red-50'
-                                                        : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
+                                                    ? 'text-gray-400 hover:text-red-500 hover:bg-red-50'
+                                                    : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
                                                     }`}
                                                 title={u.status === 'active' ? 'Деактивирај' : 'Активирај'}
                                             >

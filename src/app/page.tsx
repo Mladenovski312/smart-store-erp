@@ -9,7 +9,7 @@ import Link from 'next/link';
 import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
 
-export default function StorefrontHome() {
+export default function Home() {
     const [mounted, setMounted] = useState(false);
     const [products, setProducts] = useState<Product[]>([]);
     const [cartOpen, setCartOpen] = useState(false);
@@ -45,7 +45,7 @@ export default function StorefrontHome() {
     }
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white text-gray-900">
             {/* ═══ Navigation ═══ */}
             <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -101,29 +101,25 @@ export default function StorefrontHome() {
                             Над 20 години радост за децата
                         </div>
 
-                        <h1 className="text-4xl md:text-6xl font-black text-white leading-tight mb-6 tracking-tight">
-                            Најголемиот избор на<br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-300 to-jumbo-red">играчки</span> во Куманово
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.1] mb-6 drop-shadow-lg">
+                            Најголемиот избор на играчки во <span className="text-jumbo-red">Куманово</span>
                         </h1>
-
-                        <p className="text-blue-100 text-lg md:text-xl mb-8 leading-relaxed max-w-lg">
-                            Lego, Barbie, Paw Patrol, Bruder и уште многу повеќе.
-                            Дојдете и побарајте ја вашата омилена играчка!
+                        <p className="text-lg md:text-xl text-blue-50 mb-10 leading-relaxed font-medium max-w-xl drop-shadow">
+                            Вашата омилена локална продавница за играчки. Нарачајте онлајн со брза достава низ цела Македонија и плаќање при достава (COD).
                         </p>
-
                         <div className="flex flex-col sm:flex-row gap-4">
                             <Link
                                 href="/catalog"
-                                className="inline-flex items-center justify-center gap-2 bg-jumbo-red hover:bg-red-700 text-white px-8 py-3.5 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                                className="bg-jumbo-red hover:bg-red-600 text-white font-bold px-8 py-4 rounded-xl text-lg transition-all hover:scale-105 active:scale-95 text-center shadow-lg shadow-red-500/25 flex items-center justify-center gap-2"
                             >
-                                <ShoppingBag size={20} />
+                                <ShoppingBag size={22} />
                                 Погледни ги играчките
                             </Link>
                             <Link
                                 href="/lokacija"
-                                className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white px-8 py-3.5 rounded-xl font-semibold text-lg transition-all backdrop-blur-sm border border-white/20"
+                                className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold px-8 py-4 rounded-xl text-lg transition-all hover:scale-105 active:scale-95 text-center flex items-center justify-center gap-2 backdrop-blur-sm"
                             >
-                                <MapPin size={20} />
+                                <MapPin size={22} />
                                 Најди не
                             </Link>
                         </div>
@@ -134,11 +130,11 @@ export default function StorefrontHome() {
             {/* ═══ Trust Badges ═══ */}
             <section className="border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        <TrustBadge icon={<Shield />} title="Оригинални брендови" subtitle="100% автентични" />
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                         <TrustBadge icon={<Truck />} title="Достава низ МК" subtitle="Испорака до врата" />
                         <TrustBadge icon={<Star />} title="20+ години искуство" subtitle="Од 2004 година" />
-                        <TrustBadge icon={<Gift />} title="Подарок пакување" subtitle="Бесплатно" />
+                        <TrustBadge icon={<Shield />} title="Познати брендови" subtitle="Широк асортиман" />
+                        <TrustBadge icon={<Gift />} title="Подарок пакување" subtitle="Бесплатно, по желба" />
                     </div>
                 </div>
             </section>
@@ -152,7 +148,7 @@ export default function StorefrontHome() {
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {(categoryGroups.length > 0 ? categoryGroups : CATEGORIES.map(c => ({ ...c, count: 0 }))).map(cat => (
+                        {categoryGroups.map(cat => (
                             <Link
                                 key={cat.value}
                                 href={`/catalog?category=${encodeURIComponent(cat.value)}`}
@@ -207,24 +203,43 @@ export default function StorefrontHome() {
             )}
 
             {/* ═══ Top Brands ═══ */}
-            <section className="py-14 md:py-20 border-b border-gray-100">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-10 text-center">ВРВНИ БРЕНДОВИ</h2>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6 md:gap-8 items-center">
+            <section className="py-14 md:py-20 border-b border-gray-100 overflow-hidden bg-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 text-center">
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-wide uppercase">ВРВНИ БРЕНДОВИ</h2>
+                </div>
+
+                <div className="relative flex overflow-hidden group py-4">
+                    <div className="absolute left-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+
+                    <div className="flex min-w-full shrink-0 items-center justify-around gap-20 px-8 animate-marquee group-hover:[animation-play-state:paused]">
                         {[
                             { name: 'LEGO', src: '/brands/lego.png' },
                             { name: 'Bruder', src: '/brands/bruder.png' },
                             { name: 'Clementoni', src: '/brands/clementoni.png' },
                             { name: 'Kikka Boo', src: '/brands/kikkaboo.png' },
-                            { name: 'Barbie', src: null },
-                            { name: 'Paw Patrol', src: null },
-                        ].map(brand => (
-                            <div key={brand.name} className="flex items-center justify-center h-20 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300">
-                                {brand.src ? (
-                                    <img src={brand.src} alt={brand.name} className="max-h-14 max-w-[120px] object-contain" />
-                                ) : (
-                                    <span className="text-lg font-bold text-gray-400 hover:text-gray-700 transition-colors">{brand.name}</span>
-                                )}
+                            { name: 'Barbie', src: '/brands/barbie.svg' },
+                            { name: 'Paw Patrol', src: '/brands/pawpatrol.png' },
+                            { name: 'Nip', src: '/brands/nip.png' },
+                        ].map((brand, i) => (
+                            <div key={`${brand.name}-1-${i}`} className="inline-flex items-center justify-center h-28 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300">
+                                <img src={brand.src} alt={brand.name} className="max-h-24 max-w-[192px] object-contain" />
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="flex min-w-full shrink-0 items-center justify-around gap-20 px-8 animate-marquee group-hover:[animation-play-state:paused]" aria-hidden="true">
+                        {[
+                            { name: 'LEGO', src: '/brands/lego.png' },
+                            { name: 'Bruder', src: '/brands/bruder.png' },
+                            { name: 'Clementoni', src: '/brands/clementoni.png' },
+                            { name: 'Kikka Boo', src: '/brands/kikkaboo.png' },
+                            { name: 'Barbie', src: '/brands/barbie.svg' },
+                            { name: 'Paw Patrol', src: '/brands/pawpatrol.png' },
+                            { name: 'Nip', src: '/brands/nip.png' },
+                        ].map((brand, i) => (
+                            <div key={`${brand.name}-2-${i}`} className="inline-flex items-center justify-center h-28 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300">
+                                <img src={brand.src} alt={brand.name} className="max-h-24 max-w-[192px] object-contain" />
                             </div>
                         ))}
                     </div>
@@ -232,7 +247,7 @@ export default function StorefrontHome() {
             </section>
 
             {/* ═══ Delivery Banner ═══ */}
-            <section className="py-12 md:py-16 bg-gradient-to-r from-jumbo-blue via-blue-700 to-indigo-800">
+            <section className="py-12 md:py-16 bg-gradient-to-r from-jumbo-blue via-blue-700 to-indigo-800 text-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="text-center md:text-left">
@@ -272,7 +287,7 @@ export default function StorefrontHome() {
                         <p className="text-gray-600 text-lg leading-relaxed mb-8">
                             Со над 20 години искуство, <strong>Интер Стар Џамбо</strong> е една од најпознатите
                             продавници за играчки во Куманово. Нашата мисија е да донесеме радост на секое
-                            дете преку квалитетни и оригинални играчки од светски познати брендови.
+                            дете преку широк избор на играчки од познати светски брендови.
                         </p>
                         <div className="flex flex-wrap justify-center gap-3">
                             {['LEGO', 'Barbie', 'Paw Patrol', 'Bruder', 'Clementoni', 'Kikka Boo'].map(brand => (
@@ -285,9 +300,67 @@ export default function StorefrontHome() {
                 </div>
             </section>
 
+            {/* ═══ FAQ AI / AEO Section ═══ */}
+            <section className="py-16 bg-gray-50 border-t border-gray-100">
+                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">Често поставувани прашања</h2>
+                    <div className="space-y-6">
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <h3 className="text-lg font-bold text-gray-900 mb-2">Дали Interstar Jumbo врши достава надвор од Куманово?</h3>
+                            <p className="text-gray-600">Да! Иако нашата физичка продавница се наоѓа во Куманово, ние вршиме брза достава низ цела Македонија со опција за плаќање при преземање на пратката (COD).</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <h3 className="text-lg font-bold text-gray-900 mb-2">Каде можам да купам квалитетни играчки во Куманово?</h3>
+                            <p className="text-gray-600">Можете да нè посетите во нашата продавница на ул. Народна Револуција 43 во Куманово, или да ги разгледате сите достапни играчки онлајн преку нашиот каталог.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <Footer />
 
             <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+
+            {/* Structured Data (JSON-LD) for AEO */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "ToyStore",
+                        "name": "Интер Стар Џамбо",
+                        "image": "https://www.interstarjumbo.com/hd_logo.png",
+                        "@id": "https://www.interstarjumbo.com",
+                        "url": "https://www.interstarjumbo.com",
+                        "telephone": "+389 31 422 656",
+                        "address": {
+                            "@type": "PostalAddress",
+                            "streetAddress": "Narodna Revolucija 43",
+                            "addressLocality": "Kumanovo",
+                            "postalCode": "1300",
+                            "addressCountry": "MK"
+                        },
+                        "geo": {
+                            "@type": "GeoCoordinates",
+                            "latitude": 42.1322,
+                            "longitude": 21.7144
+                        },
+                        "openingHoursSpecification": {
+                            "@type": "OpeningHoursSpecification",
+                            "dayOfWeek": [
+                                "Monday",
+                                "Tuesday",
+                                "Wednesday",
+                                "Thursday",
+                                "Friday",
+                                "Saturday"
+                            ],
+                            "opens": "09:00",
+                            "closes": "20:00"
+                        }
+                    })
+                }}
+            />
         </div>
     );
 }
@@ -296,13 +369,13 @@ export default function StorefrontHome() {
 
 function TrustBadge({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) {
     return (
-        <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-jumbo-blue-light text-jumbo-blue rounded-xl flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-blue-50 text-jumbo-blue rounded-xl flex items-center justify-center shrink-0">
                 {icon}
             </div>
             <div>
-                <div className="font-semibold text-gray-900 text-sm">{title}</div>
-                <div className="text-xs text-gray-500">{subtitle}</div>
+                <div className="font-bold text-gray-900 text-base">{title}</div>
+                <div className="text-sm text-gray-500">{subtitle}</div>
             </div>
         </div>
     );
@@ -320,8 +393,8 @@ function ProductCard({ product }: { product: Product }) {
     };
 
     return (
-        <div className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-            <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-3">
+        <Link href={`/produkt/${product.id}`} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-3 relative">
                 {product.imageUrl ? (
                     <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
                 ) : (
@@ -341,13 +414,13 @@ function ProductCard({ product }: { product: Product }) {
                 </div>
                 <button
                     onClick={handleAddToCart}
-                    className="w-full flex items-center justify-center gap-2 bg-jumbo-red/10 text-jumbo-red hover:bg-jumbo-red hover:text-white py-2 rounded-lg text-xs font-semibold transition-colors"
+                    className="w-full flex items-center justify-center gap-2 bg-jumbo-red text-white hover:bg-red-700 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow-md active:scale-95"
                 >
-                    <Plus size={14} />
+                    <Plus size={16} />
                     Додај во кошничка
                 </button>
             </div>
-        </div>
+        </Link>
     );
 }
 
@@ -359,6 +432,7 @@ function getCategoryEmoji(category: string): string {
         'Outdoor & Sports': '⚽',
         'Games & Puzzles': '🧩',
         'Clothing & School': '🎒',
+        'Играчки': '🧸',
         'Разно (Miscellaneous)': '🎁',
     };
     return map[category] || '📦';

@@ -3,6 +3,7 @@
 export interface Product {
     id: string;
     name: string;
+    description?: string;
     category: string;
     imageUrl?: string;
     purchasePrice: number;
@@ -32,6 +33,7 @@ export interface DashboardStats {
 }
 
 export const CATEGORIES = [
+    { value: 'Toys', label: 'Играчки' },
     { value: 'Vehicles & Ride-ons', label: 'Возила и Автомобили на батерии' },
     { value: 'Dolls & Figures', label: 'Кукли и Фигури' },
     { value: 'Baby & Toddler', label: 'Опрема за Бебиња' },

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase';
-import { Package, Clock, Truck, CheckCircle, XCircle, Phone, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
+import { Package, Truck, CheckCircle, XCircle, Phone, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface OrderItem {
     productId: string;

@@ -12,6 +12,7 @@ function dbToProduct(row: Record<string, unknown>): Product {
     return {
         id: row.id as string,
         name: row.name as string,
+        description: row.description as string | undefined,
         category: row.category as string,
         imageUrl: row.image_url as string | undefined,
         purchasePrice: Number(row.purchase_price) || 0,
@@ -48,6 +49,18 @@ export async function getProducts(): Promise<Product[]> {
     return data.map(dbToProduct);
 }
 
+export async function getProductById(id: string): Promise<Product | null> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error || !data) return null;
+    return dbToProduct(data);
+}
+
 export async function saveProduct(
     product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<Product | null> {
@@ -56,6 +69,7 @@ export async function saveProduct(
         .from('products')
         .insert({
             name: product.name,
+            description: product.description || null,
             category: product.category,
             image_url: product.imageUrl || null,
             purchase_price: product.purchasePrice,

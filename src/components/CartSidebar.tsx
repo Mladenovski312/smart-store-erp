@@ -18,13 +18,15 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     };
 
     useEffect(() => {
-        refresh();
+        setTimeout(() => setItems(getCart()), 0);
         window.addEventListener('cart-updated', refresh);
         return () => window.removeEventListener('cart-updated', refresh);
     }, []);
 
     useEffect(() => {
-        if (isOpen) refresh();
+        if (isOpen) {
+            setTimeout(() => setItems(getCart()), 0);
+        }
     }, [isOpen]);
 
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -58,10 +60,20 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     {/* Items */}
                     <div className="flex-1 overflow-y-auto p-4">
                         {items.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center h-full text-center">
-                                <ShoppingCart size={48} className="text-gray-200 mb-4" />
-                                <p className="text-gray-500 font-medium">Кошничката е празна</p>
-                                <p className="text-gray-400 text-sm mt-1">Додадете артикли од каталогот</p>
+                            <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                                <div className="relative mb-6">
+                                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center">
+                                        <ShoppingCart size={36} className="text-gray-300" />
+                                    </div>
+                                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-jumbo-blue/10 rounded-full flex items-center justify-center animate-bounce" style={{ animationDuration: '2s' }}>
+                                        <span className="text-jumbo-blue text-xs font-bold">0</span>
+                                    </div>
+                                </div>
+                                <p className="text-gray-900 font-semibold text-lg mb-1">Кошничката е празна</p>
+                                <p className="text-gray-400 text-sm mb-6">Разгледајте ги нашите играчки и додадете нешто!</p>
+                                <Link href="/catalog" onClick={onClose} className="inline-flex items-center gap-2 bg-jumbo-blue text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors">
+                                    Кон каталогот
+                                </Link>
                             </div>
                         ) : (
                             <div className="space-y-4">
