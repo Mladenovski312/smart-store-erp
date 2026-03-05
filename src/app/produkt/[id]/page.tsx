@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { getProductById } from '@/lib/store';
 import { addToCart, getCartCount } from '@/lib/cart';
-import { Product, getCategoryLabel } from '@/lib/types';
+import { Product, getCategoryLabel, formatPrice } from '@/lib/types';
 import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
 
@@ -52,6 +52,7 @@ export default function ProductDetailPage() {
                 name: product.name,
                 price: product.sellingPrice,
                 imageUrl: product.imageUrl,
+                stock: product.stockQuantity,
             });
         }
         setAddedToCart(true);
@@ -211,7 +212,7 @@ export default function ProductDetailPage() {
                         </h1>
 
                         <p className="text-3xl font-bold text-jumbo-blue mb-6">
-                            {product.sellingPrice.toLocaleString()} <span className="text-base font-normal text-gray-500">ден</span>
+                            {formatPrice(product.sellingPrice)} <span className="text-base font-normal text-gray-500">ден</span>
                         </p>
 
                         {/* Description */}
@@ -247,7 +248,8 @@ export default function ProductDetailPage() {
                                 <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
                                     <button
                                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                        className="p-3 hover:bg-gray-50 transition-colors text-gray-600"
+                                        disabled={quantity <= 1}
+                                        className={`p-3 transition-colors ${quantity <= 1 ? 'bg-gray-50 text-gray-200' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
                                     >
                                         <Minus size={16} />
                                     </button>
@@ -256,7 +258,8 @@ export default function ProductDetailPage() {
                                     </span>
                                     <button
                                         onClick={() => setQuantity(Math.min(product.stockQuantity, quantity + 1))}
-                                        className="p-3 hover:bg-gray-50 transition-colors text-gray-600"
+                                        disabled={quantity >= product.stockQuantity}
+                                        className={`p-3 transition-colors ${quantity >= product.stockQuantity ? 'bg-gray-50 text-gray-200' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
                                     >
                                         <Plus size={16} />
                                     </button>
@@ -348,7 +351,7 @@ export default function ProductDetailPage() {
                 <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex items-center gap-3 lg:hidden z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
                     <div className="flex-1">
                         <p className="text-xs text-gray-500 truncate">{product.name}</p>
-                        <p className="text-lg font-bold text-jumbo-blue">{product.sellingPrice.toLocaleString()} ден</p>
+                        <p className="text-lg font-bold text-jumbo-blue">{formatPrice(product.sellingPrice)} ден</p>
                     </div>
                     <button
                         onClick={handleAddToCart}

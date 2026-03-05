@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Product, getCategoryLabel } from '@/lib/types';
+import { Product, getCategoryLabel, formatPrice } from '@/lib/types';
 import { recordSale } from '@/lib/store';
 import { ShoppingCart, CheckCircle2, Search, Package } from 'lucide-react';
 
@@ -87,7 +87,7 @@ export default function EmployeePOS({ products, onSaleComplete }: EmployeePOSPro
                             {/* Price & Stock — employee sees selling price only */}
                             <div className="flex items-end justify-between">
                                 <span className="text-lg font-bold text-jumbo-blue">
-                                    {product.sellingPrice.toLocaleString()} <span className="text-xs font-normal">ден</span>
+                                    {formatPrice(product.sellingPrice)} <span className="text-xs font-normal">ден</span>
                                 </span>
                                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${product.stockQuantity <= 2 ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
                                     {product.stockQuantity}
@@ -119,7 +119,7 @@ export default function EmployeePOS({ products, onSaleComplete }: EmployeePOSPro
                             </div>
                             <div>
                                 <h3 className="font-bold text-gray-900">{sellTarget.name}</h3>
-                                <p className="text-jumbo-blue font-semibold">{sellTarget.sellingPrice.toLocaleString()} ден</p>
+                                <p className="text-jumbo-blue font-semibold">{formatPrice(sellTarget.sellingPrice)} ден</p>
                             </div>
                         </div>
 
@@ -149,7 +149,7 @@ export default function EmployeePOS({ products, onSaleComplete }: EmployeePOSPro
                         </div>
 
                         <div className="text-center text-sm text-gray-500 mb-4">
-                            Вкупно: <span className="font-bold text-lg text-gray-900">{(sellTarget.sellingPrice * sellQty).toLocaleString()} ден</span>
+                            Вкупно: <span className="font-bold text-lg text-gray-900">{formatPrice(sellTarget.sellingPrice * sellQty)} ден</span>
                         </div>
 
                         <div className="flex gap-3">

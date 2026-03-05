@@ -46,3 +46,11 @@ export const CATEGORIES = [
 export function getCategoryLabel(value: string): string {
     return CATEGORIES.find(c => c.value === value)?.label || value;
 }
+
+/**
+ * Formats a number as a price string with a dot as the thousands separator.
+ * Example: 1000 -> "1.000"
+ */
+export function formatPrice(price: number): string {
+    return Math.round(price).toLocaleString('de-DE');
+}

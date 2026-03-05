@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { ShoppingCart, X, Trash2, Plus, Minus } from 'lucide-react';
-import { getCart, updateCartQuantity, removeFromCart, getCartTotal, getCartCount, CartItem } from '@/lib/cart';
+import { getCart, updateCartQuantity, removeFromCart, getCartTotal, getCartCount, syncCartWithServer, CartItem } from '@/lib/cart';
 import Link from 'next/link';
+import { formatPrice } from '@/lib/types';
 
 interface CartSidebarProps {
     isOpen: boolean;
@@ -25,7 +26,9 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
     useEffect(() => {
         if (isOpen) {
-            setTimeout(() => setItems(getCart()), 0);
+            syncCartWithServer().then(() => {
+                setItems(getCart());
+            });
         }
     }, [isOpen]);
 
@@ -91,27 +94,28 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                         {/* Details */}
                                         <div className="flex-1 min-w-0">
                                             <h4 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-tight">{item.name}</h4>
-                                            <p className="text-sm font-bold text-jumbo-blue mt-1">{item.price.toLocaleString()} ден</p>
+                                            <p className="text-sm font-bold text-jumbo-blue mt-1">{formatPrice(item.price)} ден</p>
 
                                             {/* Quantity Controls */}
                                             <div className="flex items-center gap-2 mt-2">
                                                 <button
                                                     onClick={() => {
-                                                        if (item.quantity <= 1) {
-                                                            removeFromCart(item.productId);
-                                                        } else {
+                                                        if (item.quantity > 1) {
                                                             updateCartQuantity(item.productId, item.quantity - 1);
+                                                            refresh();
                                                         }
-                                                        refresh();
                                                     }}
-                                                    className="w-7 h-7 bg-white border border-gray-200 rounded-md flex items-center justify-center hover:bg-gray-100 transition-colors"
+                                                    disabled={item.quantity <= 1}
+                                                    className={`w-7 h-7 border rounded-md flex items-center justify-center transition-colors ${item.quantity <= 1 ? 'bg-gray-50 text-gray-200 border-gray-100' : 'bg-gray-300 text-gray-800 hover:bg-gray-400 border-gray-300'}`}
                                                 >
                                                     <Minus size={12} />
                                                 </button>
                                                 <span className="text-sm font-semibold w-6 text-center">{item.quantity}</span>
                                                 <button
                                                     onClick={() => { updateCartQuantity(item.productId, item.quantity + 1); refresh(); }}
-                                                    className="w-7 h-7 bg-white border border-gray-200 rounded-md flex items-center justify-center hover:bg-gray-100 transition-colors"
+                                                    disabled={item.quantity >= item.stock}
+                                                    title={item.quantity >= item.stock ? `Достапни се само ${item.stock} ком.` : ''}
+                                                    className={`w-7 h-7 border rounded-md flex items-center justify-center transition-colors ${item.quantity >= item.stock ? 'bg-gray-50 text-gray-200 border-gray-100' : 'bg-gray-300 text-gray-800 hover:bg-gray-400 border-gray-300'}`}
                                                 >
                                                     <Plus size={12} />
                                                 </button>
@@ -136,7 +140,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                         <div className="border-t border-gray-100 p-4 space-y-3">
                             <div className="flex justify-between items-center">
                                 <span className="text-gray-500 font-medium">Меѓузбир:</span>
-                                <span className="text-xl font-bold text-gray-900">{total.toLocaleString()} ден</span>
+                                <span className="text-xl font-bold text-gray-900">{formatPrice(total)} ден</span>
                             </div>
                             <Link
                                 href="/kosnicka"

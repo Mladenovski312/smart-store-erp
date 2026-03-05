@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Minus, Plus, Trash2, ShoppingBag, ChevronLeft, ShoppingCart } from 'lucide-react';
-import { getCart, updateCartQuantity, removeFromCart, getCartTotal, getCartCount, CartItem } from '@/lib/cart';
+import { getCart, updateCartQuantity, removeFromCart, getCartTotal, getCartCount, syncCartWithServer, CartItem } from '@/lib/cart';
 import Link from 'next/link';
+import { formatPrice } from '@/lib/types';
 import Footer from '@/components/Footer';
 
 export default function CartPage() {
@@ -17,6 +18,7 @@ export default function CartPage() {
     useEffect(() => {
         setMounted(true);
         refresh();
+        syncCartWithServer();
         window.addEventListener('cart-updated', refresh);
         return () => window.removeEventListener('cart-updated', refresh);
     }, []);
@@ -109,7 +111,7 @@ export default function CartPage() {
                                         </div>
                                         <div className="min-w-0">
                                             <p className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">{item.name}</p>
-                                            <p className="text-xs text-gray-400 mt-0.5">{item.price.toLocaleString()} ден / ком</p>
+                                            <p className="text-xs text-gray-400 mt-0.5">{formatPrice(item.price)} ден / ком</p>
                                         </div>
                                     </div>
 
@@ -117,17 +119,19 @@ export default function CartPage() {
                                     <div className="flex items-center gap-2 w-28 justify-center">
                                         <button
                                             onClick={() => {
-                                                if (item.quantity <= 1) removeFromCart(item.productId);
-                                                else updateCartQuantity(item.productId, item.quantity - 1);
+                                                if (item.quantity > 1) updateCartQuantity(item.productId, item.quantity - 1);
                                             }}
-                                            className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                                            disabled={item.quantity <= 1}
+                                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${item.quantity <= 1 ? 'bg-gray-50 text-gray-200 border border-gray-100' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
                                         >
                                             <Minus size={14} />
                                         </button>
                                         <span className="w-8 text-center font-semibold text-sm">{item.quantity}</span>
                                         <button
                                             onClick={() => updateCartQuantity(item.productId, item.quantity + 1)}
-                                            className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                                            disabled={item.quantity >= item.stock}
+                                            title={item.quantity >= item.stock ? `Достапни се само ${item.stock} ком.` : ''}
+                                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${item.quantity >= item.stock ? 'bg-gray-50 text-gray-200 border border-gray-100' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
                                         >
                                             <Plus size={14} />
                                         </button>
@@ -135,7 +139,7 @@ export default function CartPage() {
 
                                     {/* Price */}
                                     <div className="w-24 text-right">
-                                        <span className="font-bold text-gray-900 text-sm">{(item.price * item.quantity).toLocaleString()} ден</span>
+                                        <span className="font-bold text-gray-900 text-sm">{formatPrice(item.price * item.quantity)} ден</span>
                                     </div>
 
                                     {/* Remove */}
@@ -153,7 +157,7 @@ export default function CartPage() {
                         <div className="bg-white rounded-2xl border border-gray-100 p-6">
                             <div className="flex items-center justify-between mb-4">
                                 <span className="text-gray-600 font-medium">Меѓузбир</span>
-                                <span className="text-xl font-bold text-gray-900">{subtotal.toLocaleString()} ден</span>
+                                <span className="text-xl font-bold text-gray-900">{formatPrice(subtotal)} ден</span>
                             </div>
                             <p className="text-xs text-gray-400 mb-5">
                                 *Цената за испорака ќе биде одредена од доставувачката компанија.

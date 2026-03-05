@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import { Product, getCategoryLabel, CATEGORIES } from '@/lib/types';
+import { Product, getCategoryLabel, CATEGORIES, formatPrice } from '@/lib/types';
 import { recordSale, deleteProduct, updateProduct, uploadProductImage } from '@/lib/store';
 import { Trash2, MinusCircle, Search, Filter, Pencil, Upload, X } from 'lucide-react';
 
@@ -160,7 +160,7 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
 
                             <div className="flex items-end justify-between">
                                 <div>
-                                    <div className="text-lg font-bold text-jumbo-blue">{product.sellingPrice.toLocaleString()} ден</div>
+                                    <div className="text-lg font-bold text-jumbo-blue">{formatPrice(product.sellingPrice)} ден</div>
                                     <div className={`text-xs font-medium mt-0.5 ${product.stockQuantity <= 2 ? 'text-red-500' : 'text-green-600'}`}>
                                         {product.stockQuantity > 0 ? `${product.stockQuantity} на залиха` : 'Нема залиха'}
                                     </div>
@@ -212,7 +212,7 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
                         <div className="bg-gray-50 rounded-lg p-4 mb-4">
                             <div className="flex justify-between text-sm mb-2">
                                 <span className="text-gray-500">Цена:</span>
-                                <span className="font-semibold">{sellModal.sellingPrice.toLocaleString()} ден</span>
+                                <span className="font-semibold">{formatPrice(sellModal.sellingPrice)} ден</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">На залиха:</span>
@@ -230,7 +230,7 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
                             className="w-full p-2.5 border border-gray-200 rounded-lg mb-2 outline-none focus:ring-2 focus:ring-jumbo-red"
                         />
                         <div className="text-right text-sm text-gray-500 mb-4">
-                            Вкупно: <span className="font-bold text-gray-900">{(sellModal.sellingPrice * sellQty).toLocaleString()} ден</span>
+                            Вкупно: <span className="font-bold text-gray-900">{formatPrice(sellModal.sellingPrice * sellQty)} ден</span>
                         </div>
 
                         <div className="flex gap-3">
@@ -254,63 +254,66 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
             {/* Edit Modal */}
             {editModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
-                        <div className="flex items-center justify-between mb-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95 flex flex-col">
+                        <div className="flex items-center justify-between mb-5 shrink-0">
                             <h3 className="text-lg font-bold text-gray-900">Измени артикл</h3>
                             <button onClick={() => setEditModal(null)} className="p-1 text-gray-400 hover:text-gray-600 rounded"><X size={20} /></button>
                         </div>
 
-                        {/* Image */}
-                        <div className="mb-4">
-                            <div className="w-full h-40 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden mb-2">
-                                {editImagePreview ? (
-                                    <img src={editImagePreview} alt="" className="h-full object-contain" />
-                                ) : (
-                                    <span className="text-gray-300 text-sm">Нема слика</span>
-                                )}
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-2">
+                            {/* Image - Left Column */}
+                            <div className="md:col-span-2 flex flex-col">
+                                <div className="w-full aspect-square bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden mb-3">
+                                    {editImagePreview ? (
+                                        <img src={editImagePreview} alt="" className="w-full h-full object-contain p-2" />
+                                    ) : (
+                                        <span className="text-gray-300 text-sm">Нема слика</span>
+                                    )}
+                                </div>
+                                <button type="button" onClick={() => editFileRef.current?.click()} className="w-full flex justify-center items-center gap-2 text-sm text-jumbo-blue hover:underline font-medium py-2.5 bg-blue-50 hover:bg-blue-100 transition-colors rounded-xl">
+                                    <Upload size={16} /> Промени слика
+                                </button>
+                                <input ref={editFileRef} type="file" accept="image/*" onChange={handleEditImageChange} className="hidden" />
                             </div>
-                            <button type="button" onClick={() => editFileRef.current?.click()} className="flex items-center gap-2 text-sm text-jumbo-blue hover:underline font-medium">
-                                <Upload size={14} /> Промени слика
-                            </button>
-                            <input ref={editFileRef} type="file" accept="image/*" onChange={handleEditImageChange} className="hidden" />
+
+                            {/* Form - Right Column */}
+                            <div className="md:col-span-3 space-y-3 flex flex-col">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Име</label>
+                                    <input type="text" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Категорија</label>
+                                    <select value={editForm.category} onChange={e => setEditForm({ ...editForm, category: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue">
+                                        {CATEGORIES.map(c => (
+                                            <option key={c.value} value={c.value}>{c.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex-1 flex flex-col min-h-[100px]">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Опис</label>
+                                    <textarea value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} className="w-full flex-1 min-h-[100px] p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue resize-y" />
+                                </div>
+                                <div className="grid grid-cols-3 gap-3 pt-2">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-500 mb-1">Набавна (ден)</label>
+                                        <input type="number" min="0" value={editForm.purchasePrice} onChange={e => setEditForm({ ...editForm, purchasePrice: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-500 mb-1">Продажна (ден)</label>
+                                        <input type="number" min="0" value={editForm.sellingPrice} onChange={e => setEditForm({ ...editForm, sellingPrice: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-500 mb-1">Залиха</label>
+                                        <input type="number" min="0" value={editForm.stockQuantity} onChange={e => setEditForm({ ...editForm, stockQuantity: Math.max(0, parseInt(e.target.value) || 0).toString() })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="space-y-3">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Име</label>
-                                <input type="text" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Категорија</label>
-                                <select value={editForm.category} onChange={e => setEditForm({ ...editForm, category: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue">
-                                    {CATEGORIES.map(c => (
-                                        <option key={c.value} value={c.value}>{c.label}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Опис</label>
-                                <textarea value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} rows={3} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue resize-y" />
-                            </div>
-                            <div className="grid grid-cols-3 gap-3">
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Набавна (ден)</label>
-                                    <input type="number" value={editForm.purchasePrice} onChange={e => setEditForm({ ...editForm, purchasePrice: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Продажна (ден)</label>
-                                    <input type="number" value={editForm.sellingPrice} onChange={e => setEditForm({ ...editForm, sellingPrice: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Залиха</label>
-                                    <input type="number" value={editForm.stockQuantity} onChange={e => setEditForm({ ...editForm, stockQuantity: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-3 mt-6">
-                            <button onClick={() => setEditModal(null)} className="flex-1 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Откажи</button>
-                            <button onClick={handleEditSave} disabled={isSaving || !editForm.name.trim()} className="flex-1 py-2.5 bg-jumbo-blue text-white rounded-lg text-sm font-bold hover:bg-blue-800 transition-colors disabled:opacity-50">
+                        <div className="flex gap-3 mt-4 pt-5 border-t border-gray-100 shrink-0">
+                            <button onClick={() => setEditModal(null)} className="flex-1 py-3 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Откажи</button>
+                            <button onClick={handleEditSave} disabled={isSaving || !editForm.name.trim()} className="flex-1 py-3 bg-jumbo-blue text-white rounded-xl text-sm font-bold hover:bg-blue-800 transition-colors disabled:opacity-50">
                                 {isSaving ? 'Се зачувува...' : 'Зачувај промени'}
                             </button>
                         </div>

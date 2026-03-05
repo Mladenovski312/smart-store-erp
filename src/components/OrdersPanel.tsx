@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase';
 import { Package, Truck, CheckCircle, XCircle, Phone, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
+import { formatPrice } from '@/lib/types';
 
 interface OrderItem {
     productId: string;
@@ -175,7 +176,7 @@ export default function OrdersPanel() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <span className="font-bold text-jumbo-blue text-sm">{Number(order.total).toLocaleString()} ден</span>
+                                        <span className="font-bold text-jumbo-blue text-sm">{formatPrice(order.total)} ден</span>
                                         {isExpanded ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
                                     </div>
                                 </button>
@@ -207,7 +208,7 @@ export default function OrdersPanel() {
                                             {order.items.map((item, i) => (
                                                 <div key={i} className="flex justify-between text-sm py-1">
                                                     <span className="text-gray-700">{item.quantity}x {item.name}</span>
-                                                    <span className="font-medium">{(item.price * item.quantity).toLocaleString()} ден</span>
+                                                    <span className="font-medium">{formatPrice(item.price * item.quantity)} ден</span>
                                                 </div>
                                             ))}
                                             <div className="border-t border-gray-200 mt-2 pt-2 flex justify-between text-sm">
