@@ -121,7 +121,7 @@ export default function OrdersPanel() {
     return (
         <div className="max-w-3xl mx-auto space-y-6">
             {/* Filter Tabs */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
                 {[
                     { value: 'all', label: `Сите (${orders.length})` },
                     { value: 'pending', label: `За обработка (${pendingCount})` },
@@ -132,9 +132,9 @@ export default function OrdersPanel() {
                     <button
                         key={tab.value}
                         onClick={() => setFilter(tab.value)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${filter === tab.value
-                            ? 'bg-jumbo-blue text-white'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${filter === tab.value
+                            ? 'bg-jumbo-blue text-white shadow-md transform scale-105'
+                            : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
                             }`}
                     >
                         {tab.label}

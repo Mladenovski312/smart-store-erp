@@ -119,10 +119,6 @@ export default function DashboardLayout() {
 
           {activeTab === 'scanner' && (
             <>
-              <header className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900">Регистрација на нов продукт</h2>
-                <p className="text-gray-500 text-sm mt-1">Сликајте за автоматско препознавање со помош на вештачка интелигенција.</p>
-              </header>
               <ErrorBoundary fallbackMessage="Грешка при скенирање.">
                 <Scanner onProductSaved={() => { refresh(); }} />
               </ErrorBoundary>
@@ -256,10 +252,6 @@ export default function DashboardLayout() {
 
         {activeTab === 'scanner' && (
           <>
-            <header className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">Регистрација на нов продукт</h2>
-              <p className="text-gray-500 text-sm mt-1">Сликајте за автоматско препознавање со помош на вештачка интелигенција.</p>
-            </header>
             <ErrorBoundary fallbackMessage="Грешка при скенирање.">
               <Scanner onProductSaved={() => { refresh(); }} />
             </ErrorBoundary>

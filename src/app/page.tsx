@@ -6,11 +6,11 @@ import { getProducts } from '@/lib/store';
 import { addToCart, getCartCount } from '@/lib/cart';
 import { Product, CATEGORIES, getCategoryLabel } from '@/lib/types';
 import Link from 'next/link';
+import Image from 'next/image';
 import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
 
 export default function Home() {
-    const [mounted, setMounted] = useState(false);
     const [products, setProducts] = useState<Product[]>([]);
     const [cartOpen, setCartOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
@@ -18,7 +18,6 @@ export default function Home() {
     const refreshCartCount = () => setCartCount(getCartCount());
 
     useEffect(() => {
-        setMounted(true);
         getProducts().then(all => setProducts(all.filter(p => p.stockQuantity > 0)));
         refreshCartCount();
         const openCart = () => setCartOpen(true);
@@ -35,14 +34,6 @@ export default function Home() {
         ...c,
         count: products.filter(p => p.category === c.value).length,
     })).filter(c => c.count > 0);
-
-    if (!mounted) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-white">
-                <div className="w-10 h-10 border-4 border-jumbo-blue border-t-transparent rounded-full animate-spin" />
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-white text-gray-900">
@@ -212,37 +203,15 @@ export default function Home() {
                     <div className="absolute left-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
                     <div className="absolute right-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
-                    <div className="flex min-w-full shrink-0 items-center justify-around gap-20 px-8 animate-marquee group-hover:[animation-play-state:paused]">
-                        {[
-                            { name: 'LEGO', src: '/brands/lego.png' },
-                            { name: 'Bruder', src: '/brands/bruder.png' },
-                            { name: 'Clementoni', src: '/brands/clementoni.png' },
-                            { name: 'Kikka Boo', src: '/brands/kikkaboo.png' },
-                            { name: 'Barbie', src: '/brands/barbie.svg' },
-                            { name: 'Paw Patrol', src: '/brands/pawpatrol.png' },
-                            { name: 'Nip', src: '/brands/nip.png' },
-                        ].map((brand, i) => (
-                            <div key={`${brand.name}-1-${i}`} className="inline-flex items-center justify-center h-28 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300">
-                                <img src={brand.src} alt={brand.name} className="max-h-24 max-w-[192px] object-contain" />
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="flex min-w-full shrink-0 items-center justify-around gap-20 px-8 animate-marquee group-hover:[animation-play-state:paused]" aria-hidden="true">
-                        {[
-                            { name: 'LEGO', src: '/brands/lego.png' },
-                            { name: 'Bruder', src: '/brands/bruder.png' },
-                            { name: 'Clementoni', src: '/brands/clementoni.png' },
-                            { name: 'Kikka Boo', src: '/brands/kikkaboo.png' },
-                            { name: 'Barbie', src: '/brands/barbie.svg' },
-                            { name: 'Paw Patrol', src: '/brands/pawpatrol.png' },
-                            { name: 'Nip', src: '/brands/nip.png' },
-                        ].map((brand, i) => (
-                            <div key={`${brand.name}-2-${i}`} className="inline-flex items-center justify-center h-28 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300">
-                                <img src={brand.src} alt={brand.name} className="max-h-24 max-w-[192px] object-contain" />
-                            </div>
-                        ))}
-                    </div>
+                    {[1, 2].map(copy => (
+                        <div key={copy} className="flex min-w-full shrink-0 items-center justify-around gap-20 px-8 animate-marquee group-hover:[animation-play-state:paused]" aria-hidden={copy === 2}>
+                            {BRANDS.map((brand, i) => (
+                                <div key={`${brand.name}-${copy}-${i}`} className="inline-flex items-center justify-center h-28 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300">
+                                    <Image src={brand.src} alt={brand.name} width={192} height={96} className="max-h-24 max-w-[192px] object-contain" loading="lazy" />
+                                </div>
+                            ))}
+                        </div>
+                    ))}
                 </div>
             </section>
 
@@ -329,7 +298,7 @@ export default function Home() {
                         "@context": "https://schema.org",
                         "@type": "ToyStore",
                         "name": "Интер Стар Џамбо",
-                        "image": "https://www.interstarjumbo.com/hd_logo.png",
+                        "image": "https://www.interstarjumbo.com/hd_logo.webp",
                         "@id": "https://www.interstarjumbo.com",
                         "url": "https://www.interstarjumbo.com",
                         "telephone": "+389 31 422 656",
@@ -365,6 +334,18 @@ export default function Home() {
     );
 }
 
+// ─── Constants ──────────────────────────────────────
+
+const BRANDS = [
+    { name: 'LEGO', src: '/brands/lego.png' },
+    { name: 'Bruder', src: '/brands/bruder.png' },
+    { name: 'Clementoni', src: '/brands/clementoni.png' },
+    { name: 'Kikka Boo', src: '/brands/kikkaboo.png' },
+    { name: 'Barbie', src: '/brands/barbie.svg' },
+    { name: 'Paw Patrol', src: '/brands/pawpatrol.webp' },
+    { name: 'Nip', src: '/brands/nip.png' },
+];
+
 // ─── Sub-components ─────────────────────────────────
 
 function TrustBadge({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) {
@@ -396,7 +377,7 @@ function ProductCard({ product }: { product: Product }) {
         <Link href={`/produkt/${product.id}`} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
             <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-3 relative">
                 {product.imageUrl ? (
-                    <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                    <Image src={product.imageUrl} alt={product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="object-contain group-hover:scale-105 transition-transform duration-300 p-3" />
                 ) : (
                     <div className="text-5xl font-bold text-gray-200">{product.name.charAt(0)}</div>
                 )}
