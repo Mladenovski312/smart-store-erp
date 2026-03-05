@@ -35,5 +35,18 @@ E-commerce storefront + internal ERP/POS for **Интер Стар Џамбо** 
 - `npm run build`: Production verification.
 - `npm run lint`: Code quality check.
 
-## Operational Status: STABLE
-The project is currently in a "Compacted" state. All core features (Checkout, Stock, AI Scanner, Emails) are functional. Focus future work on ROI-positive features (Marketing, Real-time alerts, etc.).
+## Performance Rules (DO NOT BREAK)
+- **No `mounted` guards:** Never add `useState(false)` + `useEffect(setMounted)` patterns. They block SSR and kill LCP/FCP. Pages render immediately.
+- **Always `next/image`:** Never use raw `<img>`. Use `fill` + `sizes` for fluid containers, explicit `width`/`height` for fixed-size thumbnails. Always include `alt`.
+- **WebP logos:** `public/hd_logo.webp` and `public/fhd_logo.webp` (compressed from PNG via Sharp). Reference these in JSON-LD and anywhere the logo appears.
+- **Supabase images:** `next.config.ts` has `remotePatterns` for `*.supabase.co` — do not remove.
+
+## Accessibility Rules
+- All icon-only `<button>` and `<a>` elements must have `aria-label` in Macedonian.
+- All `next/image` components must have meaningful `alt` text.
+
+## Operational Status: STABLE — Phase 1 Complete
+Core features and Phase 1 (Performance + Accessibility) are done and deployed.
+- **Mobile PageSpeed: 97/100** (FCP 0.9s, TBT 0ms, CLS 0)
+- **Accessibility:** All icon-only interactive elements labelled with `aria-label`
+- Focus next work on Phase 2: Real-time order alerts, analytics, Stripe.
