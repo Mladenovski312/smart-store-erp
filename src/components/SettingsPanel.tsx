@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/lib/supabase';
-import { ShieldCheck, UserCheck, Mail, AlertCircle, CheckCircle, Loader2, Send, Ban, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, UserCheck, Mail, AlertCircle, CheckCircle, Loader2, UserPlus, Ban, CheckCircle2, Lock } from 'lucide-react';
 
 interface UserRole {
     id: string;
@@ -19,6 +19,7 @@ export default function SettingsPanel() {
     const { user, role } = useAuth();
     const [users, setUsers] = useState<UserRole[]>([]);
     const [newEmail, setNewEmail] = useState('');
+    const [newPassword, setNewPassword] = useState('');
     const [newDisplayName, setNewDisplayName] = useState('');
     const [loading, setLoading] = useState(true);
     const [inviting, setInviting] = useState(false);
@@ -70,7 +71,7 @@ export default function SettingsPanel() {
         e.preventDefault();
         setMessage(null);
 
-        if (!newEmail.trim()) return;
+        if (!newEmail.trim() || !newPassword.trim()) return;
 
         setInviting(true);
 
@@ -91,6 +92,7 @@ export default function SettingsPanel() {
                 },
                 body: JSON.stringify({
                     email: newEmail.trim().toLowerCase(),
+                    password: newPassword,
                     displayName: newDisplayName.trim() || undefined,
                     role: 'employee',
                 }),
@@ -103,6 +105,7 @@ export default function SettingsPanel() {
             } else {
                 setMessage({ type: 'success', text: data.message });
                 setNewEmail('');
+                setNewPassword('');
                 setNewDisplayName('');
                 fetchUsers();
             }
@@ -153,9 +156,9 @@ export default function SettingsPanel() {
         <div className="max-w-2xl mx-auto space-y-8">
             {/* Add Employee Form */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-1">Покани вработен</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Додај вработен</h3>
                 <p className="text-sm text-gray-500 mb-4">
-                    Внесете го email-от на новиот вработен. Тие ќе добијат покана на email за да ја постават лозинката.
+                    Креирајте сметка за нов вработен. Дајте му ги податоците за најава.
                 </p>
 
                 {message && (
@@ -187,6 +190,18 @@ export default function SettingsPanel() {
                             className="w-36 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue text-sm"
                         />
                     </div>
+                    <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <input
+                            type="text"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="Лозинка (мин. 6 карактери)"
+                            required
+                            minLength={6}
+                            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue text-sm"
+                        />
+                    </div>
                     <button
                         type="submit"
                         disabled={inviting}
@@ -195,9 +210,9 @@ export default function SettingsPanel() {
                         {inviting ? (
                             <Loader2 size={16} className="animate-spin" />
                         ) : (
-                            <Send size={16} />
+                            <UserPlus size={16} />
                         )}
-                        {inviting ? 'Се испраќа...' : 'Испрати покана'}
+                        {inviting ? 'Се креира...' : 'Додај вработен'}
                     </button>
                 </form>
             </div>
@@ -287,7 +302,7 @@ export default function SettingsPanel() {
                 <ul className="text-blue-700 space-y-1 ml-5 list-disc">
                     <li><strong>Админ</strong> — Целосен пристап: залиха, продажба, аналитика, поставки.</li>
                     <li><strong>Вработен</strong> — Залиха, додавање артикли, продажба (POS), управување со нарачки.</li>
-                    <li>Поканетиот вработен добива email за да ја постави лозинката.</li>
+                    <li>Админот ја поставува лозинката и му ја дава на вработениот.</li>
                 </ul>
             </div>
         </div>
