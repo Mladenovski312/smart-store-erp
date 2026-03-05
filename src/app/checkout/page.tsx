@@ -22,7 +22,7 @@ export default function CheckoutPage() {
     const [showCityDropdown, setShowCityDropdown] = useState(false);
     const [street, setStreet] = useState('');
     const [note, setNote] = useState('');
-    const [createAccount, setCreateAccount] = useState(false);
+    const [saveData, setSaveData] = useState(false);
     const [acceptTerms, setAcceptTerms] = useState(false);
 
     // State
@@ -52,6 +52,7 @@ export default function CheckoutPage() {
                 setCity(c.city || '');
                 setCitySearch(c.city || '');
                 setStreet(c.street || '');
+                setSaveData(true); // They previously opted in, keep it checked
             } catch { /* ignore */ }
         }
 
@@ -94,53 +95,19 @@ export default function CheckoutPage() {
         setSubmitting(true);
 
         try {
-            // 1. Handle customer creation / lookup
-            let customerId: string | null = null;
-
-            if (createAccount) {
-                // Check if customer exists
-                const { data: existing } = await supabase
-                    .from('customers')
-                    .select('id')
-                    .eq('email', email.trim().toLowerCase())
-                    .maybeSingle();
-
-                if (existing) {
-                    customerId = existing.id;
-                    // Update their info
-                    await supabase.from('customers').update({
-                        first_name: firstName.trim(),
-                        last_name: lastName.trim(),
-                        phone: phone.trim(),
-                        city: city.trim(),
-                        street: street.trim(),
-                    }).eq('id', customerId);
-                } else {
-                    const { data: newCust } = await supabase
-                        .from('customers')
-                        .insert({
-                            first_name: firstName.trim(),
-                            last_name: lastName.trim(),
-                            email: email.trim().toLowerCase(),
-                            phone: phone.trim(),
-                            city: city.trim(),
-                            street: street.trim(),
-                        })
-                        .select('id')
-                        .single();
-                    if (newCust) customerId = newCust.id;
-                }
+            // Save or clear customer info locally based on consent
+            if (saveData) {
+                localStorage.setItem('jumbo_customer', JSON.stringify({
+                    firstName: firstName.trim(),
+                    lastName: lastName.trim(),
+                    email: email.trim(),
+                    phone: phone.trim(),
+                    city: city.trim(),
+                    street: street.trim(),
+                }));
+            } else {
+                localStorage.removeItem('jumbo_customer');
             }
-
-            // Save customer info locally for auto-fill
-            localStorage.setItem('jumbo_customer', JSON.stringify({
-                firstName: firstName.trim(),
-                lastName: lastName.trim(),
-                email: email.trim(),
-                phone: phone.trim(),
-                city: city.trim(),
-                street: street.trim(),
-            }));
 
             // 2. Atomically deduct stock — must happen before order insert so no orphan orders are created on failure
             const stockItems = items.map(i => ({ id: i.productId, quantity: i.quantity }));
@@ -162,7 +129,6 @@ export default function CheckoutPage() {
                 delivery_city: city.trim(),
                 delivery_address: street.trim(),
                 note: note.trim() || null,
-                customer_id: customerId,
                 items: items.map(i => ({
                     productId: i.productId,
                     name: i.name,
@@ -427,17 +393,17 @@ export default function CheckoutPage() {
 
                             {/* Account + Payment */}
                             <section className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
-                                {/* Create Account */}
+                                {/* Save Data Consent */}
                                 <label className="flex items-start gap-3 cursor-pointer">
                                     <input
                                         type="checkbox"
-                                        checked={createAccount}
-                                        onChange={e => setCreateAccount(e.target.checked)}
+                                        checked={saveData}
+                                        onChange={e => setSaveData(e.target.checked)}
                                         className="mt-0.5 w-4 h-4 rounded border-gray-300 text-jumbo-blue focus:ring-jumbo-blue/20"
                                     />
                                     <div>
-                                        <span className="font-semibold text-sm text-gray-900">Креирај Корисничка сметка?</span>
-                                        <p className="text-xs text-gray-500 mt-0.5">Зачувајте ги вашите податоци за побрза нарачка следниот пат.</p>
+                                        <span className="font-semibold text-sm text-gray-900">Зачувај ги моите податоци</span>
+                                        <p className="text-xs text-gray-500 mt-0.5">За побрза нарачка следниот пат. Вашите податоци ќе бидат зачувани само на овој уред.</p>
                                     </div>
                                 </label>
 
