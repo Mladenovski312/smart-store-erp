@@ -15,6 +15,13 @@ To avoid wasting tokens rediscovering established patterns, keep these in mind:
 3. **Database RLS:** Security is handled purely at the database level. If a query fails, it's likely an RLS policy issue, not a frontend bug.
 4. **Resend Emails:** Email templates are inline HTML in `src/app/api/emails/`. No external template library is used.
 
+## 👥 Employee Management
+- Admin creates employee accounts directly in **Поставки** (Settings) with email + password.
+- No invite emails — admin tells the employee their credentials in person.
+- API: `POST /api/invite` uses `supabase.auth.admin.createUser()` with `email_confirm: true`.
+- Roles (`admin`/`employee`) and status (`active`/`inactive`) managed in `user_roles` table.
+- Future improvement: add "change password" option for employees to update their own password.
+
 ## 🗺️ Roadmap: What's Next?
 1. **Real-time Order Alerts:** Add a Supabase Realtime listener to the Admin panel to notify employees immediately when a `pending` order is created.
 2. **User Preferences:** Allow customers to save their details (address, phone) in `localStorage` across sessions (partially implemented in `/checkout`).

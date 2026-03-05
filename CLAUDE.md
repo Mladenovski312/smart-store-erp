@@ -8,7 +8,7 @@ E-commerce storefront + internal ERP/POS for **Интер Стар Џамбо** 
 
 ## Tech Stack
 - **Framework:** Next.js 16 (App Router), deployed on Vercel.
-- **Database/Auth:** Supabase (PostgreSQL + RLS + Magic Link).
+- **Database/Auth:** Supabase (PostgreSQL + RLS). Admin creates employee accounts with passwords directly (no invite emails).
 - **Emails:** Resend (`naracki@interstarjumbo.com`).
 - **AI:** Google Gemini Vision API (product photos).
 - **Styling:** Tailwind CSS 4.
@@ -18,6 +18,7 @@ E-commerce storefront + internal ERP/POS for **Интер Стар Џамбо** 
 - **Atomic Stock:** Deducted via Supabase RPC `process_checkout_stock` at checkout; restored via `restore_order_stock` on cancellation. Saves tokens: *Do not reinvent stock logic.*
 - **Cart Sync:** Client-side only (`localStorage`). Uses `src/lib/cart.ts` event system for UI updates.
 - **Security:** RLS protects data at DB level. No `middleware.ts` needed.
+- **Employee Auth:** Admin creates employees via `/api/invite` using `supabase.auth.admin.createUser()` with a password. Roles stored in `user_roles` table (admin/employee).
 - **Email:** Triggered via internal `/api/emails` routes.
 
 ## Critical File Map
@@ -25,6 +26,8 @@ E-commerce storefront + internal ERP/POS for **Интер Стар Џамбо** 
 - `src/components/OrdersPanel.tsx`: Admin order processing + email triggers.
 - `src/lib/store.ts`: Supabase CRUD layer.
 - `src/lib/cart.ts`: Event-driven cart logic.
+- `src/components/SettingsPanel.tsx`: Admin employee management (create accounts, toggle roles/status).
+- `src/app/api/invite/route.ts`: Employee creation API (uses Supabase admin.createUser).
 - `supabase_schema.sql` + `migration_*.sql`: Database source of truth.
 
 ## Commands
