@@ -4,6 +4,12 @@
 
 A modern, high-performance E-commerce storefront and internal ERP/POS system built for **Интер Стар Џамбо** in Kumanovo, Macedonia. Designed for speed, reliability, and real-time inventory synchronization between the physical store and the online shop.
 
+## ⚡ Performance
+- **Mobile PageSpeed: 97/100** — FCP 0.9s, LCP 2.6s, TBT 0ms, CLS 0
+- SSR-first: no client-side spinners, pages render immediately
+- All images served via `next/image` (WebP, lazy loading, responsive srcsets)
+- Logos compressed 99%+ via Sharp (7.7MB PNG → 57KB WebP)
+
 ## 🌟 Key Features
 
 ### 🛒 Customer Experience
@@ -12,6 +18,7 @@ A modern, high-performance E-commerce storefront and internal ERP/POS system bui
 - **Smart Checkout:** Fast guest checkout at `/checkout` with intuitive address validation and progress tracking.
 - **Atomic Stock Protection:** Prevents overselling via database-level row locks during the checkout process.
 - **Localized Notifications:** Automated order confirmation and shipping updates via email (Resend).
+- **Accessible:** All interactive elements labelled for screen readers (`aria-label`), all images have `alt` text.
 
 ### ⚙️ Internal ERP/POS (Admin Only)
 - **AI Product Scanner:** Instantly recognize and list products using **Google Gemini Vision**.
