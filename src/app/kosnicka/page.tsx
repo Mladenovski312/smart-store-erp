@@ -4,32 +4,23 @@ import { useState, useEffect } from 'react';
 import { Minus, Plus, Trash2, ShoppingBag, ChevronLeft, ShoppingCart } from 'lucide-react';
 import { getCart, updateCartQuantity, removeFromCart, getCartTotal, getCartCount, syncCartWithServer, CartItem } from '@/lib/cart';
 import Link from 'next/link';
+import Image from 'next/image';
 import { formatPrice } from '@/lib/types';
 import Footer from '@/components/Footer';
 
 export default function CartPage() {
     const [items, setItems] = useState<CartItem[]>([]);
-    const [mounted, setMounted] = useState(false);
 
     const refresh = () => {
         setItems(getCart());
     };
 
     useEffect(() => {
-        setMounted(true);
         refresh();
         syncCartWithServer();
         window.addEventListener('cart-updated', refresh);
         return () => window.removeEventListener('cart-updated', refresh);
     }, []);
-
-    if (!mounted) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-white">
-                <div className="w-10 h-10 border-4 border-jumbo-blue border-t-transparent rounded-full animate-spin" />
-            </div>
-        );
-    }
 
     const subtotal = getCartTotal();
 
@@ -104,7 +95,7 @@ export default function CartPage() {
                                     <div className="flex items-center gap-4">
                                         <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
                                             {item.imageUrl ? (
-                                                <img src={item.imageUrl} alt={item.name} className="w-full h-full object-contain p-1" />
+                                                <Image src={item.imageUrl} alt={item.name} width={64} height={64} className="w-full h-full object-contain p-1" />
                                             ) : (
                                                 <ShoppingBag className="w-6 h-6 text-gray-300" />
                                             )}

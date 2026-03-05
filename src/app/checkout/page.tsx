@@ -6,12 +6,12 @@ import { getCart, getCartTotal, clearCart, CartItem } from '@/lib/cart';
 import { MK_CITIES } from '@/lib/cities';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
+import Image from 'next/image';
 import Footer from '@/components/Footer';
 import { latinToCyrillic } from '@/lib/transliterate';
 import { formatPrice } from '@/lib/types';
 
 export default function CheckoutPage() {
-    const [mounted, setMounted] = useState(false);
     const [items, setItems] = useState<CartItem[]>([]);
 
     // Form
@@ -37,10 +37,7 @@ export default function CheckoutPage() {
     const supabase = createClient();
 
     useEffect(() => {
-        Promise.resolve().then(() => {
-            setMounted(true);
-            setItems(getCart());
-        });
+        setItems(getCart());
 
         // Try to auto-fill from saved customer
         const saved = localStorage.getItem('jumbo_customer');
@@ -178,14 +175,6 @@ export default function CheckoutPage() {
             setSubmitting(false);
         }
     };
-
-    if (!mounted) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-white">
-                <div className="w-10 h-10 border-4 border-jumbo-blue border-t-transparent rounded-full animate-spin" />
-            </div>
-        );
-    }
 
     // ═══ Order Complete State ═══
     if (orderComplete) {
@@ -475,7 +464,7 @@ export default function CheckoutPage() {
                                     <div key={item.productId} className="flex gap-3 py-3">
                                         <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
                                             {item.imageUrl ? (
-                                                <img src={item.imageUrl} alt={item.name} className="w-full h-full object-contain p-0.5" />
+                                                <Image src={item.imageUrl} alt={item.name} width={48} height={48} className="w-full h-full object-contain p-0.5" />
                                             ) : (
                                                 <ShoppingBag className="w-4 h-4 text-gray-300" />
                                             )}
