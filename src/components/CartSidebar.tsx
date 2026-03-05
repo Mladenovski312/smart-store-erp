@@ -56,7 +56,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                 </span>
                             )}
                         </div>
-                        <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <button onClick={onClose} aria-label="Затвори кошничка" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                             <X size={20} className="text-gray-500" />
                         </button>
                     </div>
@@ -107,6 +107,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                                         }
                                                     }}
                                                     disabled={item.quantity <= 1}
+                                                    aria-label="Намали количина"
                                                     className={`w-7 h-7 border rounded-md flex items-center justify-center transition-colors ${item.quantity <= 1 ? 'bg-gray-50 text-gray-200 border-gray-100' : 'bg-gray-300 text-gray-800 hover:bg-gray-400 border-gray-300'}`}
                                                 >
                                                     <Minus size={12} />
@@ -115,6 +116,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                                 <button
                                                     onClick={() => { updateCartQuantity(item.productId, item.quantity + 1); refresh(); }}
                                                     disabled={item.quantity >= item.stock}
+                                                    aria-label="Зголеми количина"
                                                     title={item.quantity >= item.stock ? `Достапни се само ${item.stock} ком.` : ''}
                                                     className={`w-7 h-7 border rounded-md flex items-center justify-center transition-colors ${item.quantity >= item.stock ? 'bg-gray-50 text-gray-200 border-gray-100' : 'bg-gray-300 text-gray-800 hover:bg-gray-400 border-gray-300'}`}
                                                 >
@@ -126,6 +128,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                         {/* Remove */}
                                         <button
                                             onClick={() => { removeFromCart(item.productId); refresh(); }}
+                                            aria-label="Отстрани од кошничка"
                                             className="p-1.5 text-gray-400 hover:text-red-500 transition-colors self-start"
                                         >
                                             <Trash2 size={14} />

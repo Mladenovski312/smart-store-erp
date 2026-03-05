@@ -20,7 +20,7 @@ export default function Footer() {
                             Најголемиот избор на играчки во Куманово. Квалитетни производи за секоја возраст.
                         </p>
                         <div className="flex gap-3 mt-4">
-                            <a href="https://www.facebook.com/InterStarJumbo/" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-white/10 hover:bg-jumbo-blue rounded-lg flex items-center justify-center transition-colors">
+                            <a href="https://www.facebook.com/InterStarJumbo/" target="_blank" rel="noopener noreferrer" aria-label="Интер Стар Џамбо на Facebook" className="w-9 h-9 bg-white/10 hover:bg-jumbo-blue rounded-lg flex items-center justify-center transition-colors">
                                 <Facebook size={16} />
                             </a>
                         </div>
