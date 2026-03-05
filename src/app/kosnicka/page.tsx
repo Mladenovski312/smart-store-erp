@@ -113,6 +113,7 @@ export default function CartPage() {
                                                 if (item.quantity > 1) updateCartQuantity(item.productId, item.quantity - 1);
                                             }}
                                             disabled={item.quantity <= 1}
+                                            aria-label="Намали количина"
                                             className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${item.quantity <= 1 ? 'bg-gray-50 text-gray-200 border border-gray-100' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
                                         >
                                             <Minus size={14} />
@@ -121,6 +122,7 @@ export default function CartPage() {
                                         <button
                                             onClick={() => updateCartQuantity(item.productId, item.quantity + 1)}
                                             disabled={item.quantity >= item.stock}
+                                            aria-label="Зголеми количина"
                                             title={item.quantity >= item.stock ? `Достапни се само ${item.stock} ком.` : ''}
                                             className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${item.quantity >= item.stock ? 'bg-gray-50 text-gray-200 border border-gray-100' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
                                         >
@@ -136,6 +138,7 @@ export default function CartPage() {
                                     {/* Remove */}
                                     <button
                                         onClick={() => removeFromCart(item.productId)}
+                                        aria-label="Отстрани од кошничка"
                                         className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                     >
                                         <Trash2 size={16} />
