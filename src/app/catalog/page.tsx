@@ -67,6 +67,7 @@ export default function CatalogPage() {
                         </div>
                         <button
                             onClick={() => setCartOpen(true)}
+                            aria-label="Отвори кошничка"
                             className="relative p-2 text-gray-600 hover:text-jumbo-blue transition-colors"
                         >
                             <ShoppingCart size={22} />

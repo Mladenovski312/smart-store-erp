@@ -164,6 +164,7 @@ export default function ProductDetailPage() {
                         </div>
                         <button
                             onClick={() => setCartOpen(true)}
+                            aria-label="Отвори кошничка"
                             className="relative p-2 text-gray-600 hover:text-jumbo-blue transition-colors"
                         >
                             <ShoppingCart size={22} />
@@ -253,6 +254,7 @@ export default function ProductDetailPage() {
                                     <button
                                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                         disabled={quantity <= 1}
+                                        aria-label="Намали количина"
                                         className={`p-3 transition-colors ${quantity <= 1 ? 'bg-gray-50 text-gray-200' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
                                     >
                                         <Minus size={16} />
@@ -263,6 +265,7 @@ export default function ProductDetailPage() {
                                     <button
                                         onClick={() => setQuantity(Math.min(product.stockQuantity, quantity + 1))}
                                         disabled={quantity >= product.stockQuantity}
+                                        aria-label="Зголеми количина"
                                         className={`p-3 transition-colors ${quantity >= product.stockQuantity ? 'bg-gray-50 text-gray-200' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
                                     >
                                         <Plus size={16} />
@@ -289,7 +292,7 @@ export default function ProductDetailPage() {
                                     )}
                                 </button>
 
-                                <button className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-gray-200 text-gray-500 hover:text-jumbo-red hover:border-jumbo-red transition-all text-sm font-medium">
+                                <button aria-label="Додај во желботека" className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-gray-200 text-gray-500 hover:text-jumbo-red hover:border-jumbo-red transition-all text-sm font-medium">
                                     <Heart size={18} />
                                     <span className="sm:hidden">ВО ЖЕЛБОТЕКА</span>
                                 </button>
@@ -330,6 +333,7 @@ export default function ProductDetailPage() {
                                         href={link.href(getShareUrl(), product.name)}
                                         target="_blank"
                                         rel="noopener noreferrer"
+                                        aria-label={`Сподели на ${link.name}`}
                                         title={link.name}
                                         className={`w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 transition-all duration-200 ${link.color}`}
                                     >
@@ -338,6 +342,7 @@ export default function ProductDetailPage() {
                                 ))}
                                 <button
                                     onClick={handleCopyLink}
+                                    aria-label="Копирај линк"
                                     title="Копирај линк"
                                     className={`w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center transition-all duration-200 ${copied ? 'bg-green-600 text-white border-green-600' : 'text-gray-500 hover:bg-gray-700 hover:text-white'
                                         }`}
