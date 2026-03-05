@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { PackageSearch, TrendingUp, Tags, Settings, LogOut, ScanLine, BarChart3, ShoppingBag, Lock, Eye, EyeOff } from 'lucide-react';
+import { PackageSearch, TrendingUp, Tags, Settings, LogOut, ScanLine, BarChart3, ShoppingBag } from 'lucide-react';
 import Scanner from '@/components/Scanner';
 import InventoryList from '@/components/InventoryList';
 import EmployeePOS from '@/components/EmployeePOS';
@@ -14,7 +14,7 @@ import { getProducts, getDashboardStats, getSales } from '@/lib/store';
 import { Product, DashboardStats, SaleRecord } from '@/lib/types';
 
 export default function DashboardLayout() {
-  const { user, role: authRole, displayName, loading: authLoading, needsPasswordSetup, setPassword, signOut } = useAuth();
+  const { user, role: authRole, displayName, loading: authLoading, signOut } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('inventory');
   const [products, setProducts] = useState<Product[]>([]);
@@ -43,11 +43,6 @@ export default function DashboardLayout() {
         </div>
       </div>
     );
-  }
-
-  // Invite flow — user clicked invite link, needs to set their password
-  if (needsPasswordSetup && user) {
-    return <SetPasswordPage setPassword={setPassword} />;
   }
 
   // Auth gate — require login
@@ -327,113 +322,6 @@ export default function DashboardLayout() {
 }
 
 // ─── Helper Components ────────────────────────────────
-
-function SetPasswordPage({ setPassword }: { setPassword: (password: string) => Promise<{ error: string | null }> }) {
-  const [password, setPasswordVal] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (password.length < 6) {
-      setError('Лозинката мора да има најмалку 6 карактери.');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError('Лозинките не се совпаѓаат.');
-      return;
-    }
-
-    setSubmitting(true);
-    const result = await setPassword(password);
-    if (result.error) {
-      setError(result.error);
-    }
-    setSubmitting(false);
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-jumbo-blue via-blue-800 to-indigo-900 flex items-center justify-center p-4">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 -left-20 w-72 h-72 bg-jumbo-red/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 -right-20 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-block bg-jumbo-blue text-white px-4 py-2 rounded-xl font-black text-xl tracking-tight mb-3">
-            ИНТЕР СТАР <span className="text-jumbo-red">ЏАМБО</span>
-          </div>
-          <h1 className="text-xl font-bold text-gray-900">Поставете лозинка</h1>
-          <p className="text-gray-500 text-sm mt-1">Внесете нова лозинка за вашата сметка</p>
-        </div>
-
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Нова лозинка</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPasswordVal(e.target.value)}
-                placeholder="Најмалку 6 карактери"
-                required
-                minLength={6}
-                className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue text-sm"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Потврди лозинка</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Повторете ја лозинката"
-                required
-                minLength={6}
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue text-sm"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full bg-jumbo-blue hover:bg-blue-800 text-white font-bold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {submitting ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              'Постави лозинка'
-            )}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
 
 function NavItem({ icon, label, active = false, onClick }: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void }) {
   return (

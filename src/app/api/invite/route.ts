@@ -9,10 +9,14 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { email, displayName, role } = await req.json();
+        const { email, displayName, role, password } = await req.json();
 
-        if (!email) {
-            return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+        if (!email || !password) {
+            return NextResponse.json({ error: 'Email и лозинка се задолжителни.' }, { status: 400 });
+        }
+
+        if (password.length < 6) {
+            return NextResponse.json({ error: 'Лозинката мора да има најмалку 6 карактери.' }, { status: 400 });
         }
 
         const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -55,51 +59,27 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Овој email е веќе регистриран.' }, { status: 400 });
         }
 
-        // Create the user in Supabase Auth using admin API
-        // This sends them a magic link / invite email automatically
-        const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-            data: { display_name: displayName || email.split('@')[0] },
-            redirectTo: `${req.nextUrl.origin}/admin`,
+        // Create the user in Supabase Auth with password set by admin
+        const { data: createData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+            email: email.toLowerCase(),
+            password,
+            email_confirm: true,
+            user_metadata: { display_name: displayName || email.split('@')[0] },
         });
 
-        if (inviteError) {
-            // If user already exists in auth but not in roles, just add the role
-            if (inviteError.message.includes('already been registered') || inviteError.message.includes('already exists')) {
-                // Get the existing auth user
-                const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
-                const existingAuthUser = existingUsers?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase());
-
-                if (existingAuthUser) {
-                    const { error: roleError } = await supabaseAdmin
-                        .from('user_roles')
-                        .insert({
-                            user_id: existingAuthUser.id,
-                            email: email.toLowerCase(),
-                            role: role || 'employee',
-                            display_name: displayName || email.split('@')[0],
-                        });
-
-                    if (roleError) {
-                        return NextResponse.json({ error: 'Грешка при додавање на улога: ' + roleError.message }, { status: 500 });
-                    }
-
-                    return NextResponse.json({
-                        success: true,
-                        message: `${email} е додаден како ${role || 'employee'}. Корисникот веќе има сметка.`,
-                        alreadyExisted: true
-                    });
-                }
+        if (createError) {
+            if (createError.message.includes('already been registered') || createError.message.includes('already exists')) {
+                return NextResponse.json({ error: 'Овој email е веќе регистриран во системот.' }, { status: 400 });
             }
-
-            return NextResponse.json({ error: 'Грешка при покана: ' + inviteError.message }, { status: 500 });
+            return NextResponse.json({ error: 'Грешка при креирање: ' + createError.message }, { status: 500 });
         }
 
-        // Add user_roles entry with the new user's ID
-        if (inviteData.user) {
+        // Add user_roles entry
+        if (createData.user) {
             const { error: roleError } = await supabaseAdmin
                 .from('user_roles')
                 .insert({
-                    user_id: inviteData.user.id,
+                    user_id: createData.user.id,
                     email: email.toLowerCase(),
                     role: role || 'employee',
                     display_name: displayName || email.split('@')[0],
@@ -112,7 +92,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({
             success: true,
-            message: `Покана е испратена на ${email}. Тие ќе добијат email за да ја постават својата лозинка.`
+            message: `Вработениот ${displayName || email} е успешно креиран. Дајте му ја лозинката за да се најави.`
         });
 
     } catch (err) {
