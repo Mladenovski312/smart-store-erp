@@ -107,12 +107,12 @@ export default function CatalogPage() {
                             </div>
 
                             <div className="flex gap-3">
-                                <div className="relative shrink-0">
+                                <div className="relative flex-1 sm:flex-initial">
                                     <SlidersHorizontal className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none" />
                                     <select
                                         value={sortBy}
                                         onChange={(e) => setSortBy(e.target.value)}
-                                        className="pl-9 pr-8 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue text-sm font-medium appearance-none cursor-pointer hover:border-gray-300 transition-colors"
+                                        className="w-full sm:w-auto pl-9 pr-8 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue text-sm font-medium appearance-none cursor-pointer hover:border-gray-300 transition-colors"
                                     >
                                         <option value="newest">Најнови</option>
                                         <option value="price-asc">Цена: Ниска до Висока</option>
@@ -124,22 +124,22 @@ export default function CatalogPage() {
                         </div>
 
                         {/* Interactive Category Chips */}
-                        <div className="flex items-center justify-between gap-4 flex-wrap w-full mt-2 border-t border-gray-100 pt-4">
-                            <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex flex-col gap-3 w-full mt-2 border-t border-gray-100 pt-4">
+                            <div className="flex items-center gap-1.5 flex-wrap">
                                 <button
                                     onClick={() => setSelectedCategory('')}
-                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === ''
+                                    className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${selectedCategory === ''
                                         ? 'bg-jumbo-blue text-white shadow-md'
                                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
                                         }`}
                                 >
-                                    Сите категории
+                                    Сите
                                 </button>
                                 {CATEGORIES.map(c => (
                                     <button
                                         key={c.value}
                                         onClick={() => setSelectedCategory(c.value)}
-                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === c.value
+                                        className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${selectedCategory === c.value
                                             ? 'bg-jumbo-blue text-white shadow-md'
                                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
                                             }`}
@@ -148,7 +148,7 @@ export default function CatalogPage() {
                                     </button>
                                 ))}
                             </div>
-                            <label className="flex items-center gap-2 text-sm font-bold text-gray-700 cursor-pointer select-none bg-white border border-gray-200 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors shadow-sm shrink-0">
+                            <label className="flex items-center gap-2 text-sm font-bold text-gray-700 cursor-pointer select-none bg-white border border-gray-200 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors shadow-sm self-start">
                                 <input type="checkbox" checked={inStockOnly} onChange={e => setInStockOnly(e.target.checked)} className="w-4 h-4 text-jumbo-blue rounded border-gray-300 focus:ring-jumbo-blue accent-jumbo-blue" />
                                 Само на залиха
                             </label>
@@ -165,34 +165,34 @@ export default function CatalogPage() {
                                 className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                             >
                                 <Link href={`/produkt/${product.id}`}>
-                                    <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-3 cursor-pointer relative">
+                                    <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-2 cursor-pointer relative">
                                         {product.imageUrl ? (
-                                            <Image src={product.imageUrl} alt={product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1280px) 25vw, 20vw" className={`object-contain transition-transform duration-300 p-3 ${product.stockQuantity > 0 ? 'group-hover:scale-105' : 'opacity-90'}`} />
+                                            <Image src={product.imageUrl} alt={product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1280px) 25vw, 20vw" className={`object-contain transition-transform duration-300 p-2 ${product.stockQuantity > 0 ? 'group-hover:scale-105' : 'opacity-90'}`} />
                                         ) : (
                                             <Package className={`w-12 h-12 text-gray-200 ${product.stockQuantity <= 0 ? 'opacity-80' : ''}`} />
                                         )}
                                         {product.stockQuantity <= 0 && (
                                             <div className="absolute inset-0 bg-white/20 flex flex-col items-center justify-center z-10 pointer-events-none">
-                                                <span className="bg-gray-800 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-lg border border-gray-700 backdrop-blur-md">Нема залиха</span>
+                                                <span className="bg-gray-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg border border-gray-700 backdrop-blur-md">Нема залиха</span>
                                             </div>
                                         )}
                                     </div>
                                 </Link>
-                                <div className={`p-4 ${product.stockQuantity <= 0 ? 'opacity-80' : ''}`}>
-                                    <p className="text-xs text-gray-400 mb-1">{getCategoryLabel(product.category)}</p>
+                                <div className={`p-2.5 sm:p-3 ${product.stockQuantity <= 0 ? 'opacity-80' : ''}`}>
+                                    <p className="text-[10px] text-gray-400 mb-0.5 truncate">{getCategoryLabel(product.category)}</p>
                                     <Link href={`/produkt/${product.id}`}>
-                                        <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 mb-2 min-h-[2.5rem] hover:text-jumbo-blue transition-colors cursor-pointer">{product.name}</h3>
+                                        <h3 className="font-semibold text-gray-900 text-xs sm:text-sm leading-tight line-clamp-2 mb-2 min-h-[2rem] hover:text-jumbo-blue transition-colors cursor-pointer">{product.name}</h3>
                                     </Link>
-                                    <div className="flex items-end justify-between mb-3">
-                                        <span className={`text-lg font-bold ${product.stockQuantity > 0 ? 'text-jumbo-blue' : 'text-gray-500'}`}>
-                                            {formatPrice(product.sellingPrice)} <span className="text-xs font-normal text-gray-400">ден</span>
+                                    <div className="flex items-center justify-between mb-2 gap-1 flex-wrap">
+                                        <span className={`text-sm sm:text-base font-bold leading-none ${product.stockQuantity > 0 ? 'text-jumbo-blue' : 'text-gray-500'}`}>
+                                            {formatPrice(product.sellingPrice)}<span className="text-[10px] font-normal text-gray-400 ml-0.5">ден</span>
                                         </span>
                                         {product.stockQuantity > 0 ? (
-                                            <span className="text-[10px] font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                            <span className="text-[9px] font-medium text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                                                 ✓ Залиха
                                             </span>
                                         ) : (
-                                            <span className="text-[10px] font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full">
+                                            <span className="text-[9px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                                                 Нема залиха
                                             </span>
                                         )}
@@ -200,12 +200,12 @@ export default function CatalogPage() {
                                     <button
                                         onClick={() => addToCart({ productId: product.id, name: product.name, price: product.sellingPrice, imageUrl: product.imageUrl, stock: product.stockQuantity })}
                                         disabled={product.stockQuantity <= 0}
-                                        className={`w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-colors ${product.stockQuantity > 0
+                                        className={`w-full flex items-center justify-center gap-1 py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition-colors ${product.stockQuantity > 0
                                             ? 'bg-jumbo-red/10 text-jumbo-red hover:bg-jumbo-red hover:text-white'
                                             : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                             }`}
                                     >
-                                        <Plus size={14} />
+                                        <Plus size={13} />
                                         {product.stockQuantity > 0 ? 'Додај во кошничка' : 'Нема залиха'}
                                     </button>
                                 </div>

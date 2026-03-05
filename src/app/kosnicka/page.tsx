@@ -76,73 +76,62 @@ export default function CartPage() {
                     <>
                         {/* Items Table */}
                         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-6">
-                            {/* Header */}
-                            <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto] gap-4 px-6 py-3 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                <span>Продукт</span>
-                                <span className="w-28 text-center">Количина</span>
-                                <span className="w-24 text-right">Цена</span>
-                                <span className="w-10" />
-                            </div>
-
                             {/* Items */}
                             {items.map((item, idx) => (
                                 <div
                                     key={item.productId}
-                                    className={`grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-6 py-4 ${idx > 0 ? 'border-t border-gray-100' : ''
-                                        }`}
+                                    className={`px-4 sm:px-6 py-4 ${idx > 0 ? 'border-t border-gray-100' : ''}`}
                                 >
-                                    {/* Product */}
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+                                    <div className="flex items-start gap-3">
+                                        {/* Thumbnail */}
+                                        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
                                             {item.imageUrl ? (
                                                 <Image src={item.imageUrl} alt={item.name} width={64} height={64} className="w-full h-full object-contain p-1" />
                                             ) : (
                                                 <ShoppingBag className="w-6 h-6 text-gray-300" />
                                             )}
                                         </div>
-                                        <div className="min-w-0">
-                                            <p className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">{item.name}</p>
-                                            <p className="text-xs text-gray-400 mt-0.5">{formatPrice(item.price)} ден / ком</p>
+
+                                        {/* Name + controls */}
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 mb-0.5">{item.name}</p>
+                                            <p className="text-xs text-gray-400 mb-2">{formatPrice(item.price)} ден / ком</p>
+
+                                            {/* Quantity + Price + Delete in one row */}
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <div className="flex items-center gap-1.5">
+                                                    <button
+                                                        onClick={() => { if (item.quantity > 1) updateCartQuantity(item.productId, item.quantity - 1); }}
+                                                        disabled={item.quantity <= 1}
+                                                        aria-label="Намали количина"
+                                                        className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${item.quantity <= 1 ? 'bg-gray-50 text-gray-200 border border-gray-100' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+                                                    >
+                                                        <Minus size={12} />
+                                                    </button>
+                                                    <span className="w-6 text-center font-semibold text-sm">{item.quantity}</span>
+                                                    <button
+                                                        onClick={() => updateCartQuantity(item.productId, item.quantity + 1)}
+                                                        disabled={item.quantity >= item.stock}
+                                                        aria-label="Зголеми количина"
+                                                        title={item.quantity >= item.stock ? `Достапни се само ${item.stock} ком.` : ''}
+                                                        className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${item.quantity >= item.stock ? 'bg-gray-50 text-gray-200 border border-gray-100' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+                                                    >
+                                                        <Plus size={12} />
+                                                    </button>
+                                                </div>
+
+                                                <span className="font-bold text-gray-900 text-sm ml-auto">{formatPrice(item.price * item.quantity)} ден</span>
+
+                                                <button
+                                                    onClick={() => removeFromCart(item.productId)}
+                                                    aria-label="Отстрани од кошничка"
+                                                    className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    {/* Quantity */}
-                                    <div className="flex items-center gap-2 w-28 justify-center">
-                                        <button
-                                            onClick={() => {
-                                                if (item.quantity > 1) updateCartQuantity(item.productId, item.quantity - 1);
-                                            }}
-                                            disabled={item.quantity <= 1}
-                                            aria-label="Намали количина"
-                                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${item.quantity <= 1 ? 'bg-gray-50 text-gray-200 border border-gray-100' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
-                                        >
-                                            <Minus size={14} />
-                                        </button>
-                                        <span className="w-8 text-center font-semibold text-sm">{item.quantity}</span>
-                                        <button
-                                            onClick={() => updateCartQuantity(item.productId, item.quantity + 1)}
-                                            disabled={item.quantity >= item.stock}
-                                            aria-label="Зголеми количина"
-                                            title={item.quantity >= item.stock ? `Достапни се само ${item.stock} ком.` : ''}
-                                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${item.quantity >= item.stock ? 'bg-gray-50 text-gray-200 border border-gray-100' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
-                                        >
-                                            <Plus size={14} />
-                                        </button>
-                                    </div>
-
-                                    {/* Price */}
-                                    <div className="w-24 text-right">
-                                        <span className="font-bold text-gray-900 text-sm">{formatPrice(item.price * item.quantity)} ден</span>
-                                    </div>
-
-                                    {/* Remove */}
-                                    <button
-                                        onClick={() => removeFromCart(item.productId)}
-                                        aria-label="Отстрани од кошничка"
-                                        className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
                                 </div>
                             ))}
                         </div>
