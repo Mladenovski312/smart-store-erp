@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { ShoppingBag, MapPin, Phone, Clock, ChevronRight, Star, Truck, Shield, Gift, Search, ShoppingCart, Plus } from 'lucide-react';
 import { getProducts } from '@/lib/store';
 import { addToCart, getCartCount } from '@/lib/cart';
-import { Product, CATEGORIES, getCategoryLabel } from '@/lib/types';
+import { Product, CATEGORIES, getCategoryLabel, formatPrice } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
 import CartSidebar from '@/components/CartSidebar';
@@ -18,7 +18,7 @@ export default function Home() {
     const refreshCartCount = () => setCartCount(getCartCount());
 
     useEffect(() => {
-        getProducts().then(all => setProducts(all.filter(p => p.stockQuantity > 0)));
+        getProducts().then(all => setProducts(all));
         refreshCartCount();
         const openCart = () => setCartOpen(true);
         window.addEventListener('cart-updated', refreshCartCount);
@@ -370,6 +370,7 @@ function ProductCard({ product }: { product: Product }) {
             name: product.name,
             price: product.sellingPrice,
             imageUrl: product.imageUrl,
+            stock: product.stockQuantity,
         });
     };
 
@@ -377,28 +378,43 @@ function ProductCard({ product }: { product: Product }) {
         <Link href={`/produkt/${product.id}`} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
             <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-3 relative">
                 {product.imageUrl ? (
-                    <Image src={product.imageUrl} alt={product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="object-contain group-hover:scale-105 transition-transform duration-300 p-3" />
+                    <Image src={product.imageUrl} alt={product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className={`object-contain transition-transform duration-300 p-3 ${product.stockQuantity > 0 ? 'group-hover:scale-105' : 'opacity-90'}`} />
                 ) : (
-                    <div className="text-5xl font-bold text-gray-200">{product.name.charAt(0)}</div>
+                    <div className={`text-5xl font-bold text-gray-200 ${product.stockQuantity <= 0 ? 'opacity-80' : ''}`}>{product.name.charAt(0)}</div>
+                )}
+                {product.stockQuantity <= 0 && (
+                    <div className="absolute inset-0 bg-white/20 flex flex-col items-center justify-center z-10 pointer-events-none">
+                        <span className="bg-gray-800 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-lg border border-gray-700 backdrop-blur-md">Нема залиха</span>
+                    </div>
                 )}
             </div>
-            <div className="p-4">
+            <div className={`p-4 ${product.stockQuantity <= 0 ? 'opacity-80' : ''}`}>
                 <p className="text-xs text-gray-400 mb-1">{getCategoryLabel(product.category)}</p>
                 <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 mb-2 min-h-[2.5rem]">{product.name}</h3>
                 <div className="flex items-end justify-between mb-3">
-                    <span className="text-lg font-bold text-jumbo-blue">
-                        {product.sellingPrice.toLocaleString()} <span className="text-xs font-normal text-gray-400">ден</span>
+                    <span className={`text-lg font-bold ${product.stockQuantity > 0 ? 'text-jumbo-blue' : 'text-gray-500'}`}>
+                        {formatPrice(product.sellingPrice)} <span className="text-xs font-normal text-gray-400">ден</span>
                     </span>
-                    <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                        На залиха
-                    </span>
+                    {product.stockQuantity > 0 ? (
+                        <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                            На залиха
+                        </span>
+                    ) : (
+                        <span className="text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full">
+                            Нема на залиха
+                        </span>
+                    )}
                 </div>
                 <button
                     onClick={handleAddToCart}
-                    className="w-full flex items-center justify-center gap-2 bg-jumbo-red text-white hover:bg-red-700 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow-md active:scale-95"
+                    disabled={product.stockQuantity <= 0}
+                    className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm ${product.stockQuantity > 0
+                        ? 'bg-jumbo-red text-white hover:bg-red-700 hover:shadow-md active:scale-95'
+                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
                 >
                     <Plus size={16} />
-                    Додај во кошничка
+                    {product.stockQuantity > 0 ? 'Додај во кошничка' : 'Нема залиха'}
                 </button>
             </div>
         </Link>

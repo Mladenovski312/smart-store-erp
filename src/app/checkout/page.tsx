@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
 import Footer from '@/components/Footer';
 import { latinToCyrillic } from '@/lib/transliterate';
+import { formatPrice } from '@/lib/types';
 
 export default function CheckoutPage() {
     const [mounted, setMounted] = useState(false);
@@ -481,10 +482,10 @@ export default function CheckoutPage() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm text-gray-900 font-medium line-clamp-2 leading-tight">{item.name}</p>
-                                            <p className="text-xs text-gray-400 mt-0.5">{item.quantity} × {item.price.toLocaleString()} ден</p>
+                                            <p className="text-xs text-gray-400 mt-0.5">{item.quantity} × {formatPrice(item.price)} ден</p>
                                         </div>
                                         <span className="text-sm font-semibold text-gray-900 whitespace-nowrap">
-                                            {(item.price * item.quantity).toLocaleString()} ден
+                                            {formatPrice(item.price * item.quantity)} ден
                                         </span>
                                     </div>
                                 ))}
@@ -494,7 +495,7 @@ export default function CheckoutPage() {
                             <div className="border-t border-gray-100 pt-4 mt-2 space-y-2">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Меѓузбир</span>
-                                    <span className="font-semibold">{subtotal.toLocaleString()} ден</span>
+                                    <span className="font-semibold">{formatPrice(subtotal)} ден</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Испорака</span>
@@ -504,7 +505,7 @@ export default function CheckoutPage() {
 
                             <div className="border-t border-gray-200 pt-4 mt-4 flex justify-between items-baseline">
                                 <span className="font-bold text-gray-900">Вкупно</span>
-                                <span className="text-xl font-bold text-jumbo-blue">{subtotal.toLocaleString()} ден</span>
+                                <span className="text-xl font-bold text-jumbo-blue">{formatPrice(subtotal)} ден</span>
                             </div>
 
                             {/* Desktop submit */}

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Search, SlidersHorizontal, ChevronLeft, Package, ShoppingCart, Plus } from 'lucide-react';
 import { getProducts } from '@/lib/store';
 import { addToCart, getCartCount } from '@/lib/cart';
-import { Product, CATEGORIES, getCategoryLabel } from '@/lib/types';
+import { Product, CATEGORIES, getCategoryLabel, formatPrice } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
 import CartSidebar from '@/components/CartSidebar';
@@ -14,6 +14,7 @@ export default function CatalogPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
+    const [inStockOnly, setInStockOnly] = useState(false);
     const [sortBy, setSortBy] = useState('newest');
     const [cartOpen, setCartOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
@@ -21,7 +22,7 @@ export default function CatalogPage() {
     const refreshCartCount = () => setCartCount(getCartCount());
 
     useEffect(() => {
-        getProducts().then(all => setProducts(all.filter(p => p.stockQuantity > 0)));
+        getProducts().then(all => setProducts(all));
         setCartCount(getCartCount());
         const openCart = () => setCartOpen(true);
         window.addEventListener('cart-updated', refreshCartCount);
@@ -41,6 +42,7 @@ export default function CatalogPage() {
     const filtered = products
         .filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
         .filter(p => !selectedCategory || p.category === selectedCategory)
+        .filter(p => !inStockOnly || p.stockQuantity > 0)
         .sort((a, b) => {
             if (sortBy === 'price-asc') return a.sellingPrice - b.sellingPrice;
             if (sortBy === 'price-desc') return b.sellingPrice - a.sellingPrice;
@@ -121,28 +123,34 @@ export default function CatalogPage() {
                         </div>
 
                         {/* Interactive Category Chips */}
-                        <div className="flex items-center gap-2 flex-wrap">
-                            <button
-                                onClick={() => setSelectedCategory('')}
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === ''
-                                    ? 'bg-jumbo-blue text-white shadow-md'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
-                                    }`}
-                            >
-                                Сите категории
-                            </button>
-                            {CATEGORIES.map(c => (
+                        <div className="flex items-center justify-between gap-4 flex-wrap w-full mt-2 border-t border-gray-100 pt-4">
+                            <div className="flex items-center gap-2 flex-wrap">
                                 <button
-                                    key={c.value}
-                                    onClick={() => setSelectedCategory(c.value)}
-                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === c.value
+                                    onClick={() => setSelectedCategory('')}
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === ''
                                         ? 'bg-jumbo-blue text-white shadow-md'
                                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
                                         }`}
                                 >
-                                    {c.label}
+                                    Сите категории
                                 </button>
-                            ))}
+                                {CATEGORIES.map(c => (
+                                    <button
+                                        key={c.value}
+                                        onClick={() => setSelectedCategory(c.value)}
+                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === c.value
+                                            ? 'bg-jumbo-blue text-white shadow-md'
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+                                            }`}
+                                    >
+                                        {c.label}
+                                    </button>
+                                ))}
+                            </div>
+                            <label className="flex items-center gap-2 text-sm font-bold text-gray-700 cursor-pointer select-none bg-white border border-gray-200 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors shadow-sm shrink-0">
+                                <input type="checkbox" checked={inStockOnly} onChange={e => setInStockOnly(e.target.checked)} className="w-4 h-4 text-jumbo-blue rounded border-gray-300 focus:ring-jumbo-blue accent-jumbo-blue" />
+                                Само на залиха
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -158,31 +166,46 @@ export default function CatalogPage() {
                                 <Link href={`/produkt/${product.id}`}>
                                     <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-3 cursor-pointer relative">
                                         {product.imageUrl ? (
-                                            <Image src={product.imageUrl} alt={product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1280px) 25vw, 20vw" className="object-contain group-hover:scale-105 transition-transform duration-300 p-3" />
+                                            <Image src={product.imageUrl} alt={product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1280px) 25vw, 20vw" className={`object-contain transition-transform duration-300 p-3 ${product.stockQuantity > 0 ? 'group-hover:scale-105' : 'opacity-90'}`} />
                                         ) : (
-                                            <Package className="w-12 h-12 text-gray-200" />
+                                            <Package className={`w-12 h-12 text-gray-200 ${product.stockQuantity <= 0 ? 'opacity-80' : ''}`} />
+                                        )}
+                                        {product.stockQuantity <= 0 && (
+                                            <div className="absolute inset-0 bg-white/20 flex flex-col items-center justify-center z-10 pointer-events-none">
+                                                <span className="bg-gray-800 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-lg border border-gray-700 backdrop-blur-md">Нема залиха</span>
+                                            </div>
                                         )}
                                     </div>
                                 </Link>
-                                <div className="p-4">
+                                <div className={`p-4 ${product.stockQuantity <= 0 ? 'opacity-80' : ''}`}>
                                     <p className="text-xs text-gray-400 mb-1">{getCategoryLabel(product.category)}</p>
                                     <Link href={`/produkt/${product.id}`}>
                                         <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 mb-2 min-h-[2.5rem] hover:text-jumbo-blue transition-colors cursor-pointer">{product.name}</h3>
                                     </Link>
                                     <div className="flex items-end justify-between mb-3">
-                                        <span className="text-lg font-bold text-jumbo-blue">
-                                            {product.sellingPrice.toLocaleString()} <span className="text-xs font-normal text-gray-400">ден</span>
+                                        <span className={`text-lg font-bold ${product.stockQuantity > 0 ? 'text-jumbo-blue' : 'text-gray-500'}`}>
+                                            {formatPrice(product.sellingPrice)} <span className="text-xs font-normal text-gray-400">ден</span>
                                         </span>
-                                        <span className="text-[10px] font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                                            ✓ Залиха
-                                        </span>
+                                        {product.stockQuantity > 0 ? (
+                                            <span className="text-[10px] font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                                ✓ Залиха
+                                            </span>
+                                        ) : (
+                                            <span className="text-[10px] font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full">
+                                                Нема залиха
+                                            </span>
+                                        )}
                                     </div>
                                     <button
-                                        onClick={() => addToCart({ productId: product.id, name: product.name, price: product.sellingPrice, imageUrl: product.imageUrl })}
-                                        className="w-full flex items-center justify-center gap-2 bg-jumbo-red/10 text-jumbo-red hover:bg-jumbo-red hover:text-white py-2 rounded-lg text-xs font-semibold transition-colors"
+                                        onClick={() => addToCart({ productId: product.id, name: product.name, price: product.sellingPrice, imageUrl: product.imageUrl, stock: product.stockQuantity })}
+                                        disabled={product.stockQuantity <= 0}
+                                        className={`w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-colors ${product.stockQuantity > 0
+                                            ? 'bg-jumbo-red/10 text-jumbo-red hover:bg-jumbo-red hover:text-white'
+                                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                            }`}
                                     >
                                         <Plus size={14} />
-                                        Додај во кошничка
+                                        {product.stockQuantity > 0 ? 'Додај во кошничка' : 'Нема залиха'}
                                     </button>
                                 </div>
                             </div>

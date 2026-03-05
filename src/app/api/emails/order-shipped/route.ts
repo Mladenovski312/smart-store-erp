@@ -7,15 +7,38 @@ function esc(text: string | number): string {
   return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+interface OrderItem {
+  name: string;
+  price: number;
+  quantity: number;
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const { orderId, customerName, customerEmail, deliveryCity, trackingNumber } = await req.json();
+    const { orderId, customerName, customerEmail, deliveryCity, trackingNumber, items, subtotal } = await req.json();
 
     if (!customerEmail || !orderId) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     const shortId = orderId.slice(0, 8).toUpperCase();
+
+    const itemsHtml = items && items.length > 0 ? (items as OrderItem[]).map(item => `
+      <tr>
+        <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: #333;">
+          ${esc(item.name)}
+        </td>
+        <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #666; text-align: center;">
+          ${esc(item.quantity)}
+        </td>
+        <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #666; text-align: right; white-space: nowrap;">
+          ${(item.price).toLocaleString('de-DE')} ден
+        </td>
+        <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; font-weight: 500; color: #333; text-align: right; white-space: nowrap;">
+          ${(item.price * item.quantity).toLocaleString('de-DE')} ден
+        </td>
+      </tr>
+    `).join('') : '';
 
     const html = `
     <!DOCTYPE html>
@@ -69,6 +92,42 @@ export async function POST(req: NextRequest) {
               </tr>` : ''}
             </table>
           </div>
+
+          ${itemsHtml ? `
+          <!-- Order Details -->
+          <div style="background: #f9fafb; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+            <h3 style="margin: 0 0 12px; font-size: 13px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px;">
+              Артикли во пратката
+            </h3>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
+              <thead>
+                <tr>
+                  <th style="padding: 0 0 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 12px; font-weight: 600; color: #6b7280; text-align: left; text-transform: uppercase;">Артикл</th>
+                  <th style="padding: 0 0 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 12px; font-weight: 600; color: #6b7280; text-align: center; text-transform: uppercase;">Кол.</th>
+                  <th style="padding: 0 0 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 12px; font-weight: 600; color: #6b7280; text-align: right; text-transform: uppercase;">Цена/ком</th>
+                  <th style="padding: 0 0 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 12px; font-weight: 600; color: #6b7280; text-align: right; text-transform: uppercase;">Вкупно</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemsHtml}
+              </tbody>
+            </table>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="font-size: 14px; color: #666; padding: 4px 0;">Меѓузбир</td>
+                <td style="font-size: 14px; font-weight: 500; color: #333; text-align: right;">${Number(subtotal).toLocaleString('de-DE')} ден</td>
+              </tr>
+              <tr>
+                <td style="font-size: 14px; color: #666; padding: 4px 0;">Испорака</td>
+                <td style="font-size: 13px; color: #999; text-align: right; font-style: italic;">Укажано на товарниот лист</td>
+              </tr>
+              <tr>
+                <td style="font-size: 15px; font-weight: 700; color: #111; padding: 12px 0 4px 0; border-top: 1px solid #e5e7eb; margin-top: 8px;">Вкупно</td>
+                <td style="font-size: 16px; font-weight: 800; color: #1e40af; text-align: right; padding: 12px 0 4px 0; border-top: 1px solid #e5e7eb; margin-top: 8px;">${Number(subtotal).toLocaleString('de-DE')} ден</td>
+              </tr>
+            </table>
+          </div>
+          ` : ''}
 
           <!-- Note -->
           <div style="background: #fefce8; border: 1px solid #fde68a; border-radius: 12px; padding: 16px;">
