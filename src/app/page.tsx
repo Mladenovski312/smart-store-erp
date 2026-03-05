@@ -184,7 +184,7 @@ export default function Home() {
                                     href="/catalog"
                                     className="inline-flex items-center gap-2 bg-jumbo-blue text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-800 transition-colors shadow-sm"
                                 >
-                                    Погледни ги сите {products.length} артикли
+                                    Види ги сите артикли
                                     <ChevronRight size={18} />
                                 </Link>
                             </div>
