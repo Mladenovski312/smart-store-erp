@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ShoppingCart, X, Trash2, Plus, Minus } from 'lucide-react';
 import { getCart, updateCartQuantity, removeFromCart, getCartTotal, getCartCount, syncCartWithServer, CartItem } from '@/lib/cart';
 import Link from 'next/link';
+import Image from 'next/image';
 import { formatPrice } from '@/lib/types';
 
 interface CartSidebarProps {
@@ -85,7 +86,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                         {/* Image */}
                                         <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
                                             {item.imageUrl ? (
-                                                <img src={item.imageUrl} alt={item.name} className="w-full h-full object-contain p-1" />
+                                                <Image src={item.imageUrl} alt={item.name} width={64} height={64} className="w-full h-full object-contain p-1" />
                                             ) : (
                                                 <ShoppingCart size={20} className="text-gray-300" />
                                             )}

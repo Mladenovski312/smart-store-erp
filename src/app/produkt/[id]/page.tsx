@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
     ChevronLeft, ChevronRight, ShoppingCart, Heart, Package,
     Minus, Plus, Truck, Share2, Copy, Check
@@ -193,12 +194,15 @@ export default function ProductDetailPage() {
                 {/* Product Layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
                     {/* Image */}
-                    <div className="bg-white rounded-2xl border border-gray-100 p-6 lg:p-10 flex items-center justify-center aspect-square">
+                    <div className="bg-white rounded-2xl border border-gray-100 p-6 lg:p-10 flex items-center justify-center aspect-square relative">
                         {product.imageUrl ? (
-                            <img
+                            <Image
                                 src={product.imageUrl}
                                 alt={product.name}
-                                className="w-full h-full object-contain"
+                                fill
+                                sizes="(max-width: 1024px) 100vw, 50vw"
+                                className="object-contain p-6 lg:p-10"
+                                priority
                             />
                         ) : (
                             <Package className="w-32 h-32 text-gray-200" />
@@ -392,7 +396,7 @@ export default function ProductDetailPage() {
                         "@context": "https://schema.org",
                         "@type": "Product",
                         "name": product.name,
-                        "image": product.imageUrl || "https://www.interstarjumbo.com/hd_logo.png",
+                        "image": product.imageUrl || "https://www.interstarjumbo.com/hd_logo.webp",
                         "description": product.description || `Купи ${product.name} во Интер Стар Џамбо Куманово. Најдобра цена и брза достава низ цела Македонија.`,
                         "sku": product.barcode || product.id,
                         "brand": {
