@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from 'react';
-import { Product, getCategoryLabel } from '@/lib/types';
-import { recordSale, deleteProduct } from '@/lib/store';
-import { Trash2, MinusCircle, Search, Filter } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Product, getCategoryLabel, CATEGORIES } from '@/lib/types';
+import { recordSale, deleteProduct, updateProduct, uploadProductImage } from '@/lib/store';
+import { Trash2, MinusCircle, Search, Filter, Pencil, Upload, X } from 'lucide-react';
 
 interface InventoryListProps {
     products: Product[];
@@ -15,6 +15,61 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
     const [selectedCategory, setSelectedCategory] = useState('');
     const [sellModal, setSellModal] = useState<Product | null>(null);
     const [sellQty, setSellQty] = useState(1);
+    const [editModal, setEditModal] = useState<Product | null>(null);
+    const [editForm, setEditForm] = useState({ name: '', description: '', category: '', purchasePrice: '', sellingPrice: '', stockQuantity: '', imageUrl: '' });
+    const [editImageFile, setEditImageFile] = useState<File | null>(null);
+    const [editImagePreview, setEditImagePreview] = useState<string | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const editFileRef = useRef<HTMLInputElement>(null);
+
+    const openEditModal = (product: Product) => {
+        setEditModal(product);
+        setEditForm({
+            name: product.name,
+            description: product.description || '',
+            category: product.category,
+            purchasePrice: String(product.purchasePrice),
+            sellingPrice: String(product.sellingPrice),
+            stockQuantity: String(product.stockQuantity),
+            imageUrl: product.imageUrl || '',
+        });
+        setEditImageFile(null);
+        setEditImagePreview(product.imageUrl || null);
+    };
+
+    const handleEditImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setEditImageFile(file);
+        setEditImagePreview(URL.createObjectURL(file));
+    };
+
+    const handleEditSave = async () => {
+        if (!editModal) return;
+        setIsSaving(true);
+
+        let imageUrl = editForm.imageUrl || undefined;
+
+        // Upload new image if one was selected
+        if (editImageFile) {
+            const url = await uploadProductImage(editImageFile);
+            if (url) imageUrl = url;
+        }
+
+        await updateProduct(editModal.id, {
+            name: editForm.name.trim(),
+            description: editForm.description.trim() || undefined,
+            category: editForm.category,
+            imageUrl,
+            purchasePrice: parseFloat(editForm.purchasePrice) || 0,
+            sellingPrice: parseFloat(editForm.sellingPrice) || 0,
+            stockQuantity: parseInt(editForm.stockQuantity) || 0,
+        });
+
+        setIsSaving(false);
+        setEditModal(null);
+        onRefresh();
+    };
 
     const filtered = products.filter(p => {
         const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -115,18 +170,25 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
                             {/* Actions */}
                             <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
                                 <button
-                                    onClick={() => { setSellModal(product); setSellQty(1); }}
-                                    disabled={product.stockQuantity === 0}
-                                    className="flex-1 flex items-center justify-center gap-1.5 bg-jumbo-red/10 text-jumbo-red hover:bg-jumbo-red hover:text-white py-2 rounded-lg text-xs font-semibold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                    onClick={() => openEditModal(product)}
+                                    className="flex-1 flex items-center justify-center gap-1.5 bg-jumbo-blue/10 text-jumbo-blue hover:bg-jumbo-blue hover:text-white py-2 rounded-lg text-xs font-semibold transition-colors"
                                 >
-                                    <MinusCircle size={14} />
-                                    Продај
+                                    <Pencil size={14} />
+                                    Измени
                                 </button>
                                 <button
                                     onClick={() => handleDelete(product)}
-                                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    className="flex items-center justify-center gap-1.5 px-3 py-2 border border-red-200 text-red-500 hover:bg-red-50 rounded-lg text-xs font-semibold transition-colors"
                                 >
                                     <Trash2 size={14} />
+                                </button>
+                                <button
+                                    onClick={() => { setSellModal(product); setSellQty(1); }}
+                                    disabled={product.stockQuantity === 0}
+                                    className="flex items-center justify-center gap-1 px-3 py-2 text-gray-400 hover:text-jumbo-red hover:bg-red-50 rounded-lg text-xs transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                    title="Продај"
+                                >
+                                    <MinusCircle size={14} />
                                 </button>
                             </div>
                         </div>
@@ -183,6 +245,73 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
                                 className="flex-1 py-2.5 bg-jumbo-red text-white rounded-lg text-sm font-bold hover:bg-red-700 transition-colors"
                             >
                                 Потврди продажба
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Modal */}
+            {editModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-bold text-gray-900">Измени артикл</h3>
+                            <button onClick={() => setEditModal(null)} className="p-1 text-gray-400 hover:text-gray-600 rounded"><X size={20} /></button>
+                        </div>
+
+                        {/* Image */}
+                        <div className="mb-4">
+                            <div className="w-full h-40 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden mb-2">
+                                {editImagePreview ? (
+                                    <img src={editImagePreview} alt="" className="h-full object-contain" />
+                                ) : (
+                                    <span className="text-gray-300 text-sm">Нема слика</span>
+                                )}
+                            </div>
+                            <button type="button" onClick={() => editFileRef.current?.click()} className="flex items-center gap-2 text-sm text-jumbo-blue hover:underline font-medium">
+                                <Upload size={14} /> Промени слика
+                            </button>
+                            <input ref={editFileRef} type="file" accept="image/*" onChange={handleEditImageChange} className="hidden" />
+                        </div>
+
+                        <div className="space-y-3">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Име</label>
+                                <input type="text" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Категорија</label>
+                                <select value={editForm.category} onChange={e => setEditForm({ ...editForm, category: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue">
+                                    {CATEGORIES.map(c => (
+                                        <option key={c.value} value={c.value}>{c.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Опис</label>
+                                <textarea value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} rows={3} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue resize-y" />
+                            </div>
+                            <div className="grid grid-cols-3 gap-3">
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">Набавна (ден)</label>
+                                    <input type="number" value={editForm.purchasePrice} onChange={e => setEditForm({ ...editForm, purchasePrice: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">Продажна (ден)</label>
+                                    <input type="number" value={editForm.sellingPrice} onChange={e => setEditForm({ ...editForm, sellingPrice: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">Залиха</label>
+                                    <input type="number" value={editForm.stockQuantity} onChange={e => setEditForm({ ...editForm, stockQuantity: e.target.value })} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 mt-6">
+                            <button onClick={() => setEditModal(null)} className="flex-1 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Откажи</button>
+                            <button onClick={handleEditSave} disabled={isSaving || !editForm.name.trim()} className="flex-1 py-2.5 bg-jumbo-blue text-white rounded-lg text-sm font-bold hover:bg-blue-800 transition-colors disabled:opacity-50">
+                                {isSaving ? 'Се зачувува...' : 'Зачувај промени'}
                             </button>
                         </div>
                     </div>

@@ -6,11 +6,11 @@ import { getProducts } from '@/lib/store';
 import { addToCart, getCartCount } from '@/lib/cart';
 import { Product, CATEGORIES, getCategoryLabel } from '@/lib/types';
 import Link from 'next/link';
+import Image from 'next/image';
 import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
 
 export default function CatalogPage() {
-    const [mounted, setMounted] = useState(false);
     const [products, setProducts] = useState<Product[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -21,9 +21,8 @@ export default function CatalogPage() {
     const refreshCartCount = () => setCartCount(getCartCount());
 
     useEffect(() => {
-        setTimeout(() => setMounted(true), 0);
         getProducts().then(all => setProducts(all.filter(p => p.stockQuantity > 0)));
-        setTimeout(() => setCartCount(getCartCount()), 0);
+        setCartCount(getCartCount());
         const openCart = () => setCartOpen(true);
         window.addEventListener('cart-updated', refreshCartCount);
         window.addEventListener('cart-item-added', openCart);
@@ -48,14 +47,6 @@ export default function CatalogPage() {
             if (sortBy === 'name') return a.name.localeCompare(b.name);
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
-
-    if (!mounted) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-white">
-                <div className="w-10 h-10 border-4 border-jumbo-blue border-t-transparent rounded-full animate-spin" />
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -165,9 +156,9 @@ export default function CatalogPage() {
                                 className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                             >
                                 <Link href={`/produkt/${product.id}`}>
-                                    <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-3 cursor-pointer">
+                                    <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-3 cursor-pointer relative">
                                         {product.imageUrl ? (
-                                            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                                            <Image src={product.imageUrl} alt={product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1280px) 25vw, 20vw" className="object-contain group-hover:scale-105 transition-transform duration-300 p-3" />
                                         ) : (
                                             <Package className="w-12 h-12 text-gray-200" />
                                         )}

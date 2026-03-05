@@ -101,6 +101,58 @@ export async function deleteProduct(productId: string): Promise<void> {
         .eq('id', productId);
 }
 
+/** Upload an image file to Supabase Storage and return its public URL. */
+export async function uploadProductImage(file: File): Promise<string | null> {
+    const supabase = createClient();
+    const ext = file.name.split('.').pop() || 'png';
+    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+    const { error } = await supabase.storage
+        .from('product-images')
+        .upload(fileName, file, { cacheControl: '31536000', upsert: false });
+
+    if (error) {
+        console.error('Image upload failed:', error);
+        return null;
+    }
+
+    const { data: urlData } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(fileName);
+
+    return urlData.publicUrl;
+}
+
+/** Update any subset of product fields. */
+export async function updateProduct(
+    productId: string,
+    updates: Partial<Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>
+): Promise<Product | null> {
+    const supabase = createClient();
+
+    // Map camelCase fields to snake_case DB columns
+    const dbUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    if (updates.name !== undefined) dbUpdates.name = updates.name;
+    if (updates.description !== undefined) dbUpdates.description = updates.description || null;
+    if (updates.category !== undefined) dbUpdates.category = updates.category;
+    if (updates.imageUrl !== undefined) dbUpdates.image_url = updates.imageUrl || null;
+    if (updates.purchasePrice !== undefined) dbUpdates.purchase_price = updates.purchasePrice;
+    if (updates.sellingPrice !== undefined) dbUpdates.selling_price = updates.sellingPrice;
+    if (updates.stockQuantity !== undefined) dbUpdates.stock_quantity = updates.stockQuantity;
+    if (updates.barcode !== undefined) dbUpdates.barcode = updates.barcode || null;
+    if (updates.notes !== undefined) dbUpdates.notes = updates.notes || null;
+
+    const { data, error } = await supabase
+        .from('products')
+        .update(dbUpdates)
+        .eq('id', productId)
+        .select()
+        .single();
+
+    if (error || !data) return null;
+    return dbToProduct(data);
+}
+
 // ─── Sales ───────────────────────────────────────────
 export async function getSales(): Promise<SaleRecord[]> {
     const supabase = createClient();

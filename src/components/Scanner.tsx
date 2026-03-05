@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { Camera, ImageUp, Wand2, CheckCircle, Upload, Eraser } from 'lucide-react';
 import { CATEGORIES } from '@/lib/types';
-import { saveProduct } from '@/lib/store';
+import { saveProduct, uploadProductImage } from '@/lib/store';
 
 interface ScannerProps {
     onProductSaved?: () => void;
@@ -92,6 +92,8 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
 
     const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
+    const [isUploading, setIsUploading] = useState(false);
+
     const submitProduct = async (e: React.FormEvent) => {
         e.preventDefault();
         const errors: string[] = [];
@@ -111,16 +113,40 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
         }
 
         setValidationErrors([]);
+        setIsUploading(true);
+
+        // Upload image to Supabase Storage if we have one
+        let permanentImageUrl: string | undefined;
+        if (previewUrl) {
+            try {
+                let fileToUpload: File;
+                if (selectedFileRef.current && originalUrl === previewUrl) {
+                    // Original file still intact — upload directly
+                    fileToUpload = selectedFileRef.current;
+                } else {
+                    // Background was removed — convert blob URL back to File
+                    const response = await fetch(previewUrl);
+                    const blob = await response.blob();
+                    fileToUpload = new File([blob], `product-${Date.now()}.png`, { type: blob.type || 'image/png' });
+                }
+                const url = await uploadProductImage(fileToUpload);
+                if (url) permanentImageUrl = url;
+            } catch (err) {
+                console.warn('Image upload failed, saving without image:', err);
+            }
+        }
 
         await saveProduct({
             name: name.trim(),
             description: description.trim() || undefined,
             category,
-            imageUrl: previewUrl || undefined,
+            imageUrl: permanentImageUrl,
             purchasePrice: parseFloat(purchasePrice) || 0,
             sellingPrice: parseFloat(sellingPrice) || 0,
             stockQuantity: parseInt(stockQuantity) || 1,
         });
+
+        setIsUploading(false);
 
         setSaved(true);
         onProductSaved?.();
@@ -142,8 +168,8 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-2xl mx-auto">
-            <div className="mb-6 flex justify-between items-center border-b pb-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 max-w-4xl mx-auto">
+            <div className="mb-4 flex justify-between items-center border-b pb-3">
                 <div>
                     <h2 className="text-xl font-bold text-gray-900">Нов Артикл</h2>
                     <p className="text-gray-500 text-sm">Сликајте или изберете слика за препознавање.</p>
@@ -166,11 +192,11 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Left Col: Image Upload & Preview */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                     {/* Image Preview Area */}
-                    <div className={`relative w-full aspect-square rounded-xl border-2 flex flex-col items-center justify-center overflow-hidden transition-all ${previewUrl ? 'border-jumbo-blue/30' : 'border-gray-200 bg-gray-50'}`}
+                    <div className={`relative w-full h-48 rounded-xl border-2 flex flex-col items-center justify-center overflow-hidden transition-all ${previewUrl ? 'border-jumbo-blue/30' : 'border-gray-200 bg-gray-50'}`}
                         style={previewUrl ? { backgroundImage: 'repeating-conic-gradient(#f0f0f0 0% 25%, white 0% 50%)', backgroundSize: '20px 20px' } : undefined}
                     >
                         {previewUrl ? (
@@ -266,7 +292,7 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
 
                 {/* Right Col: Details Form */}
                 <div>
-                    <form onSubmit={submitProduct} className="space-y-4">
+                    <form onSubmit={submitProduct} className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Име на артиклот</label>
                             <input
@@ -305,20 +331,9 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
                             />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Количина</label>
-                            <input
-                                type="number"
-                                min={1}
-                                value={stockQuantity}
-                                onChange={(e) => setStockQuantity(e.target.value)}
-                                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none"
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm text-gray-500 mb-1 font-medium">Набавна цена (ден)</label>
+                        <div className="grid grid-cols-3 gap-3">
+                            <div className="flex flex-col justify-end">
+                                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Набавна (ден)</label>
                                 <input
                                     type="number"
                                     value={purchasePrice}
@@ -327,8 +342,8 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
                                     className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Продажна цена (ден)</label>
+                            <div className="flex flex-col justify-end">
+                                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Продажна (ден)</label>
                                 <input
                                     type="number"
                                     value={sellingPrice}
@@ -338,16 +353,26 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
                                     className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-jumbo-red outline-none border-b-2 border-b-jumbo-red/30 focus:border-b-jumbo-red"
                                 />
                             </div>
+                            <div className="flex flex-col justify-end">
+                                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Количина</label>
+                                <input
+                                    type="number"
+                                    min={1}
+                                    value={stockQuantity}
+                                    onChange={(e) => setStockQuantity(e.target.value)}
+                                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none"
+                                />
+                            </div>
                         </div>
 
-                        <div className="pt-4">
+                        <div className="pt-2">
                             <button
                                 type="submit"
-                                disabled={isProcessing || !name}
+                                disabled={isProcessing || isUploading || !name}
                                 className="w-full bg-jumbo-blue hover:bg-blue-800 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center"
                             >
                                 <ImageUp className="mr-2" />
-                                Зачувај и Објави
+                                {isUploading ? 'Се качува...' : 'Зачувај и Објави'}
                             </button>
                         </div>
                     </form>
