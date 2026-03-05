@@ -7,6 +7,7 @@ import { MK_CITIES } from '@/lib/cities';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
 import Footer from '@/components/Footer';
+import { latinToCyrillic } from '@/lib/transliterate';
 
 export default function CheckoutPage() {
     const [mounted, setMounted] = useState(false);
@@ -339,7 +340,9 @@ export default function CheckoutPage() {
                                             type="text"
                                             value={citySearch}
                                             onChange={e => {
-                                                setCitySearch(e.target.value);
+                                                const val = e.target.value;
+                                                const transliterated = latinToCyrillic(val);
+                                                setCitySearch(transliterated);
                                                 setCity('');
                                                 setShowCityDropdown(true);
                                             }}
@@ -403,7 +406,7 @@ export default function CheckoutPage() {
                                     />
                                     <div>
                                         <span className="font-semibold text-sm text-gray-900">Зачувај ги моите податоци</span>
-                                        <p className="text-xs text-gray-500 mt-0.5">За побрза нарачка следниот пат. Вашите податоци ќе бидат зачувани само на овој уред.</p>
+                                        <p className="text-xs text-gray-500 mt-0.5">Вашите податоци ќе бидат зачувани за побрза нарачка следниот пат од истиот уред</p>
                                     </div>
                                 </label>
 
