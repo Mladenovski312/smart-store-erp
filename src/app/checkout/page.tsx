@@ -78,7 +78,7 @@ export default function CheckoutPage() {
         if (!firstName.trim()) errs.push('Внесете го вашето име.');
         if (!lastName.trim()) errs.push('Внесете го вашето презиме.');
         if (!email.trim() || !email.includes('@')) errs.push('Внесете валидна е-маил адреса.');
-        if (!phone.trim() || phone.replace(/\D/g, '').length < 8) errs.push('Внесете валиден телефонски број.');
+        if (phone.length !== 8) errs.push('Внесете валиден телефонски број (8 цифри по +389).');
         if (!city.trim()) errs.push('Одберете град/општина.');
         if (!street.trim()) errs.push('Внесете ја вашата улица.');
         if (!acceptTerms) errs.push('Мора да ги прифатите условите.');
@@ -124,7 +124,7 @@ export default function CheckoutPage() {
                 customer_first_name: firstName.trim(),
                 customer_last_name: lastName.trim(),
                 customer_email: email.trim().toLowerCase(),
-                customer_phone: phone.trim(),
+                customer_phone: `+389${phone}`,
                 delivery_city: city.trim(),
                 delivery_address: street.trim(),
                 note: note.trim() || null,
@@ -314,13 +314,18 @@ export default function CheckoutPage() {
 
                                 <div className="mt-4">
                                     <label className="block text-sm font-medium text-gray-700 mb-1.5">Телефон *</label>
-                                    <input
-                                        type="tel"
-                                        value={phone}
-                                        onChange={e => setPhone(e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/20 focus:border-jumbo-blue transition-all outline-none"
-                                        placeholder="07X XXX XXX"
-                                    />
+                                    <div className="flex rounded-xl overflow-hidden border border-gray-200 focus-within:ring-2 focus-within:ring-jumbo-blue/20 focus-within:border-jumbo-blue transition-all bg-white">
+                                        <div className="bg-gray-50 text-gray-500 font-medium px-4 py-3 border-r border-gray-200 flex items-center shrink-0">
+                                            +389
+                                        </div>
+                                        <input
+                                            type="tel"
+                                            value={phone}
+                                            onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                                            className="w-full px-4 py-3 text-sm outline-none bg-transparent"
+                                            placeholder="7X XXX XXX"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="mt-4" ref={cityRef}>

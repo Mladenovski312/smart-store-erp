@@ -11,6 +11,7 @@ import { Product, SaleRecord, DashboardStats } from './types';
 function dbToProduct(row: Record<string, unknown>): Product {
     return {
         id: row.id as string,
+        slug: (row.slug as string) || (row.id as string),
         name: row.name as string,
         description: row.description as string | undefined,
         category: row.category as string,
@@ -61,14 +62,37 @@ export async function getProductById(id: string): Promise<Product | null> {
     return dbToProduct(data);
 }
 
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('slug', slug)
+        .single();
+
+    if (error || !data) return null;
+    return dbToProduct(data);
+}
+
+function generateSlug(name: string): string {
+    return name
+        .toLowerCase()
+        .replace(/[^a-z0-9\-]/g, '-')
+        .replace(/-{2,}/g, '-')
+        .replace(/^-|-$/g, '')
+        || 'product';
+}
+
 export async function saveProduct(
-    product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>
+    product: Omit<Product, 'id' | 'slug' | 'createdAt' | 'updatedAt'>
 ): Promise<Product | null> {
     const supabase = createClient();
+    const slug = generateSlug(product.name) + '-' + Date.now().toString(36);
     const { data, error } = await supabase
         .from('products')
         .insert({
             name: product.name,
+            slug,
             description: product.description || null,
             category: product.category,
             image_url: product.imageUrl || null,

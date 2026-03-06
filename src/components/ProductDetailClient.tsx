@@ -1,25 +1,18 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
     ChevronLeft, ChevronRight, ShoppingCart, Heart, Package,
     Minus, Plus, Truck, Share2, Copy, Check
 } from 'lucide-react';
-import { getProductById } from '@/lib/store';
 import { addToCart, getCartCount } from '@/lib/cart';
 import { Product, getCategoryLabel, formatPrice } from '@/lib/types';
 import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
 
-export default function ProductDetailPage() {
-    const params = useParams();
-    const productId = params.id as string;
-
-    const [product, setProduct] = useState<Product | null>(null);
-    const [loading, setLoading] = useState(true);
+export default function ProductDetailClient({ product }: { product: Product }) {
     const [quantity, setQuantity] = useState(1);
     const [cartOpen, setCartOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
@@ -29,13 +22,7 @@ export default function ProductDetailPage() {
     const refreshCartCount = () => setCartCount(getCartCount());
 
     useEffect(() => {
-        if (productId) {
-            getProductById(productId).then(p => {
-                setProduct(p);
-                setLoading(false);
-            });
-        }
-        setTimeout(() => setCartCount(getCartCount()), 0);
+        refreshCartCount();
         const openCart = () => setCartOpen(true);
         window.addEventListener('cart-updated', refreshCartCount);
         window.addEventListener('cart-item-added', openCart);
@@ -43,10 +30,9 @@ export default function ProductDetailPage() {
             window.removeEventListener('cart-updated', refreshCartCount);
             window.removeEventListener('cart-item-added', openCart);
         };
-    }, [productId]);
+    }, []);
 
     const handleAddToCart = () => {
-        if (!product) return;
         for (let i = 0; i < quantity; i++) {
             addToCart({
                 productId: product.id,
@@ -110,42 +96,6 @@ export default function ProductDetailPage() {
             color: 'hover:bg-gray-700 hover:text-white',
         },
     ];
-
-    if (loading) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-white">
-                <div className="w-10 h-10 border-4 border-jumbo-blue border-t-transparent rounded-full animate-spin" />
-            </div>
-        );
-    }
-
-    if (!product) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex flex-col">
-                <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex items-center justify-between h-16">
-                            <Link href="/catalog" className="flex items-center gap-2 text-gray-500 hover:text-jumbo-blue transition-colors">
-                                <ChevronLeft size={20} />
-                                <span className="text-sm font-medium">Назад кон каталог</span>
-                            </Link>
-                        </div>
-                    </div>
-                </nav>
-                <div className="flex-1 flex items-center justify-center">
-                    <div className="text-center">
-                        <Package className="w-20 h-20 text-gray-200 mx-auto mb-6" />
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Производот не е пронајден</h2>
-                        <p className="text-gray-500 mb-6">Овој производ може да не е веќе достапен.</p>
-                        <Link href="/catalog" className="inline-flex items-center gap-2 bg-jumbo-blue text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors">
-                            <ChevronLeft size={18} />
-                            Кон каталогот
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -392,36 +342,6 @@ export default function ProductDetailPage() {
             </div>
 
             <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-
-            {/* Product Structured Data for SEO/AEO */}
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "Product",
-                        "name": product.name,
-                        "image": product.imageUrl || "https://www.interstarjumbo.com/hd_logo.webp",
-                        "description": product.description || `Купи ${product.name} во Интер Стар Џамбо Куманово. Најдобра цена и брза достава низ цела Македонија.`,
-                        "sku": product.barcode || product.id,
-                        "brand": {
-                            "@type": "Brand",
-                            "name": "Interstar Jumbo"
-                        },
-                        "offers": {
-                            "@type": "Offer",
-                            "url": typeof window !== 'undefined' ? window.location.href : "",
-                            "priceCurrency": "MKD",
-                            "price": product.sellingPrice,
-                            "availability": product.stockQuantity > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-                            "seller": {
-                                "@type": "Organization",
-                                "name": "Интер Стар Џамбо"
-                            }
-                        }
-                    })
-                }}
-            />
         </div>
     );
 }
