@@ -59,7 +59,6 @@ export default function Footer() {
                             <li><Link href="/" className="text-gray-400 hover:text-white transition-colors">Почетна</Link></li>
                             <li><Link href="/catalog" className="text-gray-400 hover:text-white transition-colors">Каталог</Link></li>
                             <li><Link href="/uslovi-za-isporaka" className="text-gray-400 hover:text-white transition-colors">Услови за испорака</Link></li>
-                            <li><Link href="/admin" className="text-gray-400 hover:text-white transition-colors">Администрација</Link></li>
                         </ul>
                     </div>
                 </div>

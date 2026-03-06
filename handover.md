@@ -1,56 +1,45 @@
 # Handoff Guide — Интер Стар Џамбо
 
-This document serves as a "Source of Truth" for the current session's end and a guide for the next AI agent to pick up work efficiently with minimal token overhead.
+This document serves as the high-level roadmap and technical baseline for the current state of the project.
 
-## 🏁 Session Summary (March 5, 2026) — Phase 1: Performance & Accessibility
-Phase 1 is **complete and deployed**. All changes are live on Vercel via `main` branch.
+## Current State: Phase 1 Complete, Phase 2 Complete
 
-### Performance (PageSpeed Mobile: 97/100)
-- **Removed `mounted` guards** from all pages (`page.tsx`, `checkout`, `kosnicka`, `produkt/[id]`). These caused a full-screen spinner before every render — blocking SSR and killing LCP/FCP.
-- **Replaced all raw `<img>` tags** with `next/image` — automatic WebP conversion, lazy loading, responsive `srcset`.
-- **Compressed images** with Sharp: `hd_logo.png` 7.7MB → `hd_logo.webp` 57KB, `fhd_logo.png` 7.5MB → 73KB, `pawpatrol.png` 132KB → 22KB.
-- **Configured `next.config.ts`** with Supabase `remotePatterns` so product images from Supabase Storage are optimized by Next.js.
-- **Updated JSON-LD structured data** to reference `.webp` logo.
-- **Result:** FCP 0.9s, LCP 2.6s, TBT 0ms, CLS 0, Score **97/100 mobile**.
+### Phase 1 (Quick Fixes) — DONE
+Removed admin links from footer, implemented strictly validated `+389` phone input in checkout, added placeholder cards for empty/ghost categories on the homepage.
 
-### Accessibility (~84 → target 95+)
-Added `aria-label` to every icon-only interactive element across all public pages:
-- **`src/components/CartSidebar.tsx`** — close button, minus/plus quantity, remove (Trash2)
-- **`src/components/Footer.tsx`** — Facebook link
-- **`src/app/page.tsx`** — cart navbar button
-- **`src/app/catalog/page.tsx`** — cart navbar button
-- **`src/app/kosnicka/page.tsx`** — minus/plus quantity, remove (Trash2)
-- **`src/app/produkt/[id]/page.tsx`** — cart navbar button, minus/plus quantity, heart/wishlist, social share links, copy-link button
+### Phase 2 (SEO & AEO) — DONE
+**Baseline:** Generated `robots.txt`, dynamic `sitemap.ts`, `llms.txt`, JSON-LD schemas (`ToyStore`, `WebSite`, `FAQPage`), expanded FAQ section in Macedonian.
 
-All product images and brand logos already had proper `alt` text via `next/image`.
+**Advanced (this session):**
+1. **Server-Side Rendering:** Refactored `page.tsx`, `catalog/page.tsx`, and `produkt/[slug]/page.tsx` from `"use client"` + `useEffect` data fetching to true Next.js Server Components. Data is fetched server-side and passed as props to Client Components (`HomePageClient`, `CatalogClient`, `ProductDetailClient`). AI bots now receive fully populated HTML.
+2. **Dynamic OpenGraph & Meta:** Product page exports `generateMetadata` with per-product title, description, image for Facebook/Viber link previews.
+3. **metadataBase & Title Template:** `layout.tsx` now has `metadataBase: new URL("https://interstarjumbo.com")` and `title: { template: "%s | Интер Стар Џамбо" }`.
+4. **SEO-Friendly URLs (Slugs):** Route changed from `/produkt/[id]` to `/produkt/[slug]`. Added `slug` column to products table, `getProductBySlug()` in store.ts, updated all links and sitemap. **Requires running `migrations/add_slug_column.sql` in Supabase before deploy.**
 
----
+## Architecture Notes (Post Phase 2)
+- **Server/Client split:** Page files (`page.tsx`) are async Server Components that fetch data. Interactive UI lives in `src/components/*Client.tsx` files.
+- **Slug generation:** New products get auto-generated slugs via `saveProduct()` in `store.ts`. Existing products get slugs from the SQL migration.
+- **Homepage:** `export const dynamic = 'force-dynamic'` ensures fresh product data on every request.
 
-## 💡 Token-Saving Insights (Read this first!)
-1. **Stock Logic:** Do NOT modify `src/app/checkout/page.tsx` stock logic without checking the Supabase RPC `process_checkout_stock`. It handles row locks.
-2. **Cart Events:** The cart uses a custom event system in `src/lib/cart.ts`. Listen for `cart-updated` to sync UI components.
-3. **Database RLS:** Security is handled purely at the database level. If a query fails, it's likely an RLS policy issue, not a frontend bug.
-4. **Resend Emails:** Email templates are inline HTML in `src/app/api/emails/`. No external template library is used.
-5. **No `mounted` pattern:** Pages render immediately via SSR. Do NOT reintroduce `useState(false)` + `useEffect(setMounted)` guards — they kill performance.
-6. **Images:** Always use `next/image` with `alt`, `sizes`, and either `fill` (for aspect-ratio containers) or explicit `width`/`height`. Never raw `<img>`.
+## The Roadmap (10 Technical Specs)
+1. **Quick Fixes** (`01-quick-fixes.md`): DONE.
+2. **SEO & AEO** (`02-seo-aeo.md`): DONE.
+3. **UX Improvements** (`03-ux-improvements.md`): Homepage search, price range filters, related products.
+4. **Search Normalization** (`04-search-normalization.md`): Handle Cyrillic/Latin script switching.
+5. **AI Gift Finder** (`05-ai-gift-finder.md`): Google Gemini conversational widget.
+6. **Analytics Dashboard** (`06-analytics-dashboard.md`): 7 modules of deep business intelligence.
+7. **Excel Export** (`07-excel-export.md`): XLSX reporting for inventory and sales.
+8. **Repo Cleanup** (`08-repo-cleanup.md`): Restructure migrations into `/migrations`.
+9. **Schema Changes** (`09-schema-changes.md`): Required DB columns for Analytics/AI.
+10. **Roadmap** (`10-roadmap.md`): Detailed phasing and implementation order.
 
-## 👥 Employee Management
-- Admin creates employee accounts directly in **Поставки** (Settings) with email + password.
-- No invite emails — admin tells the employee their credentials in person.
-- API: `POST /api/invite` uses `supabase.auth.admin.createUser()` with `email_confirm: true`.
-- Roles (`admin`/`employee`) and status (`active`/`inactive`) managed in `user_roles` table.
-
-## 🗺️ Roadmap: What's Next? (Phase 2)
-1. **Real-time Order Alerts:** Supabase Realtime listener in Admin panel — notify employees instantly on new `pending` orders.
-2. **Marketing Analytics:** Simple `views` counter in `products` table to track most-viewed items.
-3. **Stripe Integration:** Online payments when COD is no longer sufficient.
-4. **Employee Password Change:** Allow employees to update their own password from the admin UI.
-5. **SEO Content:** Add more FAQ items to homepage, product-level meta descriptions pulled from `product.description`.
-
-## 🛠️ Maintenance Check
-- **Build Status:** `npm run build`
-- **Database:** Migrations in root directory (`migration_*.sql`). Run in sequence if resetting.
-- **Deploy:** Push to `main` → Vercel auto-deploys. No manual step needed.
+## Technical Baseline & Constraints
+1. **Stock RPC:** `process_checkout_stock` handles deductions; `restore_order_stock` handles cancellations.
+2. **Security:** RLS is the single source of truth for access.
+3. **Cart:** Custom event system in `src/lib/cart.ts`.
+4. **AI:** Google Gemini 1.5/2.5 Flash is already integrated. Reuse existing SDK setup and API keys.
+5. **No `mounted` patterns:** High performance requires immediate SSR.
+6. **Migrations:** SQL files in `/migrations` folder and loose in root (legacy). Spec 08 will consolidate.
 
 ---
-*Signed, Claude Sonnet 4.6 (March 5, 2026)*
+*Updated March 6, 2026*

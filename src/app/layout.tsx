@@ -9,7 +9,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Интер Стар Џамбо — Играчки Куманово",
+  metadataBase: new URL("https://interstarjumbo.com"),
+  title: {
+    default: "Интер Стар Џамбо — Играчки Куманово",
+    template: "%s | Интер Стар Џамбо",
+  },
   description: "Најголемиот избор на играчки во Куманово. Lego, Barbie, Paw Patrol и повеќе.",
   openGraph: {
     title: "Интер Стар Џамбо — Играчки Куманово",
