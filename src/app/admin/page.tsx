@@ -8,6 +8,7 @@ import EmployeePOS from '@/components/EmployeePOS';
 import LoginPage from '@/components/LoginPage';
 import SettingsPanel from '@/components/SettingsPanel';
 import OrdersPanel from '@/components/OrdersPanel';
+import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAuth } from '@/components/AuthProvider';
 import { getProducts, getDashboardStats, getSales } from '@/lib/store';
@@ -191,6 +192,7 @@ export default function DashboardLayout() {
           <NavItem icon={<Tags />} label="Категории" active={activeTab === 'categories'} onClick={() => setActiveTab('categories')} />
           <NavItem icon={<TrendingUp />} label="Продажба" active={activeTab === 'sales'} onClick={() => setActiveTab('sales')} />
           <NavItem icon={<ShoppingBag />} label="Нарачки" active={activeTab === 'orders'} onClick={() => setActiveTab('orders')} />
+          <NavItem icon={<BarChart3 />} label="Аналитика" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
         </nav>
 
         <div className="p-4 border-t border-white/10">
@@ -301,6 +303,18 @@ export default function DashboardLayout() {
             </ErrorBoundary>
           </>
         )}
+
+        {activeTab === 'analytics' && (
+          <>
+            <header className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900">Аналитика</h2>
+              <p className="text-gray-500 text-sm mt-1">Детални аналитички извештаи за вашиот бизнис.</p>
+            </header>
+            <ErrorBoundary fallbackMessage="Грешка при аналитика.">
+              <AnalyticsDashboard />
+            </ErrorBoundary>
+          </>
+        )}
       </main>
 
       {/* Mobile Bottom Navigation */}
@@ -308,6 +322,7 @@ export default function DashboardLayout() {
         <MobileNavItem icon={<PackageSearch size={20} />} label="Залиха" active={activeTab === 'inventory'} onClick={() => setActiveTab('inventory')} />
         <MobileNavItem icon={<ScanLine size={20} />} label="Скенирај" active={activeTab === 'scanner'} onClick={() => setActiveTab('scanner')} />
         <MobileNavItem icon={<TrendingUp size={20} />} label="Продажба" active={activeTab === 'sales'} onClick={() => setActiveTab('sales')} />
+        <MobileNavItem icon={<BarChart3 size={20} />} label="Аналитика" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
       </div>
     </div>
   );
