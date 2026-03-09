@@ -4,7 +4,7 @@ import CatalogClient from '@/components/CatalogClient';
 export default async function CatalogPage({
     searchParams,
 }: {
-    searchParams: Promise<{ category?: string }>;
+    searchParams: Promise<{ category?: string; q?: string; min?: string; max?: string }>;
 }) {
     const [products, resolvedParams] = await Promise.all([
         getProducts(),
@@ -15,6 +15,9 @@ export default async function CatalogPage({
         <CatalogClient
             initialProducts={products}
             initialCategory={resolvedParams.category || ''}
+            initialQuery={resolvedParams.q || ''}
+            initialMin={resolvedParams.min ? Number(resolvedParams.min) : undefined}
+            initialMax={resolvedParams.max ? Number(resolvedParams.max) : undefined}
         />
     );
 }

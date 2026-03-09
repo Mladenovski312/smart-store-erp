@@ -20,14 +20,14 @@ E-commerce storefront + internal ERP/POS for **Интер Стар Џамбо** 
 - **Security:** RLS-first. No middleware needed for core protection.
 - **Server/Client Split:** Page files are async Server Components (data fetching). Interactive UI in `src/components/*Client.tsx`.
 - **Product URLs:** Use slugs (`/produkt/[slug]`), not UUIDs. `getProductBySlug()` in `store.ts`.
-- **Search:** Cyrillic/Latin normalization logic (`src/lib/search.ts` - upcoming).
+- **Search:** Bidirectional Cyrillic↔Latin transliteration (`src/lib/search.ts`). Latin input matches Cyrillic product names and vice versa.
 
 ## Development Roadmap (The 10 Specs)
 Reference `/specs` folder for detailed implementation rules:
 1. `01-quick-fixes`: /admin removal, phone validation, ghost categories. **DONE.**
 2. `02-seo-aeo`: sitemap, robots, llms.txt, Schema markup, SSR, generateMetadata, slugs. **DONE.**
-3. `03-ux-improvements`: Homepage search, Price range slider, Related products.
-4. `04-search-normalization`: Dual-script transliteration.
+3. `03-ux-improvements`: Nav search, price range slider, related products, FAQ accordion, returns policy. **DONE.**
+4. `04-search-normalization`: Dual-script transliteration. **DONE** (merged into Phase 3 — `src/lib/search.ts`).
 5. `05-ai-gift-finder`: Public Gemini-powered recommendation widget.
 6. `06-analytics-dashboard`: Full admin business intelligence suite.
 7. `07-excel-export`: Sales ledger and inventory reporting.

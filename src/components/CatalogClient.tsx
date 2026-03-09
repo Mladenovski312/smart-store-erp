@@ -1,22 +1,59 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Search, SlidersHorizontal, ChevronLeft, Package, ShoppingCart, Plus, CheckCircle2, ChevronDown } from 'lucide-react';
 import { addToCart, getCartCount } from '@/lib/cart';
 import { Product, CATEGORIES, getCategoryLabel, formatPrice } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import * as Slider from '@radix-ui/react-slider';
 import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
+import { matchesSearch } from '@/lib/search';
 
-export default function CatalogClient({ initialProducts, initialCategory }: { initialProducts: Product[]; initialCategory: string }) {
+interface CatalogClientProps {
+    initialProducts: Product[];
+    initialCategory: string;
+    initialQuery?: string;
+    initialMin?: number;
+    initialMax?: number;
+}
+
+export default function CatalogClient({ initialProducts, initialCategory, initialQuery = '', initialMin, initialMax }: CatalogClientProps) {
+    const router = useRouter();
     const [products] = useState<Product[]>(initialProducts);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState(initialQuery);
     const [selectedCategory, setSelectedCategory] = useState(initialCategory);
     const [inStockOnly, setInStockOnly] = useState(false);
     const [sortBy, setSortBy] = useState('newest');
     const [cartOpen, setCartOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
+
+    // Compute price bounds from products
+    const { priceMin, priceMax } = useMemo(() => {
+        if (products.length === 0) return { priceMin: 0, priceMax: 10000 };
+        const prices = products.map(p => p.sellingPrice);
+        return {
+            priceMin: Math.floor(Math.min(...prices) / 100) * 100,
+            priceMax: Math.ceil(Math.max(...prices) / 100) * 100,
+        };
+    }, [products]);
+
+    const [minPrice, setMinPrice] = useState(initialMin ?? priceMin);
+    const [maxPrice, setMaxPrice] = useState(initialMax ?? priceMax);
+    const priceFilterActive = minPrice > priceMin || maxPrice < priceMax;
+
+    // Sync price filter to URL
+    const syncPriceToUrl = useCallback((min: number, max: number) => {
+        const params = new URLSearchParams(window.location.search);
+        if (min > priceMin) params.set('min', String(min));
+        else params.delete('min');
+        if (max < priceMax) params.set('max', String(max));
+        else params.delete('max');
+        const qs = params.toString();
+        router.replace(`/catalog${qs ? `?${qs}` : ''}`, { scroll: false });
+    }, [priceMin, priceMax, router]);
 
     const refreshCartCount = () => setCartCount(getCartCount());
 
@@ -32,9 +69,10 @@ export default function CatalogClient({ initialProducts, initialCategory }: { in
     }, []);
 
     const filtered = products
-        .filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        .filter(p => matchesSearch(p.name, searchTerm))
         .filter(p => !selectedCategory || p.category === selectedCategory)
         .filter(p => !inStockOnly || p.stockQuantity > 0)
+        .filter(p => p.sellingPrice >= minPrice && p.sellingPrice <= maxPrice)
         .sort((a, b) => {
             if (sortBy === 'price-asc') return a.sellingPrice - b.sellingPrice;
             if (sortBy === 'price-desc') return b.sellingPrice - a.sellingPrice;
@@ -147,6 +185,39 @@ export default function CatalogClient({ initialProducts, initialCategory }: { in
                             </div>
                         </div>
                     </div>
+
+                    {/* Price Range Slider */}
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                        <div className="flex items-center justify-between mb-3">
+                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Цена</span>
+                            <span className="text-sm font-bold text-gray-900">
+                                {formatPrice(minPrice)} ден – {formatPrice(maxPrice)} ден
+                            </span>
+                        </div>
+                        <Slider.Root
+                            className="relative flex items-center select-none touch-none h-5 w-full"
+                            min={priceMin}
+                            max={priceMax}
+                            step={100}
+                            value={[minPrice, maxPrice]}
+                            onValueChange={([min, max]) => { setMinPrice(min); setMaxPrice(max); }}
+                            onValueCommit={([min, max]) => syncPriceToUrl(min, max)}
+                        >
+                            <Slider.Track className="bg-gray-200 relative grow rounded-full h-1.5">
+                                <Slider.Range className="absolute bg-jumbo-blue rounded-full h-full" />
+                            </Slider.Track>
+                            <Slider.Thumb aria-label="Минимална цена" className="block w-5 h-5 bg-white border-2 border-jumbo-blue rounded-full shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-jumbo-blue/30 transition-shadow cursor-grab active:cursor-grabbing" />
+                            <Slider.Thumb aria-label="Максимална цена" className="block w-5 h-5 bg-white border-2 border-jumbo-blue rounded-full shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-jumbo-blue/30 transition-shadow cursor-grab active:cursor-grabbing" />
+                        </Slider.Root>
+                        {priceFilterActive && (
+                            <button
+                                onClick={() => { setMinPrice(priceMin); setMaxPrice(priceMax); syncPriceToUrl(priceMin, priceMax); }}
+                                className="mt-2 text-xs text-jumbo-blue hover:underline"
+                            >
+                                Ресетирај цена
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Product Grid */}
@@ -221,9 +292,9 @@ export default function CatalogClient({ initialProducts, initialCategory }: { in
                                 ? `Не пронајдовме артикли за „${searchTerm}". Обидете се со друг термин.`
                                 : 'Моментално нема артикли во оваа категорија. Проверете повторно наскоро!'}
                         </p>
-                        {(searchTerm || selectedCategory) && (
+                        {(searchTerm || selectedCategory || priceFilterActive) && (
                             <button
-                                onClick={() => { setSearchTerm(''); setSelectedCategory(''); }}
+                                onClick={() => { setSearchTerm(''); setSelectedCategory(''); setMinPrice(priceMin); setMaxPrice(priceMax); }}
                                 className="inline-flex items-center gap-2 bg-jumbo-blue text-white px-6 py-2.5 rounded-xl font-medium text-sm hover:bg-blue-700 transition-colors"
                             >
                                 Покажи ги сите играчки
