@@ -9,14 +9,14 @@ SET slug = (
         TRIM(BOTH '-' FROM
             REGEXP_REPLACE(
                 REGEXP_REPLACE(
-                    -- Transliterate Cyrillic to Latin (multi-char digraphs first, then single chars)
+                    -- Transliterate Cyrillic to Latin (multi-char digraphs first via REPLACE, then single chars via TRANSLATE)
                     TRANSLATE(
-                        REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+                        REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
                             LOWER(name),
                             'љ', 'lj'), 'њ', 'nj'), 'џ', 'dj'), 'ж', 'zh'),
-                            'ш', 'sh'), 'ч', 'ch'), 'ѓ', 'gj'), 'ќ', 'kj'),
-                        'абвгдезѕијклмнопрстуфхц',
-                        'abvgdezdzijklmnoprstufhc'
+                            'ш', 'sh'), 'ч', 'ch'), 'ѓ', 'gj'), 'ќ', 'kj'), 'ѕ', 'dz'),
+                        'абвгдезијклмнопрстуфхц',
+                        'abvgdezijklmnoprstufhc'
                     ),
                     '[^a-z0-9]', '-', 'g'
                 ),

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getProductBySlug } from '@/lib/store';
+import { getProductBySlug, getRelatedProducts } from '@/lib/store';
 import { formatPrice } from '@/lib/types';
 import ProductDetailClient from '@/components/ProductDetailClient';
 import type { Metadata } from 'next';
@@ -47,11 +47,12 @@ export default async function ProductDetailPage({ params }: Props) {
 
     if (!product) notFound();
 
+    const relatedProducts = await getRelatedProducts(product);
     const productUrl = `https://interstarjumbo.com/produkt/${slug}`;
 
     return (
         <>
-            <ProductDetailClient product={product} />
+            <ProductDetailClient product={product} relatedProducts={relatedProducts} />
 
             {/* Product Structured Data for SEO/AEO — rendered server-side with correct URL */}
             <script

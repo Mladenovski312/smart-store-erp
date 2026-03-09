@@ -12,7 +12,7 @@ import { Product, getCategoryLabel, formatPrice } from '@/lib/types';
 import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
 
-export default function ProductDetailClient({ product }: { product: Product }) {
+export default function ProductDetailClient({ product, relatedProducts = [] }: { product: Product; relatedProducts?: Product[] }) {
     const [quantity, setQuantity] = useState(1);
     const [cartOpen, setCartOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
@@ -304,6 +304,37 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                     </div>
                 </div>
             </div>
+
+            {/* Related Products */}
+            {relatedProducts.length > 0 && (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                    <h2 className="text-xl font-bold text-gray-900 mb-6">Можеби ќе ви се допадне и</h2>
+                    <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide lg:grid lg:grid-cols-4 lg:overflow-visible lg:pb-0">
+                        {relatedProducts.map(rp => (
+                            <Link
+                                key={rp.id}
+                                href={`/produkt/${rp.slug}`}
+                                className="group flex-shrink-0 w-48 sm:w-56 lg:w-auto snap-start bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                            >
+                                <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-2 relative">
+                                    {rp.imageUrl ? (
+                                        <Image src={rp.imageUrl} alt={rp.name} fill sizes="(max-width: 1024px) 200px, 25vw" className="object-contain p-2 group-hover:scale-105 transition-transform duration-300" />
+                                    ) : (
+                                        <Package className="w-12 h-12 text-gray-200" />
+                                    )}
+                                </div>
+                                <div className="p-3">
+                                    <p className="text-[10px] text-gray-400 mb-0.5 truncate">{getCategoryLabel(rp.category)}</p>
+                                    <h3 className="font-semibold text-gray-900 text-xs sm:text-sm leading-tight line-clamp-2 mb-2 min-h-[2rem] group-hover:text-jumbo-blue transition-colors">{rp.name}</h3>
+                                    <span className="text-sm font-bold text-jumbo-blue">
+                                        {formatPrice(rp.sellingPrice)}<span className="text-[10px] font-normal text-gray-400 ml-0.5">ден</span>
+                                    </span>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Sticky Mobile Add to Cart Bar */}
             {product.stockQuantity > 0 && (

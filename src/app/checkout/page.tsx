@@ -435,6 +435,9 @@ export default function CheckoutPage() {
                                         Со прифаќање на{' '}
                                         <Link href="/uslovi-za-isporaka" className="text-jumbo-blue font-semibold hover:underline" target="_blank">
                                             правила и услови
+                                        </Link>{' '}и{' '}
+                                        <Link href="/politika-za-vrakanje" className="text-jumbo-blue font-semibold hover:underline" target="_blank">
+                                            политика за враќање
                                         </Link>{' '}
                                         за креирање нарачка корисникот е согласен да биди контактиран по пат на телефонски повик, SMS, Viber, Email од страна на Интер Стар Џамбо за статус на нарачка.
                                     </span>

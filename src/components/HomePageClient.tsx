@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { ShoppingBag, MapPin, Phone, Clock, ChevronRight, Star, Truck, Shield, Gift, Search, ShoppingCart, Plus } from 'lucide-react';
+import { ShoppingBag, MapPin, ChevronRight, ChevronDown, Star, Truck, Shield, Gift, Search, ShoppingCart, Plus } from 'lucide-react';
 import { addToCart, getCartCount } from '@/lib/cart';
 import { Product, CATEGORIES, getCategoryLabel, formatPrice } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
 import CartSidebar from '@/components/CartSidebar';
+import SearchDropdown from '@/components/SearchDropdown';
 import Footer from '@/components/Footer';
 
 const BRANDS = [
@@ -58,6 +59,7 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
     const [products] = useState<Product[]>(initialProducts);
     const [cartOpen, setCartOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
+    const [navSearchOpen, setNavSearchOpen] = useState(false);
 
     const refreshCartCount = () => setCartCount(getCartCount());
 
@@ -98,13 +100,20 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <Link
-                                href="/catalog"
-                                className="flex items-center gap-2 bg-jumbo-blue text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-800 transition-colors shadow-sm"
-                            >
-                                <Search size={16} />
-                                <span className="hidden sm:inline">Пребарај</span>
-                            </Link>
+                            {navSearchOpen ? (
+                                <div className="w-64 sm:w-80">
+                                    <SearchDropdown products={products} autoFocus onClose={() => setNavSearchOpen(false)} />
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => setNavSearchOpen(true)}
+                                    aria-label="Пребарај играчки"
+                                    className="flex items-center gap-2 bg-jumbo-blue text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-800 transition-colors shadow-sm"
+                                >
+                                    <Search size={16} />
+                                    <span className="hidden sm:inline">Пребарај</span>
+                                </button>
+                            )}
                             <button
                                 onClick={() => setCartOpen(true)}
                                 aria-label="Отвори кошничка"
@@ -142,6 +151,7 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
                         <p className="text-lg md:text-xl text-blue-50 mb-10 leading-relaxed font-medium max-w-xl drop-shadow">
                             Вашата омилена локална продавница за играчки. Нарачајте онлајн со брза достава низ цела Македонија и плаќање при достава (COD).
                         </p>
+
                         <div className="flex flex-col sm:flex-row gap-4">
                             <Link
                                 href="/catalog"
@@ -328,16 +338,13 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
                 </div>
             </section>
 
-            {/* FAQ AI / AEO Section */}
+            {/* FAQ Accordion Section */}
             <section className="py-16 bg-gray-50 border-t border-gray-100">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">Често поставувани прашања</h2>
-                    <div className="space-y-6">
+                    <div className="space-y-3">
                         {faqs.map((faq, i) => (
-                            <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">{faq.q}</h3>
-                                <p className="text-gray-600">{faq.a}</p>
-                            </div>
+                            <FaqItem key={i} question={faq.q} answer={faq.a} />
                         ))}
                     </div>
                 </div>
@@ -491,6 +498,30 @@ function ProductCard({ product }: { product: Product }) {
                 </button>
             </div>
         </Link>
+    );
+}
+
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+    const [open, setOpen] = useState(false);
+
+    return (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <button
+                onClick={() => setOpen(!open)}
+                className="w-full flex items-center justify-between px-6 py-5 text-left"
+                aria-expanded={open}
+            >
+                <h3 className="text-base font-bold text-gray-900 pr-4">{question}</h3>
+                <ChevronDown className={`w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+            </button>
+            <div
+                className={`grid transition-all duration-200 ease-in-out ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+            >
+                <div className="overflow-hidden">
+                    <p className="px-6 pb-5 text-gray-600">{answer}</p>
+                </div>
+            </div>
+        </div>
     );
 }
 

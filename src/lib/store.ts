@@ -74,6 +74,48 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     return dbToProduct(data);
 }
 
+/** Fetch related products for cross-sell: same category first, then price-range fallback. */
+export async function getRelatedProducts(product: Product, limit = 4): Promise<Product[]> {
+    const supabase = createClient();
+
+    // 1. Same category, exclude current product, in stock
+    const { data: sameCat } = await supabase
+        .from('products')
+        .select('*')
+        .eq('category', product.category)
+        .neq('id', product.id)
+        .gt('stock_quantity', 0)
+        .limit(limit);
+
+    const results = (sameCat || []).map(dbToProduct);
+    if (results.length >= 3) return results.slice(0, limit);
+
+    // 2. Fallback: similar price range (±30%) from any category
+    const existingIds = new Set(results.map(p => p.id));
+    existingIds.add(product.id);
+    const priceLow = Math.round(product.sellingPrice * 0.7);
+    const priceHigh = Math.round(product.sellingPrice * 1.3);
+
+    const { data: byPrice } = await supabase
+        .from('products')
+        .select('*')
+        .gte('selling_price', priceLow)
+        .lte('selling_price', priceHigh)
+        .gt('stock_quantity', 0)
+        .limit(limit * 2);
+
+    for (const row of byPrice || []) {
+        if (results.length >= limit) break;
+        const p = dbToProduct(row);
+        if (!existingIds.has(p.id)) {
+            results.push(p);
+            existingIds.add(p.id);
+        }
+    }
+
+    return results.slice(0, limit);
+}
+
 // Macedonian Cyrillic → Latin transliteration map
 const CYRILLIC_TO_LATIN: Record<string, string> = {
     'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'ѓ': 'gj',
