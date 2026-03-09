@@ -2,14 +2,15 @@
 
 ## Overview
 E-commerce storefront + internal ERP/POS for **Интер Стар Џамбо** (toy store in Kumanovo, Macedonia).
-- **Public:** Guest checkout, COD only, real-time stock, AI Gift Finder (upcoming).
-- **Admin:** Inventory management, AI scanner (Gemini), Analytics (upcoming), POS, order fulfillment.
+- **Public:** Guest checkout, COD only, real-time stock, AI Gift Finder.
+- **Admin:** Inventory management, AI scanner (Gemini), Analytics dashboard, POS, order fulfillment.
 - **Domain:** [interstarjumbo.com](https://interstarjumbo.com)
 
 ## Tech Stack
 - **Framework:** Next.js 16 (App Router), React 19.
 - **Database/Auth:** Supabase (PostgreSQL + RLS).
-- **AI:** Google Gemini (Flash 1.5/2.5) for AI Scanner and upcoming Gift Finder.
+- **AI:** Google Gemini (Flash 2.5) for AI Scanner and Gift Finder.
+- **Charts:** Recharts for analytics dashboard.
 - **Styling:** Tailwind CSS 4.
 - **Exports:** XLSX (SheetJS) for reports.
 
@@ -28,8 +29,8 @@ Reference `/specs` folder for detailed implementation rules:
 2. `02-seo-aeo`: sitemap, robots, llms.txt, Schema markup, SSR, generateMetadata, slugs. **DONE.**
 3. `03-ux-improvements`: Nav search, price range slider, related products, FAQ accordion, returns policy. **DONE.**
 4. `04-search-normalization`: Dual-script transliteration. **DONE** (merged into Phase 3 — `src/lib/search.ts`).
-5. `05-ai-gift-finder`: Public Gemini-powered recommendation widget.
-6. `06-analytics-dashboard`: Full admin business intelligence suite.
+5. `05-ai-gift-finder`: Public Gemini-powered recommendation widget. **DONE.**
+6. `06-analytics-dashboard`: Full admin business intelligence suite. **DONE.**
 7. `07-excel-export`: Sales ledger and inventory reporting.
 8. `08-repo-cleanup`: Migrations folder organization.
 9. `09-schema-changes`: Database prerequisites for AI/Analytics.

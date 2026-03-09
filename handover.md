@@ -2,7 +2,7 @@
 
 This document serves as the high-level roadmap and technical baseline for the current state of the project.
 
-## Current State: Phase 1–3 Complete (+ Phase 4 Search Normalization)
+## Current State: Phases 1–6 Complete
 
 ### Phase 1 (Quick Fixes) — DONE
 Removed admin links from footer, implemented strictly validated `+389` phone input in checkout, added placeholder cards for empty/ghost categories on the homepage.
@@ -26,20 +26,41 @@ Removed admin links from footer, implemented strictly validated `+389` phone inp
 ### Phase 4 (Search Normalization) — DONE
 Merged into Phase 3. `src/lib/search.ts` provides `matchesSearch()` with bidirectional Latin↔Cyrillic transliteration. Used in both `SearchDropdown` and `CatalogClient`.
 
-## Architecture Notes (Post Phase 3)
+## Architecture Notes (Post Phase 6)
 - **Server/Client split:** Page files (`page.tsx`) are async Server Components that fetch data. Interactive UI lives in `src/components/*Client.tsx` files.
 - **Slug generation:** New products get auto-generated slugs via `saveProduct()` in `store.ts`. Existing products get slugs from the SQL migration.
 - **Homepage:** `export const dynamic = 'force-dynamic'` ensures fresh product data on every request.
 - **Search:** `src/lib/search.ts` exports `matchesSearch()`, `cyrillicToLatin()`, `latinToCyrillic()`. Handles digraphs (љ→lj, ш→sh, etc.) correctly.
 - **UI Components:** `SearchDropdown` (nav search), `FaqItem` (accordion), `@radix-ui/react-slider` (price filter).
+- **Gift Finder:** `GiftFinder.tsx` (floating button) + `GiftFinderModal.tsx` (modal). API route at `/api/gift-finder`. Uses Gemini 2.5 Flash with closed-context pattern.
+- **Analytics:** `AnalyticsDashboard.tsx` — 5-tab admin dashboard (Revenue, Inventory, Brands, Orders, Customers). Uses Recharts. Fetches all data client-side from Supabase, computes metrics in JS.
+
+### Phase 5 (AI Gift Finder) — DONE
+1. **Floating Button:** "Побарај производ" button on all storefront pages, hidden on `/admin/*`.
+2. **GiftFinderModal:** Conversational widget with starter chips, input field, and product result cards.
+3. **API Route:** `/api/gift-finder` — server-side Gemini 2.5 Flash call using closed-context pattern (only knows in-stock products).
+4. **Abuse Prevention:** Session limit (3 queries), IP rate limit (10/hr), 300 max output tokens.
+5. **Cart Integration:** "Додади во кошничка" on result cards calls `addToCart()` and closes modal.
+6. **Migration:** `migrations/010_gift_finder_schema.sql` adds `age_range` column (run in Supabase).
+
+### Phase 6 (Analytics Dashboard) — DONE
+1. **Admin Tab:** "Аналитика" tab in admin sidebar + mobile nav. Component: `AnalyticsDashboard.tsx`.
+2. **Date Range Picker:** 7d / 30d / 90d / 12m presets filter all data.
+3. **5 Sub-tabs:**
+   - **Приходи (Revenue):** KPIs (total, online, POS, AOV, margin%), revenue over time line chart, revenue by weekday bar chart.
+   - **Залиха (Inventory):** KPIs (stock value, in/out of stock, low stock), stock value by category bar chart, low stock product table.
+   - **Брендови (Brands):** Revenue share donut chart, brand scorecard table with margin % and recommendation (Прошири/Одржувај/Намали).
+   - **Нарачки (Orders):** KPIs (total, pending, delivered, cancellation rate), order volume bar chart, status breakdown pie chart.
+   - **Купувачи (Customers):** KPIs (unique, repeat rate, LTV), revenue by city bar chart, customer segments (New/Returning/Loyal/At-Risk).
+4. **Tech:** Recharts for all charts, navy (#1A3C5E) / orange (#E8943A) color palette.
 
 ## The Roadmap (10 Technical Specs)
 1. **Quick Fixes** (`01-quick-fixes.md`): DONE.
 2. **SEO & AEO** (`02-seo-aeo.md`): DONE.
 3. **UX Improvements** (`03-ux-improvements.md`): DONE.
 4. **Search Normalization** (`04-search-normalization.md`): DONE (merged into Phase 3).
-5. **AI Gift Finder** (`05-ai-gift-finder.md`): Google Gemini conversational widget.
-6. **Analytics Dashboard** (`06-analytics-dashboard.md`): 7 modules of deep business intelligence.
+5. **AI Gift Finder** (`05-ai-gift-finder.md`): DONE.
+6. **Analytics Dashboard** (`06-analytics-dashboard.md`): DONE.
 7. **Excel Export** (`07-excel-export.md`): XLSX reporting for inventory and sales.
 8. **Repo Cleanup** (`08-repo-cleanup.md`): Restructure migrations into `/migrations`.
 9. **Schema Changes** (`09-schema-changes.md`): Required DB columns for Analytics/AI.
