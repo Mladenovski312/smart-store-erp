@@ -126,20 +126,20 @@ export default function AnalyticsDashboard() {
     return (
         <div>
             {/* Controls */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                <div className="flex gap-1 overflow-x-auto">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+                <div className="flex flex-wrap gap-1.5 md:gap-2">
                     {TABS.map(t => (
                         <button key={t.id} onClick={() => setTab(t.id)}
-                            className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${tab === t.id ? 'bg-[#1A3C5E] text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                            className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${tab === t.id ? 'bg-[#1A3C5E] text-white shadow-sm' : 'text-gray-600 bg-gray-100 hover:bg-gray-200'}`}>
                             {t.label}
                         </button>
                     ))}
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="flex gap-1">
+                <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex flex-wrap gap-1.5">
                         {PRESETS.map(p => (
                             <button key={p.id} onClick={() => setRange(p.id)}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${range === p.id ? 'bg-[#E8943A] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                                className={`px-2.5 py-1 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${range === p.id ? 'bg-[#E8943A] text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
                                 {p.label}
                             </button>
                         ))}
