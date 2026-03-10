@@ -19,7 +19,7 @@ export default function Footer() {
                         <p className="text-gray-400 text-sm leading-relaxed">
                             Најголемиот избор на играчки во Куманово. Квалитетни производи за секоја возраст.
                         </p>
-                        <div className="flex gap-3 mt-4">
+                        <div className="flex gap-3 mt-4 justify-center md:justify-start">
                             <a href="https://www.facebook.com/InterStarJumbo/" target="_blank" rel="noopener noreferrer" aria-label="Интер Стар Џамбо на Facebook" className="w-9 h-9 bg-white/10 hover:bg-jumbo-blue rounded-lg flex items-center justify-center transition-colors">
                                 <Facebook size={16} />
                             </a>
@@ -52,10 +52,10 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Quick Links - Left aligned */}
-                    <div>
-                        <h4 className="font-bold text-sm uppercase tracking-wider mb-5 text-gray-400">Навигација</h4>
-                        <ul className="space-y-4 text-sm inline-block text-left text-gray-300">
+                    {/* Quick Links - Center on mobile, Left on md */}
+                    <div className="md:text-left flex flex-col items-center md:items-start">
+                        <h4 className="font-bold text-sm uppercase tracking-wider mb-5 text-gray-400 w-full text-center md:text-left">Навигација</h4>
+                        <ul className="space-y-4 text-sm flex flex-col items-center md:items-start text-gray-300">
                             <li><Link href="/" className="text-gray-400 hover:text-white transition-colors">Почетна</Link></li>
                             <li><Link href="/catalog" className="text-gray-400 hover:text-white transition-colors">Каталог</Link></li>
                             <li><Link href="/uslovi-za-isporaka" className="text-gray-400 hover:text-white transition-colors">Услови за испорака</Link></li>

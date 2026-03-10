@@ -61,10 +61,10 @@ Merged into Phase 3. `src/lib/search.ts` provides `matchesSearch()` with bidirec
 4. **Search Normalization** (`04-search-normalization.md`): DONE (merged into Phase 3).
 5. **AI Gift Finder** (`05-ai-gift-finder.md`): DONE.
 6. **Analytics Dashboard** (`06-analytics-dashboard.md`): DONE.
-7. **Excel Export** (`07-excel-export.md`): XLSX reporting for inventory and sales.
-8. **Repo Cleanup** (`08-repo-cleanup.md`): Restructure migrations into `/migrations`.
-9. **Schema Changes** (`09-schema-changes.md`): Required DB columns for Analytics/AI.
-10. **Roadmap** (`10-roadmap.md`): Detailed phasing and implementation order.
+7. **Excel Export** (`07-excel-export.md`): DONE.
+8. **Repo Cleanup** (`08-repo-cleanup.md`): DONE.
+9. **Schema Changes** (`09-schema-changes.md`): DONE.
+10. **Roadmap** (`10-roadmap.md`): DONE.
 
 ## Technical Baseline & Constraints
 1. **Stock RPC:** `process_checkout_stock` handles deductions; `restore_order_stock` handles cancellations.

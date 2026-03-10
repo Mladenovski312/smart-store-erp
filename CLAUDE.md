@@ -31,10 +31,10 @@ Reference `/specs` folder for detailed implementation rules:
 4. `04-search-normalization`: Dual-script transliteration. **DONE** (merged into Phase 3 — `src/lib/search.ts`).
 5. `05-ai-gift-finder`: Public Gemini-powered recommendation widget. **DONE.**
 6. `06-analytics-dashboard`: Full admin business intelligence suite. **DONE.**
-7. `07-excel-export`: Sales ledger and inventory reporting.
-8. `08-repo-cleanup`: Migrations folder organization.
-9. `09-schema-changes`: Database prerequisites for AI/Analytics.
-10. `10-roadmap`: Precise implementation phasing.
+7. `07-excel-export`: Sales ledger and inventory reporting. **DONE.**
+8. `08-repo-cleanup`: Migrations folder organization. **DONE.**
+9. `09-schema-changes`: Database prerequisites for AI/Analytics. **DONE.**
+10. `10-roadmap`: Precise implementation phasing. **DONE.**
 
 ## Commands
 - `npm run dev`: Local development.
