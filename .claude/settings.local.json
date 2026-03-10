@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build)",
+      "Bash(mkdir -p src/app/produkt/[slug])",
+      "Bash(mv src/app/produkt/[id]/page.tsx src/app/produkt/[slug]/page.tsx)",
+      "Bash(rmdir src/app/produkt/[id])",
+      "Bash(npm install @radix-ui/react-slider)",
+      "Bash(npm install recharts)"
+    ]
+  }
+}

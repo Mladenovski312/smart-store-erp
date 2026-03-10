@@ -135,13 +135,30 @@ export default function AnalyticsDashboard() {
                         </button>
                     ))}
                 </div>
-                <div className="flex gap-1">
-                    {PRESETS.map(p => (
-                        <button key={p.id} onClick={() => setRange(p.id)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${range === p.id ? 'bg-[#E8943A] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-                            {p.label}
+                <div className="flex items-center gap-2">
+                    <div className="flex gap-1">
+                        {PRESETS.map(p => (
+                            <button key={p.id} onClick={() => setRange(p.id)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${range === p.id ? 'bg-[#E8943A] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                                {p.label}
+                            </button>
+                        ))}
+                    </div>
+                    {['revenue', 'inventory', 'orders'].includes(tab) && (
+                        <button
+                            onClick={() => {
+                                const type = tab === 'revenue' ? 'summary' : tab === 'inventory' ? 'inventory' : 'sales';
+                                const url = `/api/export?type=${type}&from=${startDate.toISOString()}&to=${new Date().toISOString()}`;
+                                window.open(url, '_blank');
+                            }}
+                            className="flex items-center gap-2 text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 font-medium transition-colors"
+                        >
+                            <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Извези во Excel
                         </button>
-                    ))}
+                    )}
                 </div>
             </div>
 
@@ -430,7 +447,7 @@ function BrandsSection({ orders, sales, products }: { orders: OrderRaw[]; sales:
                                     {brandData.map(b => {
                                         const rec = b.margin > 30 ? { t: 'Прошири', c: 'text-green-600 bg-green-50' }
                                             : b.margin > 15 ? { t: 'Одржувај', c: 'text-blue-600 bg-blue-50' }
-                                            : { t: 'Намали', c: 'text-red-600 bg-red-50' };
+                                                : { t: 'Намали', c: 'text-red-600 bg-red-50' };
                                         return (
                                             <tr key={b.name} className="hover:bg-gray-50">
                                                 <td className="px-3 py-2 font-medium text-gray-900">{b.name}</td>
