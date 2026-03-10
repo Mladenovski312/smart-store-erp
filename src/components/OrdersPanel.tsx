@@ -42,7 +42,7 @@ export default function OrdersPanel() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedId, setExpandedId] = useState<string | null>(null);
-    const [filter, setFilter] = useState('all');
+    const [filter, setFilter] = useState('pending');
     const [confirmAction, setConfirmAction] = useState<{ id: string, status: string, label: string } | null>(null);
     const [trackingNumber, setTrackingNumber] = useState('');
     const supabase = createClient();
@@ -122,105 +122,128 @@ export default function OrdersPanel() {
     return (
         <div className="max-w-3xl mx-auto space-y-6">
             {/* Filter Tabs */}
-            <div className="flex flex-wrap gap-3">
+            <div className="bg-gray-100 rounded-2xl p-2 flex flex-wrap items-center justify-center gap-2">
                 {[
-                    { value: 'all', label: `Сите (${orders.length})` },
-                    { value: 'pending', label: `За обработка (${pendingCount})` },
-                    { value: 'shipped', label: 'Испратени' },
-                    { value: 'delivered', label: 'Доставени' },
-                    { value: 'cancelled', label: 'Откажани' },
+                    { value: 'pending', label: 'За обработка', count: pendingCount, activeBg: 'bg-orange-500 text-white', activeShadow: 'shadow-orange-500/30' },
+                    { value: 'shipped', label: 'Испратени', count: orders.filter(o => o.status === 'shipped').length, activeBg: 'bg-yellow-500 text-white', activeShadow: 'shadow-yellow-500/30' },
+                    { value: 'delivered', label: 'Доставени', count: orders.filter(o => o.status === 'delivered').length, activeBg: 'bg-green-600 text-white', activeShadow: 'shadow-green-600/30' },
+                    { value: 'cancelled', label: 'Откажани', count: orders.filter(o => o.status === 'cancelled').length, activeBg: 'bg-red-600 text-white', activeShadow: 'shadow-red-600/30' },
+                    { value: 'all', label: 'Сите', count: orders.length, activeBg: 'bg-jumbo-blue text-white', activeShadow: 'shadow-blue-900/30' },
                 ].map(tab => (
                     <button
                         key={tab.value}
                         onClick={() => setFilter(tab.value)}
-                        className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${filter === tab.value
-                            ? 'bg-jumbo-blue text-white shadow-md transform scale-105'
-                            : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
+                        className={`relative px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl text-sm md:text-base font-semibold transition-all duration-200 whitespace-nowrap ${filter === tab.value
+                            ? `${tab.activeBg} shadow-md ${tab.activeShadow} transform scale-105`
+                            : 'bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50 border border-gray-200 shadow-sm'
                             }`}
                     >
                         {tab.label}
+                        {tab.count > 0 && (
+                            <span className={`ml-2 inline-flex items-center justify-center min-w-[20px] h-[20px] px-1.5 rounded-full text-[11px] font-bold ${filter === tab.value
+                                ? 'bg-white/20 text-white'
+                                : 'bg-gray-200 text-gray-700'
+                                }`}>
+                                {tab.count}
+                            </span>
+                        )}
                     </button>
                 ))}
             </div>
 
             {/* Orders List */}
             {filtered.length === 0 ? (
-                <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
-                    <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500 font-medium">Нема нарачки</p>
+                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center shadow-sm">
+                    <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-500 font-medium text-lg">Нема нарачки</p>
                 </div>
             ) : (
-                <div className="space-y-3">
+                <div className="space-y-4 md:space-y-6">
                     {filtered.map(order => {
                         const config = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
                         const isExpanded = expandedId === order.id;
                         const date = new Date(order.created_at);
 
                         return (
-                            <div key={order.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                            <div key={order.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
                                 {/* Header */}
                                 <button
                                     onClick={() => setExpandedId(isExpanded ? null : order.id)}
-                                    className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                                    className="w-full flex items-center justify-between p-5 md:p-6 hover:bg-gray-50 transition-colors"
                                 >
-                                    <div className="flex items-center gap-3 text-left">
-                                        <div className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${config.color}`}>
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 text-left">
+                                        <div className={`inline-flex items-center w-fit gap-1.5 px-3 py-1.5 rounded-full text-xs md:text-sm font-bold border ${config.color}`}>
                                             {config.icon}
                                             {config.label}
                                         </div>
                                         <div>
-                                            <p className="font-semibold text-gray-900 text-sm">{order.customer_name}</p>
-                                            <p className="text-xs text-gray-400">
+                                            <p className="font-bold text-gray-900 text-base md:text-lg">{order.customer_name}</p>
+                                            <p className="text-sm text-gray-500 mt-0.5">
                                                 {date.toLocaleDateString('mk-MK')} · {date.toLocaleTimeString('mk-MK', { hour: '2-digit', minute: '2-digit' })}
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <span className="font-bold text-jumbo-blue text-sm">{formatPrice(order.total)} ден</span>
-                                        {isExpanded ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
+                                    <div className="flex items-center gap-3 md:gap-4 shrink-0 pl-4">
+                                        <span className="font-black text-jumbo-blue text-lg md:text-xl">{formatPrice(order.total)} ден</span>
+                                        <div className={`p-2 rounded-full ${isExpanded ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-500'}`}>
+                                            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                        </div>
                                     </div>
                                 </button>
 
                                 {/* Expanded Details */}
                                 {isExpanded && (
-                                    <div className="border-t border-gray-100 p-4 space-y-4">
+                                    <div className="border-t border-gray-100 p-5 md:p-6 space-y-5 md:space-y-6 bg-gray-50/50">
                                         {/* Customer Info */}
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                            <div className="flex items-center gap-2 text-gray-600">
-                                                <Phone size={14} className="text-gray-400" />
-                                                <a href={`tel:${order.customer_phone}`} className="hover:text-jumbo-blue">{order.customer_phone}</a>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm md:text-base">
+                                            <div className="flex items-center gap-3 text-gray-700 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                                                <div className="p-2 bg-blue-50 text-jumbo-blue rounded-lg">
+                                                    <Phone size={18} />
+                                                </div>
+                                                <a href={`tel:${order.customer_phone}`} className="font-medium hover:text-jumbo-blue transition-colors">{order.customer_phone}</a>
                                             </div>
-                                            <div className="flex items-start gap-2 text-gray-600">
-                                                <MapPin size={14} className="text-gray-400 mt-0.5" />
-                                                <span>{order.delivery_address}, {order.delivery_city}</span>
+                                            <div className="flex items-center gap-3 text-gray-700 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                                                <div className="p-2 bg-blue-50 text-jumbo-blue rounded-lg">
+                                                    <MapPin size={18} />
+                                                </div>
+                                                <span className="font-medium">{order.delivery_address}, {order.delivery_city}</span>
                                             </div>
                                         </div>
 
                                         {order.note && (
-                                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
-                                                💬 {order.note}
+                                            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm md:text-base text-yellow-800 shadow-sm flex items-start gap-3">
+                                                <span className="text-xl leading-none pt-0.5">💬</span>
+                                                <div className="font-medium">{order.note}</div>
                                             </div>
                                         )}
 
                                         {/* Items */}
-                                        <div className="bg-gray-50 rounded-lg p-3">
-                                            <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Артикли</p>
-                                            {order.items.map((item, i) => (
-                                                <div key={i} className="flex justify-between text-sm py-1">
-                                                    <span className="text-gray-700">{item.quantity}x {item.name}</span>
-                                                    <span className="font-medium">{formatPrice(item.price * item.quantity)} ден</span>
-                                                </div>
-                                            ))}
-                                            <div className="border-t border-gray-200 mt-2 pt-2 flex justify-between text-sm">
-                                                <span className="text-gray-500">Испорака</span>
-                                                <span className="text-xs text-gray-400 italic">По договор</span>
+                                        <div className="bg-white border border-gray-100 rounded-xl p-4 md:p-5 shadow-sm">
+                                            <p className="text-sm md:text-base font-bold text-gray-800 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Артикли во нарачката</p>
+                                            <div className="space-y-3">
+                                                {order.items.map((item, i) => (
+                                                    <div key={i} className="flex justify-between items-center text-sm md:text-base bg-gray-50 p-3 rounded-lg border border-gray-100/50">
+                                                        <span className="text-gray-800 font-medium">
+                                                            <span className="inline-block bg-white border border-gray-200 rounded-md px-2 py-0.5 mr-3 text-gray-600 font-bold">{item.quantity}x</span>
+                                                            {item.name}
+                                                        </span>
+                                                        <span className="font-bold text-gray-900 whitespace-nowrap">{formatPrice(item.price * item.quantity)} ден</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="border-t border-gray-200 mt-4 pt-4 flex justify-between items-center text-sm md:text-base">
+                                                <span className="text-gray-600 font-medium flex items-center gap-2">
+                                                    <Truck size={16} className="text-gray-400" />
+                                                    Испорака
+                                                </span>
+                                                <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs md:text-sm font-semibold italic">По договор</span>
                                             </div>
                                         </div>
 
                                         {/* Status Change */}
-                                        <div className="mt-6 bg-gray-50 rounded-xl p-4 border border-gray-100">
-                                            <p className="text-sm font-bold text-gray-900 mb-3">Промени статус на нарачка:</p>
-                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                        <div className="mt-6 bg-white rounded-xl p-5 md:p-6 border border-gray-100 shadow-sm">
+                                            <p className="text-base md:text-lg font-bold text-gray-900 mb-4">Промени статус на нарачка:</p>
+                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
                                                 {STATUSES.map(s => {
                                                     const sc = STATUS_CONFIG[s];
                                                     const isCurrent = order.status === s;
@@ -232,13 +255,16 @@ export default function OrdersPanel() {
                                                                 setConfirmAction({ id: order.id, status: s, label: sc.label });
                                                             }}
                                                             disabled={isCurrent}
-                                                            className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all ${isCurrent
-                                                                ? sc.color + ' border-transparent shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] cursor-default ring-2 ring-white'
-                                                                : 'bg-white border-gray-200 text-gray-600 shadow-sm hover:border-jumbo-blue hover:text-jumbo-blue hover:shadow-md hover:-translate-y-0.5'
+                                                            className={`flex flex-col items-center justify-center gap-2 p-3 md:p-4 rounded-xl border-2 transition-all duration-200 ${isCurrent
+                                                                ? sc.color + ' border-transparent shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] cursor-default ring-4 ring-white ring-offset-1'
+                                                                : 'bg-white border-gray-200 text-gray-600 shadow-sm hover:border-jumbo-blue hover:text-jumbo-blue hover:shadow-md hover:-translate-y-1'
                                                                 }`}
                                                         >
-                                                            {sc.icon}
-                                                            <span className="text-xs font-bold">{sc.label}</span>
+                                                            {s === 'pending' && <Package size={isCurrent ? 24 : 20} className={isCurrent ? 'opacity-100' : 'opacity-70'} />}
+                                                            {s === 'shipped' && <Truck size={isCurrent ? 24 : 20} className={isCurrent ? 'opacity-100' : 'opacity-70'} />}
+                                                            {s === 'delivered' && <CheckCircle size={isCurrent ? 24 : 20} className={isCurrent ? 'opacity-100' : 'opacity-70'} />}
+                                                            {s === 'cancelled' && <XCircle size={isCurrent ? 24 : 20} className={isCurrent ? 'opacity-100' : 'opacity-70'} />}
+                                                            <span className={`text-xs md:text-sm font-bold ${isCurrent ? 'scale-110' : ''}`}>{sc.label}</span>
                                                         </button>
                                                     );
                                                 })}

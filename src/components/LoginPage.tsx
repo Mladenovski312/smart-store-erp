@@ -70,6 +70,8 @@ export default function LoginPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="vashiot@email.com"
                                 required
+                                autoComplete="email"
+                                name="email"
                                 className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue text-sm"
                             />
                         </div>
@@ -86,6 +88,8 @@ export default function LoginPage() {
                                 placeholder="••••••••"
                                 required
                                 minLength={6}
+                                autoComplete="current-password"
+                                name="password"
                                 className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue text-sm"
                             />
                             <button

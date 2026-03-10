@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { PackageSearch, TrendingUp, Tags, Settings, LogOut, ScanLine, BarChart3, ShoppingBag } from 'lucide-react';
+import { PackageSearch, TrendingUp, Tags, Settings, LogOut, ScanLine, BarChart3, ShoppingBag, Menu, X } from 'lucide-react';
 import Scanner from '@/components/Scanner';
 import InventoryList from '@/components/InventoryList';
 import EmployeePOS from '@/components/EmployeePOS';
@@ -18,6 +18,8 @@ export default function DashboardLayout() {
   const { user, role: authRole, displayName, loading: authLoading, signOut } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('inventory');
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [stats, setStats] = useState<DashboardStats>({ totalProducts: 0, totalStockValue: 0, todaySalesTotal: 0, todaySalesCount: 0 });
   const [sales, setSales] = useState<SaleRecord[]>([]);
@@ -56,12 +58,41 @@ export default function DashboardLayout() {
     return (
       <div className="flex h-screen bg-gray-50 flex-col md:flex-row">
 
+        {/* Logout Confirmation Modal */}
+        {showLogoutConfirm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowLogoutConfirm(false)}>
+            <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
+              <div className="text-center mb-5">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <LogOut className="text-red-600" size={24} />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">Одјави се?</h3>
+                <p className="text-sm text-gray-500 mt-1">Дали сте сигурни дека сакате да се одјавите?</p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors"
+                >
+                  Не
+                </button>
+                <button
+                  onClick={() => { setShowLogoutConfirm(false); signOut(); }}
+                  className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-semibold text-sm hover:bg-red-700 transition-colors"
+                >
+                  Да, одјави се
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Mobile Header */}
         <div className="md:hidden bg-jumbo-blue text-white p-4 flex justify-between items-center shadow-md z-10">
           <h1 className="text-xl font-bold tracking-tight">ИНТЕР СТАР <span className="text-jumbo-red">ЏАМБО</span></h1>
           <div className="flex items-center gap-2">
             <span className="text-xs text-indigo-200">{displayName}</span>
-            <button onClick={signOut} className="p-2 bg-white/10 rounded-lg">
+            <button onClick={() => setShowLogoutConfirm(true)} className="p-2 bg-white/10 rounded-lg" aria-label="Одјави се">
               <LogOut size={18} />
             </button>
           </div>
@@ -87,7 +118,7 @@ export default function DashboardLayout() {
 
           <div className="p-4 border-t border-white/10">
             <button
-              onClick={signOut}
+              onClick={() => setShowLogoutConfirm(true)}
               className="flex items-center w-full p-3 text-indigo-200 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
             >
               <LogOut className="mr-3" size={20} />
@@ -165,16 +196,71 @@ export default function DashboardLayout() {
   return (
     <div className="flex h-screen bg-gray-50 flex-col md:flex-row">
 
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
+            <div className="text-center mb-5">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <LogOut className="text-red-600" size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Одјави се?</h3>
+              <p className="text-sm text-gray-500 mt-1">Дали сте сигурни дека сакате да се одјавите?</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors"
+              >
+                Не
+              </button>
+              <button
+                onClick={() => { setShowLogoutConfirm(false); signOut(); }}
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-semibold text-sm hover:bg-red-700 transition-colors"
+              >
+                Да, одјави се
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Header */}
       <div className="md:hidden bg-jumbo-blue text-white p-4 flex justify-between items-center shadow-md z-10">
         <h1 className="text-xl font-bold tracking-tight">ИНТЕР СТАР <span className="text-jumbo-red">ЏАМБО</span></h1>
-        <button
-          onClick={() => setActiveTab('scanner')}
-          className="p-2 bg-white/10 rounded-lg"
-        >
-          <ScanLine size={24} />
-        </button>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-indigo-200">{displayName}</span>
+        </div>
       </div>
+
+      {/* Slide-up "More" Menu for Mobile Admin */}
+      {showMobileMenu && (
+        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end">
+          <div className="absolute inset-0 bg-black/50 transition-opacity" onClick={() => setShowMobileMenu(false)} />
+          <div className="relative bg-white rounded-t-3xl shadow-2xl w-full max-h-[85vh] overflow-y-auto transform transition-transform animate-in slide-in-from-bottom pb-8">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-900">Мени</h3>
+              <button onClick={() => setShowMobileMenu(false)} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+            <div className="p-3 space-y-1">
+              <MobileDrawerItem icon={<ShoppingBag />} label="Нарачки" active={activeTab === 'orders'} onClick={() => { setActiveTab('orders'); setShowMobileMenu(false); }} />
+              <MobileDrawerItem icon={<BarChart3 />} label="Аналитика" active={activeTab === 'analytics'} onClick={() => { setActiveTab('analytics'); setShowMobileMenu(false); }} />
+              <MobileDrawerItem icon={<Tags />} label="Категории" active={activeTab === 'categories'} onClick={() => { setActiveTab('categories'); setShowMobileMenu(false); }} />
+              <MobileDrawerItem icon={<Settings />} label="Поставки" active={activeTab === 'settings'} onClick={() => { setActiveTab('settings'); setShowMobileMenu(false); }} />
+              <div className="my-2 border-t border-gray-100" />
+              <button
+                onClick={() => { setShowMobileMenu(false); setShowLogoutConfirm(true); }}
+                className="flex items-center w-full p-4 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+              >
+                <LogOut className="mr-4" size={24} />
+                <span className="font-semibold text-lg">Одјави се</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Sidebar Navigation */}
       <aside className="hidden md:flex flex-col w-64 bg-jumbo-blue text-white shadow-xl shrink-0">
@@ -198,7 +284,7 @@ export default function DashboardLayout() {
         <div className="p-4 border-t border-white/10">
           <NavItem icon={<Settings />} label="Поставки" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
           <button
-            onClick={signOut}
+            onClick={() => setShowLogoutConfirm(true)}
             className="flex items-center w-full p-3 mt-2 text-indigo-200 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
           >
             <LogOut className="mr-3" size={20} />
@@ -318,11 +404,11 @@ export default function DashboardLayout() {
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 z-10">
-        <MobileNavItem icon={<PackageSearch size={20} />} label="Залиха" active={activeTab === 'inventory'} onClick={() => setActiveTab('inventory')} />
-        <MobileNavItem icon={<ScanLine size={20} />} label="Скенирај" active={activeTab === 'scanner'} onClick={() => setActiveTab('scanner')} />
-        <MobileNavItem icon={<TrendingUp size={20} />} label="Продажба" active={activeTab === 'sales'} onClick={() => setActiveTab('sales')} />
-        <MobileNavItem icon={<BarChart3 size={20} />} label="Аналитика" active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
+      <div className="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around p-3 z-10 pb-safe">
+        <MobileNavItem icon={<PackageSearch size={22} />} label="Залиха" active={activeTab === 'inventory'} onClick={() => setActiveTab('inventory')} />
+        <MobileNavItem icon={<ScanLine size={22} />} label="Скенирај" active={activeTab === 'scanner'} onClick={() => setActiveTab('scanner')} />
+        <MobileNavItem icon={<TrendingUp size={22} />} label="POS" active={activeTab === 'sales'} onClick={() => setActiveTab('sales')} />
+        <MobileNavItem icon={<Menu size={22} />} label="Повеќе" active={['orders', 'analytics', 'categories', 'settings'].includes(activeTab)} onClick={() => setShowMobileMenu(true)} />
       </div>
     </div>
   );
@@ -344,9 +430,21 @@ function NavItem({ icon, label, active = false, onClick }: { icon: React.ReactNo
 
 function MobileNavItem({ icon, label, active = false, onClick }: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void }) {
   return (
-    <button onClick={onClick} className={`flex flex-col items-center justify-center w-16 ${active ? 'text-jumbo-blue font-semibold' : 'text-gray-500 hover:text-gray-900'}`}>
+    <button onClick={onClick} className={`flex flex-col items-center justify-center w-16 px-1 transition-colors ${active ? 'text-jumbo-blue font-bold scale-105 transform' : 'text-gray-500 hover:text-gray-900'}`}>
       <div className="mb-1">{icon}</div>
-      <span className="text-[10px]">{label}</span>
+      <span className="text-[10px] sm:text-xs tracking-tight">{label}</span>
+    </button>
+  );
+}
+
+function MobileDrawerItem({ icon, label, active = false, onClick }: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center w-full p-4 rounded-xl transition-colors text-left ${active ? 'bg-jumbo-blue/10 text-jumbo-blue font-bold' : 'text-gray-700 hover:bg-gray-50 font-medium'}`}
+    >
+      <span className={`mr-4 ${active ? 'text-jumbo-blue' : 'text-gray-500'}`}>{icon}</span>
+      <span className="text-lg">{label}</span>
     </button>
   );
 }
