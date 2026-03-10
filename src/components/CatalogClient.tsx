@@ -117,7 +117,6 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Каталог на играчки - Интер Стар Џамбо</h1>
                     <p className="text-gray-500">
                         Најголем асортиман на квалитетни играчки достапни во нашата продавница во Куманово и онлајн со достава низ цела Македонија.
-                        {filtered.length} {filtered.length === 1 ? 'артикл' : 'артикли'} на залиха
                     </p>
                 </div>
 

@@ -111,15 +111,15 @@ export default function GiftFinderModal({ onClose }: { onClose: () => void }) {
     };
 
     return (
-        <div className="fixed bottom-5 right-5 z-50 w-[380px] max-w-[calc(100vw-2rem)]
+        <div className="fixed bottom-[88px] md:bottom-8 right-3 md:right-5 z-50 w-[380px] max-w-[calc(100vw-1.5rem)]
                         flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-200
                         overflow-hidden"
-             style={{ maxHeight: 'min(600px, calc(100vh - 3rem))' }}
+            style={{ maxHeight: 'min(726px, calc(100vh - 3rem))' }}
         >
             {/* Header */}
             <div className="bg-[#1A3C5E] px-4 py-3 flex items-center gap-3 shrink-0">
                 <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="scale-x-[-1]">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                     </svg>
                 </div>
@@ -145,13 +145,14 @@ export default function GiftFinderModal({ onClose }: { onClose: () => void }) {
                 {chat.length === 0 && !errorType && (
                     <div className="flex gap-2">
                         <div className="w-7 h-7 rounded-full bg-[#1A3C5E] flex items-center justify-center shrink-0 mt-0.5">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="scale-x-[-1]">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                             </svg>
                         </div>
                         <div className="bg-white border border-gray-200 rounded-xl rounded-tl-sm px-3 py-2 max-w-[85%]">
-                            <p className="text-sm text-gray-700 leading-relaxed">
-                                Здраво! Јас сум асистентот на Интер Стар Џамбо. Како можам да ти помогнам?
+                            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                Добредојдовте на страната на Интер Стар Џамбо! 👋
+                                <br />Јас сум вашиот виртуелен асистент.<br />Како можам да ви помогнам денес?
                             </p>
                         </div>
                     </div>
@@ -169,7 +170,7 @@ export default function GiftFinderModal({ onClose }: { onClose: () => void }) {
                         ) : (
                             <div className="flex gap-2">
                                 <div className="w-7 h-7 rounded-full bg-[#1A3C5E] flex items-center justify-center shrink-0 mt-0.5">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="scale-x-[-1]">
                                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                                     </svg>
                                 </div>
@@ -225,7 +226,7 @@ export default function GiftFinderModal({ onClose }: { onClose: () => void }) {
                 {loading && (
                     <div className="flex gap-2">
                         <div className="w-7 h-7 rounded-full bg-[#1A3C5E] flex items-center justify-center shrink-0">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="scale-x-[-1]">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                             </svg>
                         </div>
@@ -243,7 +244,7 @@ export default function GiftFinderModal({ onClose }: { onClose: () => void }) {
                 {errorType && (
                     <div className="flex gap-2">
                         <div className="w-7 h-7 rounded-full bg-[#1A3C5E] flex items-center justify-center shrink-0">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="scale-x-[-1]">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                             </svg>
                         </div>
