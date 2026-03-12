@@ -69,7 +69,7 @@ export default function DashboardLayout() {
 
         {/* Mobile Header */}
         <div className="md:hidden bg-jumbo-blue text-white p-4 flex justify-between items-center shadow-md z-10">
-          <h1 className="text-xl font-bold tracking-tight">ИНТЕР СТАР <span className="text-jumbo-red">ЏАМБО</span></h1>
+          <h1 className="text-xl font-bold tracking-tight">ИНТЕР СТАР <span className="text-red-300">ЏАМБО</span></h1>
           <div className="flex items-center gap-2">
             <span className="text-xs text-indigo-200">{displayName}</span>
             <button onClick={() => setShowLogoutConfirm(true)} className="p-2 bg-white/10 rounded-lg" aria-label="Одјави се">
@@ -177,7 +177,7 @@ export default function DashboardLayout() {
 
       {/* Mobile Header */}
       <div className="md:hidden bg-jumbo-blue text-white p-4 flex justify-between items-center shadow-md z-10">
-        <h1 className="text-xl font-bold tracking-tight">ИНТЕР СТАР <span className="text-jumbo-red">ЏАМБО</span></h1>
+        <h1 className="text-xl font-bold tracking-tight">ИНТЕР СТАР <span className="text-red-300">ЏАМБО</span></h1>
         <div className="flex items-center gap-2">
           <span className="text-xs text-indigo-200">{displayName}</span>
         </div>

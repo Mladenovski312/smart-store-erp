@@ -21,7 +21,7 @@ export default function DeliveryTermsPage() {
                                 <span className="text-sm font-medium hidden sm:inline">Назад</span>
                             </Link>
                             <Link href="/" className="bg-jumbo-blue text-white px-2.5 py-1 rounded-lg font-black text-sm tracking-tight">
-                                ИНТЕР СТАР <span className="text-jumbo-red">ЏАМБО</span>
+                                ИНТЕР СТАР <span className="text-red-300">ЏАМБО</span>
                             </Link>
                         </div>
                     </div>

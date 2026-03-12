@@ -45,7 +45,7 @@ export default function LoginPage() {
                 {/* Logo Header */}
                 <div className="text-center mb-8">
                     <div className="inline-block bg-jumbo-blue text-white px-4 py-2 rounded-xl font-black text-xl tracking-tight mb-3">
-                        ИНТЕР СТАР <span className="text-jumbo-red">ЏАМБО</span>
+                        ИНТЕР СТАР <span className="text-red-300">ЏАМБО</span>
                     </div>
                     <h1 className="text-xl font-bold text-gray-900">Админ Панел</h1>
                     <p className="text-gray-500 text-sm mt-1">Најавете се за да продолжите</p>
