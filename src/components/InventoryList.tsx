@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { Product, getCategoryLabel, CATEGORIES, formatPrice } from '@/lib/types';
 import { recordSale, deleteProduct, updateProduct, uploadProductImage } from '@/lib/store';
 import { Trash2, MinusCircle, Search, Filter, Pencil, Upload, X } from 'lucide-react';
@@ -141,9 +142,9 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
                         className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group"
                     >
                         {/* Image */}
-                        <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden">
+                        <div className="relative aspect-square bg-gray-50 flex items-center justify-center overflow-hidden">
                             {product.imageUrl ? (
-                                <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain p-2" />
+                                <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-2" sizes="(max-width: 768px) 50vw, 200px" />
                             ) : (
                                 <div className="text-gray-300 text-4xl font-bold">
                                     {product.name.charAt(0)}
@@ -263,9 +264,9 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
                         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-2">
                             {/* Image - Left Column */}
                             <div className="md:col-span-2 flex flex-col">
-                                <div className="w-full aspect-square bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden mb-3">
+                                <div className="relative w-full aspect-square bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden mb-3">
                                     {editImagePreview ? (
-                                        <img src={editImagePreview} alt="" className="w-full h-full object-contain p-2" />
+                                        <Image src={editImagePreview} alt="" fill className="object-contain p-2" sizes="300px" unoptimized />
                                     ) : (
                                         <span className="text-gray-300 text-sm">Нема слика</span>
                                     )}

@@ -1,8 +1,12 @@
-"use client";
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ChevronLeft, MapPin, Phone, Clock, Navigation } from 'lucide-react';
 import Footer from '@/components/Footer';
+
+export const metadata: Metadata = {
+    title: 'Локација',
+    description: 'Најдете нè на Народна Револуција 43, Куманово. Работно време: Пон–Саб 09:00–21:00.',
+};
 
 export default function LocationPage() {
     return (

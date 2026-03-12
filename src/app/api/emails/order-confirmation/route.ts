@@ -1,13 +1,9 @@
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase';
+import { OrderItem } from '@/lib/types';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-
-interface OrderItem {
-  name: string;
-  price: number;
-  quantity: number;
-}
 
 function esc(text: string | number): string {
   return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -19,6 +15,18 @@ export async function POST(req: NextRequest) {
 
     if (!customerEmail || !orderId) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // Verify the order exists in the database before sending email
+    const supabase = createClient();
+    const { data: order, error: dbError } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('id', orderId)
+      .single();
+
+    if (dbError || !order) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 403 });
     }
 
     const shortId = orderId.slice(0, 8).toUpperCase();

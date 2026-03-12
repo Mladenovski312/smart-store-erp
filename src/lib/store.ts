@@ -3,6 +3,7 @@
  * All functions are async and operate directly on the Supabase database.
  */
 import { createClient } from './supabase';
+import { cyrillicToLatin } from './search';
 import { Product, SaleRecord, DashboardStats } from './types';
 
 // ─── Helpers ─────────────────────────────────────────
@@ -116,25 +117,8 @@ export async function getRelatedProducts(product: Product, limit = 4): Promise<P
     return results.slice(0, limit);
 }
 
-// Macedonian Cyrillic → Latin transliteration map
-const CYRILLIC_TO_LATIN: Record<string, string> = {
-    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'ѓ': 'gj',
-    'е': 'e', 'ж': 'zh', 'з': 'z', 'ѕ': 'dz', 'и': 'i', 'ј': 'j',
-    'к': 'k', 'л': 'l', 'љ': 'lj', 'м': 'm', 'н': 'n', 'њ': 'nj',
-    'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'ќ': 'kj',
-    'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'c', 'ч': 'ch', 'џ': 'dj',
-    'ш': 'sh',
-};
-
-function transliterate(text: string): string {
-    return text
-        .split('')
-        .map(ch => CYRILLIC_TO_LATIN[ch] || ch)
-        .join('');
-}
-
 function generateSlug(name: string): string {
-    return transliterate(name.toLowerCase())
+    return cyrillicToLatin(name.toLowerCase())
         .replace(/[^a-z0-9\-]/g, '-')
         .replace(/-{2,}/g, '-')
         .replace(/^-|-$/g, '')
@@ -164,7 +148,9 @@ export async function saveProduct(
         .single();
 
     if (error || !data) return null;
-    return dbToProduct(data);
+    const saved = dbToProduct(data);
+    logAdminAction('product.create', 'product', saved.id, { name: saved.name, price: saved.sellingPrice });
+    return saved;
 }
 
 export async function updateProductStock(productId: string, newQuantity: number): Promise<void> {
@@ -181,6 +167,7 @@ export async function deleteProduct(productId: string): Promise<void> {
         .from('products')
         .delete()
         .eq('id', productId);
+    logAdminAction('product.delete', 'product', productId);
 }
 
 /** Upload an image file to Supabase Storage and return its public URL. */
@@ -232,7 +219,9 @@ export async function updateProduct(
         .single();
 
     if (error || !data) return null;
-    return dbToProduct(data);
+    const updated = dbToProduct(data);
+    logAdminAction('product.update', 'product', productId, updates);
+    return updated;
 }
 
 // ─── Sales ───────────────────────────────────────────
@@ -268,7 +257,31 @@ export async function recordSale(product: Product, quantity: number): Promise<Sa
     // Decrease stock
     await updateProductStock(product.id, product.stockQuantity - quantity);
 
+    logAdminAction('sale.pos', 'product', product.id, { name: product.name, quantity, total: product.sellingPrice * quantity });
     return dbToSale(data);
+}
+
+// ─── Audit Logging ───────────────────────────────────
+/** Fire-and-forget audit log for admin actions. Never throws. */
+export async function logAdminAction(
+    action: string,
+    targetType: string,
+    targetId: string,
+    details: Record<string, unknown> = {}
+): Promise<void> {
+    try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        await supabase.from('admin_audit_log').insert({
+            user_email: user?.email || 'unknown',
+            action,
+            target_type: targetType,
+            target_id: targetId,
+            details,
+        });
+    } catch {
+        // Audit log should never break the main operation
+    }
 }
 
 // ─── Stats ───────────────────────────────────────────

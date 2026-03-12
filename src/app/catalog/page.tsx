@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
 import { getProducts } from '@/lib/store';
 import CatalogClient from '@/components/CatalogClient';
+
+export const metadata: Metadata = {
+    title: 'Каталог',
+    description: 'Пребарувајте го целиот асортиман на играчки во Интер Стар Џамбо — филтрирајте по категорија, цена и возраст.',
+};
 
 export default async function CatalogPage({
     searchParams,

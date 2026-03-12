@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { Camera, ImageUp, Wand2, CheckCircle, Upload, Eraser } from 'lucide-react';
 import { CATEGORIES } from '@/lib/types';
 import { saveProduct, uploadProductImage } from '@/lib/store';
@@ -200,7 +201,7 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
                         style={previewUrl ? { backgroundImage: 'repeating-conic-gradient(#f0f0f0 0% 25%, white 0% 50%)', backgroundSize: '20px 20px' } : undefined}
                     >
                         {previewUrl ? (
-                            <img src={showOriginal ? (originalUrl || previewUrl) : previewUrl} alt="Preview" className="w-full h-full object-contain" />
+                            <Image src={showOriginal ? (originalUrl || previewUrl) : previewUrl} alt="Preview" fill className="object-contain" sizes="400px" unoptimized />
                         ) : (
                             <div className="text-center p-6 text-gray-400">
                                 <Camera className="w-12 h-12 mx-auto mb-2 opacity-50" />

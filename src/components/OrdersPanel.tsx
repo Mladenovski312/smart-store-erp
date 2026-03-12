@@ -2,15 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase';
+import { logAdminAction } from '@/lib/store';
 import { Package, Truck, CheckCircle, XCircle, Phone, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
-import { formatPrice } from '@/lib/types';
-
-interface OrderItem {
-    productId: string;
-    name: string;
-    price: number;
-    quantity: number;
-}
+import { formatPrice, OrderItem } from '@/lib/types';
 
 interface Order {
     id: string;
@@ -85,6 +79,13 @@ export default function OrdersPanel() {
             .from('orders')
             .update(updateData)
             .eq('id', orderId);
+
+        const order2 = orders.find(o => o.id === orderId);
+        logAdminAction('order.status_change', 'order', orderId, {
+            from: order2?.status,
+            to: newStatus,
+            ...(trackingNum ? { tracking: trackingNum } : {}),
+        });
 
         // Send email when marked as shipped
         if (newStatus === 'shipped') {

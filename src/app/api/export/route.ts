@@ -1,19 +1,21 @@
 import * as XLSX from 'xlsx';
-import { createClient } from '@/lib/supabase';
+import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
-import { getCategoryLabel } from '@/lib/types';
+import { getCategoryLabel, OrderItem } from '@/lib/types';
 
 export async function GET(req: NextRequest) {
-    const supabase = createClient();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                getAll() {
+                    return req.cookies.getAll();
+                },
+            },
+        }
+    );
 
-    // Auth check - wait, createBrowserClient inside createClient() can be used here?
-    // Actually yes, the app router handles cookies if using @supabase/ssr properly, 
-    // but in API route we might need an admin check or skip it if it's internal.
-    // The previous specs said:
-    // const { data: { user } } = await supabase.auth.getUser();
-    // if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-    // We will include the auth check as per spec.
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -45,7 +47,7 @@ export async function GET(req: NextRequest) {
             'Клиент': o.customer_name,
             'Град': o.delivery_city || 'Непознат',
             'Производи': Array.isArray(o.items)
-                ? o.items.map((i: any) => `${i.name} (x${i.quantity})`).join(', ')
+                ? o.items.map((i: OrderItem) => `${i.name} (x${i.quantity})`).join(', ')
                 : '',
             'Вкупно (ден)': o.total,
             'Плаќање': 'Готовина при достава',
@@ -145,7 +147,7 @@ export async function GET(req: NextRequest) {
         (orders || []).forEach(o => {
             let cost = 0;
             if (Array.isArray(o.items)) {
-                o.items.forEach((item: any) => {
+                o.items.forEach((item: OrderItem) => {
                     const p = pMap.get(item.productId);
                     if (p) cost += p.purchase_price * item.quantity;
                 });

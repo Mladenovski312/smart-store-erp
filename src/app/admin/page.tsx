@@ -1,22 +1,28 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { PackageSearch, TrendingUp, Tags, Settings, LogOut, ScanLine, BarChart3, ShoppingBag, Menu, X } from 'lucide-react';
-import Scanner from '@/components/Scanner';
 import InventoryList from '@/components/InventoryList';
 import EmployeePOS from '@/components/EmployeePOS';
 import LoginPage from '@/components/LoginPage';
 import SettingsPanel from '@/components/SettingsPanel';
 import OrdersPanel from '@/components/OrdersPanel';
-import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { NavItem, MobileNavItem, MobileDrawerItem } from '@/components/admin/NavItems';
+import StatCard from '@/components/admin/StatCard';
+import SalesHistory from '@/components/admin/SalesHistory';
+import CategoriesView from '@/components/admin/CategoriesView';
+import LogoutModal from '@/components/admin/LogoutModal';
+
+const Scanner = dynamic(() => import('@/components/Scanner'), { ssr: false });
+const AnalyticsDashboard = dynamic(() => import('@/components/AnalyticsDashboard'), { ssr: false });
 import { useAuth } from '@/components/AuthProvider';
 import { getProducts, getDashboardStats, getSales } from '@/lib/store';
 import { Product, DashboardStats, SaleRecord } from '@/lib/types';
 
 export default function DashboardLayout() {
   const { user, role: authRole, displayName, loading: authLoading, signOut } = useAuth();
-  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('inventory');
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -32,12 +38,13 @@ export default function DashboardLayout() {
   }, []);
 
   useEffect(() => {
-    setTimeout(() => setMounted(true), 0);
     refresh();
   }, [refresh]);
 
+  const handleLogout = () => { setShowLogoutConfirm(false); signOut(); };
+
   // Loading state
-  if (!mounted || authLoading) {
+  if (authLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -58,34 +65,7 @@ export default function DashboardLayout() {
     return (
       <div className="flex h-screen bg-gray-50 flex-col md:flex-row">
 
-        {/* Logout Confirmation Modal */}
-        {showLogoutConfirm && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowLogoutConfirm(false)}>
-            <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
-              <div className="text-center mb-5">
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <LogOut className="text-red-600" size={24} />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900">Одјави се?</h3>
-                <p className="text-sm text-gray-500 mt-1">Дали сте сигурни дека сакате да се одјавите?</p>
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowLogoutConfirm(false)}
-                  className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors"
-                >
-                  Не
-                </button>
-                <button
-                  onClick={() => { setShowLogoutConfirm(false); signOut(); }}
-                  className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-semibold text-sm hover:bg-red-700 transition-colors"
-                >
-                  Да, одјави се
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {showLogoutConfirm && <LogoutModal onCancel={() => setShowLogoutConfirm(false)} onConfirm={handleLogout} />}
 
         {/* Mobile Header */}
         <div className="md:hidden bg-jumbo-blue text-white p-4 flex justify-between items-center shadow-md z-10">
@@ -150,11 +130,9 @@ export default function DashboardLayout() {
           )}
 
           {activeTab === 'scanner' && (
-            <>
-              <ErrorBoundary fallbackMessage="Грешка при скенирање.">
-                <Scanner onProductSaved={() => { refresh(); }} />
-              </ErrorBoundary>
-            </>
+            <ErrorBoundary fallbackMessage="Грешка при скенирање.">
+              <Scanner onProductSaved={() => { refresh(); }} />
+            </ErrorBoundary>
           )}
 
           {activeTab === 'sales' && (
@@ -192,38 +170,10 @@ export default function DashboardLayout() {
   }
 
   // Admin role → full dashboard
-
   return (
     <div className="flex h-screen bg-gray-50 flex-col md:flex-row">
 
-      {/* Logout Confirmation Modal */}
-      {showLogoutConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowLogoutConfirm(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
-            <div className="text-center mb-5">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <LogOut className="text-red-600" size={24} />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900">Одјави се?</h3>
-              <p className="text-sm text-gray-500 mt-1">Дали сте сигурни дека сакате да се одјавите?</p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowLogoutConfirm(false)}
-                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors"
-              >
-                Не
-              </button>
-              <button
-                onClick={() => { setShowLogoutConfirm(false); signOut(); }}
-                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-semibold text-sm hover:bg-red-700 transition-colors"
-              >
-                Да, одјави се
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {showLogoutConfirm && <LogoutModal onCancel={() => setShowLogoutConfirm(false)} onConfirm={handleLogout} />}
 
       {/* Mobile Header */}
       <div className="md:hidden bg-jumbo-blue text-white p-4 flex justify-between items-center shadow-md z-10">
@@ -339,11 +289,9 @@ export default function DashboardLayout() {
         )}
 
         {activeTab === 'scanner' && (
-          <>
-            <ErrorBoundary fallbackMessage="Грешка при скенирање.">
-              <Scanner onProductSaved={() => { refresh(); }} />
-            </ErrorBoundary>
-          </>
+          <ErrorBoundary fallbackMessage="Грешка при скенирање.">
+            <Scanner onProductSaved={() => { refresh(); }} />
+          </ErrorBoundary>
         )}
 
         {activeTab === 'sales' && (
@@ -410,141 +358,6 @@ export default function DashboardLayout() {
         <MobileNavItem icon={<TrendingUp size={22} />} label="POS" active={activeTab === 'sales'} onClick={() => setActiveTab('sales')} />
         <MobileNavItem icon={<Menu size={22} />} label="Повеќе" active={['orders', 'analytics', 'categories', 'settings'].includes(activeTab)} onClick={() => setShowMobileMenu(true)} />
       </div>
-    </div>
-  );
-}
-
-// ─── Helper Components ────────────────────────────────
-
-function NavItem({ icon, label, active = false, onClick }: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex items-center w-full p-3 rounded-lg transition-colors text-left ${active ? 'bg-white/10 text-white font-semibold' : 'text-indigo-100 hover:bg-white/5 hover:text-white font-medium'}`}
-    >
-      <span className="mr-3">{icon}</span>
-      {label}
-    </button>
-  );
-}
-
-function MobileNavItem({ icon, label, active = false, onClick }: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void }) {
-  return (
-    <button onClick={onClick} className={`flex flex-col items-center justify-center w-16 px-1 transition-colors ${active ? 'text-jumbo-blue font-bold scale-105 transform' : 'text-gray-500 hover:text-gray-900'}`}>
-      <div className="mb-1">{icon}</div>
-      <span className="text-[10px] sm:text-xs tracking-tight">{label}</span>
-    </button>
-  );
-}
-
-function MobileDrawerItem({ icon, label, active = false, onClick }: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex items-center w-full p-4 rounded-xl transition-colors text-left ${active ? 'bg-jumbo-blue/10 text-jumbo-blue font-bold' : 'text-gray-700 hover:bg-gray-50 font-medium'}`}
-    >
-      <span className={`mr-4 ${active ? 'text-jumbo-blue' : 'text-gray-500'}`}>{icon}</span>
-      <span className="text-lg">{label}</span>
-    </button>
-  );
-}
-
-function StatCard({ title, value, change, highlight = false }: { title: string; value: string; change: string; highlight?: boolean }) {
-  return (
-    <div className={`p-6 rounded-xl border ${highlight ? 'bg-jumbo-blue-light border-blue-200' : 'bg-white border-gray-100 shadow-sm'}`}>
-      <h4 className="text-sm font-medium text-gray-500 mb-1">{title}</h4>
-      <div className={`text-2xl font-bold ${highlight ? 'text-jumbo-blue' : 'text-gray-900'}`}>{value}</div>
-      <div className="text-sm text-gray-500 mt-2 font-medium">{change}</div>
-    </div>
-  );
-}
-
-function SalesHistory({ sales }: { sales: SaleRecord[] }) {
-  const sorted = [...sales].sort((a, b) => new Date(b.soldAt).getTime() - new Date(a.soldAt).getTime());
-
-  if (sorted.length === 0) {
-    return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center min-h-[300px] flex flex-col items-center justify-center">
-        <BarChart3 className="text-gray-300 w-14 h-14 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900">Нема продажби</h3>
-        <p className="text-gray-500 max-w-sm mt-2">Продажбите ќе се појават тука откако ќе регистрирате продажба од инвентарот.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-100">
-              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Артикл</th>
-              <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Кол.</th>
-              <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Цена</th>
-              <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Профит</th>
-              <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Датум</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {sorted.map(sale => (
-              <tr key={sale.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">{sale.productName}</td>
-                <td className="px-4 py-4 text-sm text-center text-gray-600">{sale.quantitySold}</td>
-                <td className="px-6 py-4 text-sm text-right text-gray-900 font-semibold">{sale.soldPrice.toLocaleString()} ден</td>
-                <td className="px-6 py-4 text-sm text-right text-green-600 font-semibold">+{sale.profit.toLocaleString()} ден</td>
-                <td className="px-6 py-4 text-sm text-right text-gray-500">
-                  {new Date(sale.soldAt).toLocaleDateString('mk-MK', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-function CategoriesView({ products }: { products: Product[] }) {
-  const categoryMap = new Map<string, { count: number; value: number }>();
-  for (const p of products) {
-    const existing = categoryMap.get(p.category) || { count: 0, value: 0 };
-    categoryMap.set(p.category, {
-      count: existing.count + p.stockQuantity,
-      value: existing.value + p.sellingPrice * p.stockQuantity,
-    });
-  }
-
-  const entries = Array.from(categoryMap.entries()).sort((a, b) => b[1].count - a[1].count);
-  const labels: Record<string, string> = {
-    'Toys': 'Играчки',
-    'Vehicles & Ride-ons': 'Возила и Автомобили',
-    'Dolls & Figures': 'Кукли и Фигури',
-    'Baby & Toddler': 'Опрема за Бебиња',
-    'Outdoor & Sports': 'Спорт и Рекреација',
-    'Games & Puzzles': 'Игри и Сложувалки',
-    'Clothing & School': 'Облека и Училишно',
-    'Разно (Miscellaneous)': 'Разно',
-  };
-
-  if (entries.length === 0) {
-    return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center min-h-[300px] flex flex-col items-center justify-center">
-        <Tags className="text-gray-300 w-14 h-14 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900">Нема категории</h3>
-        <p className="text-gray-500 max-w-sm mt-2">Категориите ќе се пополнат автоматски кога ќе додадете артикли.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {entries.map(([cat, data]) => (
-        <div key={cat} className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-          <h3 className="font-semibold text-gray-900 mb-1">{labels[cat] || cat}</h3>
-          <div className="text-2xl font-bold text-jumbo-blue">{data.count}</div>
-          <div className="text-sm text-gray-500 mt-1">Вредност: {data.value.toLocaleString()} ден</div>
-        </div>
-      ))}
     </div>
   );
 }

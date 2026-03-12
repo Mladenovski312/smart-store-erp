@@ -7,7 +7,7 @@ export default async function sitemap() {
         .select('slug, updated_at')
         .gt('stock_quantity', 0);
 
-    const productUrls = (products ?? []).map((p: any) => ({
+    const productUrls = (products ?? []).map((p: { slug: string; updated_at: string }) => ({
         url: `https://interstarjumbo.com/produkt/${p.slug}`,
         lastModified: p.updated_at,
         changeFrequency: 'weekly' as const,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import { createClient } from '@/lib/supabase';
 
 // Lazy-init so the build doesn't crash when env vars are missing
 let _ai: GoogleGenAI | null = null;
@@ -14,6 +15,13 @@ function getAI() {
 
 export async function POST(req: NextRequest) {
     try {
+        // Only authenticated users (admin/employees) can use the vision API
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const ai = getAI();
 
         const formData = await req.formData();
@@ -60,6 +68,7 @@ export async function POST(req: NextRequest) {
             ],
             config: {
                 responseMimeType: "application/json",
+                httpOptions: { timeout: 15_000 },
             }
         });
 
