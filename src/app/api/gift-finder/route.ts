@@ -13,20 +13,7 @@ function getAI() {
     return _ai;
 }
 
-// ── Rate limiter (in-memory, resets on server restart) ──────
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function isRateLimited(ip: string): boolean {
-    const now = Date.now();
-    const entry = rateLimitMap.get(ip);
-    if (!entry || now > entry.resetAt) {
-        rateLimitMap.set(ip, { count: 1, resetAt: now + 3_600_000 });
-        return false;
-    }
-    if (entry.count >= 20) return true;
-    entry.count++;
-    return false;
-}
+// ── Rate limiter (persistent via Supabase) ──────
 
 const SYSTEM_PROMPT = `You are a friendly assistant for Интер Стар Џамбо (Inter Star Jumbo), a toy store in Kumanovo, Macedonia.
 Website: interstarjumbo.com
@@ -69,9 +56,15 @@ OUTPUT FORMAT — respond ONLY with valid JSON, no markdown:
 - If no products are relevant (e.g. store info question), omit the "products" field or set it to [].`;
 
 export async function POST(req: NextRequest) {
-    // ── Rate limit check ────────────────────────────────────
+    // ── Rate limit check (persistent via Supabase RPC) ─────
     const ip = req.headers.get('x-forwarded-for') ?? 'unknown';
-    if (isRateLimited(ip)) {
+    const supabaseRL = createClient();
+    const { data: allowed } = await supabaseRL.rpc('check_rate_limit', {
+        p_key: `gift-finder:${ip}`,
+        p_max_requests: 20,
+        p_window_seconds: 3600,
+    });
+    if (allowed === false) {
         return NextResponse.json({ error: 'rate_limited' }, { status: 429 });
     }
 
@@ -108,7 +101,7 @@ export async function POST(req: NextRequest) {
         age_range: p.age_range,
     }));
     // Sanitize: strip characters that could be used for prompt injection framing
-    const sanitized = query.trim().replace(/["""«»{}[\]]/g, '').slice(0, 300);
+    const sanitized = query.trim().replace(/["""«»{}[\]\n\r]/g, ' ').slice(0, 300);
     const userPrompt = `Customer message: "${sanitized}"\n\nAvailable products (${catalog.length} in stock):\n${JSON.stringify(catalog)}`;
 
     let rawResponse = '';
@@ -127,6 +120,7 @@ export async function POST(req: NextRequest) {
                 maxOutputTokens: 500,
                 temperature: 0.4,
                 responseMimeType: 'application/json',
+                httpOptions: { timeout: 15_000 },
             },
         });
         rawResponse = response?.text || '{}';

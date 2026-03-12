@@ -12,13 +12,9 @@ import {
 
 interface OrderRaw {
     id: string;
-    customer_name: string;
     customer_phone: string;
-    customer_email: string | null;
     delivery_city: string;
     items: { productId: string; name: string; price: number; quantity: number }[];
-    subtotal: number;
-    delivery_cost: number;
     total: number;
     status: string;
     created_at: string;
@@ -27,7 +23,6 @@ interface OrderRaw {
 interface SaleRaw {
     id: string;
     product_id: string;
-    product_name: string;
     quantity_sold: number;
     sold_price: number;
     profit: number;
@@ -98,9 +93,9 @@ export default function AnalyticsDashboard() {
         async function load() {
             const supabase = createClient();
             const [o, s, p] = await Promise.all([
-                supabase.from('orders').select('*').order('created_at', { ascending: false }),
-                supabase.from('sales').select('*').order('sold_at', { ascending: false }),
-                supabase.from('products').select('*'),
+                supabase.from('orders').select('id, customer_phone, delivery_city, items, total, status, created_at').order('created_at', { ascending: false }),
+                supabase.from('sales').select('id, product_id, quantity_sold, sold_price, profit, sold_at').order('sold_at', { ascending: false }),
+                supabase.from('products').select('id, name, category, brand, purchase_price, selling_price, stock_quantity'),
             ]);
             setOrders((o.data || []) as OrderRaw[]);
             setSales((s.data || []) as SaleRaw[]);
@@ -196,12 +191,12 @@ function NoData() {
     return <p className="text-center text-gray-400 py-10 text-sm">Нема податоци за избраниот период</p>;
 }
 
-function CurrTooltip({ active, payload, label }: any) {
+function CurrTooltip({ active, payload, label }: { active?: boolean; payload?: { color: string; name: string; value: number }[]; label?: string }) {
     if (!active || !payload?.length) return null;
     return (
         <div className="bg-white p-2 border rounded-lg shadow text-xs">
             <p className="font-semibold mb-1">{label}</p>
-            {payload.map((p: any, i: number) => (
+            {payload.map((p, i) => (
                 <p key={i} style={{ color: p.color }}>{p.name}: {formatPrice(p.value)} ден</p>
             ))}
         </div>
@@ -532,7 +527,7 @@ function OrdersSection({ orders }: { orders: OrderRaw[] }) {
                             <PieChart>
                                 <Pie data={statusData} cx="50%" cy="50%" innerRadius={60} outerRadius={110}
                                     dataKey="value" nameKey="name" paddingAngle={2}
-                                    label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                                    label={({ name, percent }) => `${name ?? ''} ${((percent ?? 0) * 100).toFixed(0)}%`}>
                                     {statusData.map((s) => (
                                         <Cell key={s.name} fill={STATUS_COLORS[s.name] || '#999'} />
                                     ))}

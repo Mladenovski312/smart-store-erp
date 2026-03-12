@@ -1,8 +1,12 @@
-"use client";
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 import Footer from '@/components/Footer';
+
+export const metadata: Metadata = {
+    title: 'Услови за испорака',
+    description: 'Дознајте повеќе за условите за испорака, рокови и начин на достава на нарачки од Интер Стар Џамбо.',
+};
 
 export default function DeliveryTermsPage() {
     return (

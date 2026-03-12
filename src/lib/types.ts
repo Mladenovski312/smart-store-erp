@@ -26,6 +26,13 @@ export interface SaleRecord {
     soldAt: string;
 }
 
+export interface OrderItem {
+    productId?: string;
+    name: string;
+    price: number;
+    quantity: number;
+}
+
 export interface DashboardStats {
     totalProducts: number;
     totalStockValue: number;

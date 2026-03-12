@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Product, getCategoryLabel, formatPrice } from '@/lib/types';
 import { recordSale } from '@/lib/store';
 import { ShoppingCart, CheckCircle2, Search, Package } from 'lucide-react';
@@ -70,9 +71,9 @@ export default function EmployeePOS({ products, onSaleComplete }: EmployeePOSPro
                             className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-left hover:shadow-md hover:border-jumbo-blue/30 active:scale-[0.97] transition-all group"
                         >
                             {/* Image */}
-                            <div className="aspect-square bg-gray-50 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                            <div className="relative aspect-square bg-gray-50 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                                 {product.imageUrl ? (
-                                    <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain p-1" />
+                                    <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-1" sizes="(max-width: 640px) 50vw, 150px" />
                                 ) : (
                                     <Package className="w-10 h-10 text-gray-300" />
                                 )}
@@ -110,9 +111,9 @@ export default function EmployeePOS({ products, onSaleComplete }: EmployeePOSPro
                 <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
                         <div className="flex items-center gap-4 mb-4">
-                            <div className="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
+                            <div className="relative w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
                                 {sellTarget.imageUrl ? (
-                                    <img src={sellTarget.imageUrl} alt="" className="w-full h-full object-contain" />
+                                    <Image src={sellTarget.imageUrl} alt="" fill className="object-contain" sizes="64px" />
                                 ) : (
                                     <Package className="w-8 h-8 text-gray-300" />
                                 )}

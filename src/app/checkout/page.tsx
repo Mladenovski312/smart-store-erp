@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
 import Image from 'next/image';
 import Footer from '@/components/Footer';
-import { latinToCyrillic } from '@/lib/transliterate';
+import { latinToCyrillic } from '@/lib/search';
 import { formatPrice } from '@/lib/types';
 
 export default function CheckoutPage() {
@@ -34,6 +34,7 @@ export default function CheckoutPage() {
     const [orderId, setOrderId] = useState('');
 
     const cityRef = useRef<HTMLDivElement>(null);
+    const submittingRef = useRef(false);
     const supabase = createClient();
 
     useEffect(() => {
@@ -88,9 +89,11 @@ export default function CheckoutPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (submittingRef.current) return;
         const errs = validate();
         if (errs.length > 0) { setErrors(errs); return; }
         setErrors([]);
+        submittingRef.current = true;
         setSubmitting(true);
 
         try {
@@ -108,51 +111,43 @@ export default function CheckoutPage() {
                 localStorage.removeItem('jumbo_customer');
             }
 
-            // 2. Atomically deduct stock — must happen before order insert so no orphan orders are created on failure
-            const stockItems = items.map(i => ({ id: i.productId, quantity: i.quantity }));
-            const { error: stockError } = await supabase.rpc('process_checkout_stock', { items: stockItems });
-            if (stockError) {
-                setErrors(['Еден или повеќе производи не се достапни во бараната количина. Проверете ја вашата кошничка и обидете се повторно.']);
+            // 2. Atomic checkout: deduct stock + verify prices + create order in one DB transaction
+            const generatedOrderId = crypto.randomUUID();
+            const { data: orderResult, error: orderError } = await supabase.rpc('create_order_atomic', {
+                p_order_id: generatedOrderId,
+                p_items: items.map(i => ({ id: i.productId, quantity: i.quantity, name: i.name, imageUrl: i.imageUrl })),
+                p_customer_name: `${firstName.trim()} ${lastName.trim()}`,
+                p_customer_first_name: firstName.trim(),
+                p_customer_last_name: lastName.trim(),
+                p_customer_email: email.trim().toLowerCase(),
+                p_customer_phone: `+389${phone}`,
+                p_delivery_city: city.trim(),
+                p_delivery_address: street.trim(),
+                p_note: note.trim() || null,
+                p_payment_method: 'cod',
+            });
+
+            if (orderError) {
+                const msg = orderError.message || '';
+                if (msg.includes('Not enough stock')) {
+                    setErrors(['Еден или повеќе производи не се достапни во бараната количина. Проверете ја вашата кошничка и обидете се повторно.']);
+                } else {
+                    setErrors(['Настана грешка при испраќање на нарачката. Обидете се повторно.']);
+                }
                 return;
             }
 
-            // 3. Create order
-            const generatedOrderId = crypto.randomUUID();
-            const orderData = {
-                id: generatedOrderId,
-                customer_name: `${firstName.trim()} ${lastName.trim()}`,
-                customer_first_name: firstName.trim(),
-                customer_last_name: lastName.trim(),
-                customer_email: email.trim().toLowerCase(),
-                customer_phone: `+389${phone}`,
-                delivery_city: city.trim(),
-                delivery_address: street.trim(),
-                note: note.trim() || null,
-                items: items.map(i => ({
-                    productId: i.productId,
-                    name: i.name,
-                    price: i.price,
-                    quantity: i.quantity,
-                    imageUrl: i.imageUrl,
-                })),
-                subtotal,
-                total: subtotal,
-                status: 'pending',
-                payment_method: 'cod',
-            };
-
-            const { error } = await supabase
-                .from('orders')
-                .insert(orderData);
-
-            if (error) throw error;
+            // The RPC returns verified items and subtotal (with real DB prices)
+            const verifiedItems: { productId: string; name: string; price: number; quantity: number; imageUrl?: string }[] =
+                orderResult?.items || items.map(i => ({ productId: i.productId, name: i.name, price: i.price, quantity: i.quantity }));
+            const verifiedSubtotal: number = orderResult?.subtotal || subtotal;
 
             setOrderId(generatedOrderId);
             clearCart();
             setOrderComplete(true);
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // Send confirmation email (fire-and-forget)
+            // Send confirmation email (fire-and-forget) — uses verified prices
             if (generatedOrderId) {
                 fetch('/api/emails/order-confirmation', {
                     method: 'POST',
@@ -161,8 +156,8 @@ export default function CheckoutPage() {
                         orderId: generatedOrderId,
                         customerName: `${firstName.trim()} ${lastName.trim()}`,
                         customerEmail: email.trim().toLowerCase(),
-                        items: items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
-                        subtotal,
+                        items: verifiedItems.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
+                        subtotal: verifiedSubtotal,
                         deliveryAddress: street.trim(),
                         deliveryCity: city.trim(),
                     }),
@@ -172,6 +167,7 @@ export default function CheckoutPage() {
             console.error(err);
             setErrors(['Настана грешка при испраќање на нарачката. Обидете се повторно.']);
         } finally {
+            submittingRef.current = false;
             setSubmitting(false);
         }
     };

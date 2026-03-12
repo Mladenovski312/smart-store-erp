@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/lib/supabase';
+import { logAdminAction } from '@/lib/store';
 import { ShieldCheck, UserCheck, Mail, AlertCircle, CheckCircle, Loader2, UserPlus, Ban, CheckCircle2, Lock } from 'lucide-react';
 
 interface UserRole {
@@ -103,6 +104,7 @@ export default function SettingsPanel() {
             if (!res.ok) {
                 setMessage({ type: 'error', text: data.error || 'Грешка при покана.' });
             } else {
+                logAdminAction('user.invite', 'user', newEmail.trim().toLowerCase(), { displayName: newDisplayName.trim() || null, role: 'employee' });
                 setMessage({ type: 'success', text: data.message });
                 setNewEmail('');
                 setNewPassword('');
@@ -133,6 +135,7 @@ export default function SettingsPanel() {
             .eq('id', userId);
 
         if (!error) {
+            logAdminAction('user.status_change', 'user', userId, { email, from: currentStatus, to: newStatus });
             setMessage({ type: 'success', text: `Статусот на ${email} е променет.` });
             fetchUsers();
         } else {
@@ -148,6 +151,7 @@ export default function SettingsPanel() {
             .eq('id', userId);
 
         if (!error) {
+            logAdminAction('user.role_change', 'user', userId, { from: currentRole, to: newRole });
             fetchUsers();
         }
     };
