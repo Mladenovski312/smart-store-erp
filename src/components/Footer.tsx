@@ -13,7 +13,7 @@ export default function Footer() {
                     <div>
                         <Link href="/" className="inline-block mb-4">
                             <div className="bg-jumbo-blue text-white px-3 py-1.5 rounded-lg font-black text-sm tracking-tight inline-block">
-                                ИНТЕР СТАР <span className="text-jumbo-red">ЏАМБО</span>
+                                ИНТЕР СТАР <span className="text-red-300">ЏАМБО</span>
                             </div>
                         </Link>
                         <p className="text-gray-400 text-sm leading-relaxed">

@@ -180,7 +180,7 @@ export default function CheckoutPage() {
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center justify-center h-16">
                             <Link href="/" className="bg-jumbo-blue text-white px-2.5 py-1 rounded-lg font-black text-sm tracking-tight">
-                                ИНТЕР СТАР <span className="text-jumbo-red">ЏАМБО</span>
+                                ИНТЕР СТАР <span className="text-red-300">ЏАМБО</span>
                             </Link>
                         </div>
                     </div>
@@ -236,7 +236,7 @@ export default function CheckoutPage() {
                             <span className="text-sm font-medium hidden sm:inline">Кошничка</span>
                         </Link>
                         <Link href="/" className="bg-jumbo-blue text-white px-2.5 py-1 rounded-lg font-black text-sm tracking-tight">
-                            ИНТЕР СТАР <span className="text-jumbo-red">ЏАМБО</span>
+                            ИНТЕР СТАР <span className="text-red-300">ЏАМБО</span>
                         </Link>
                         <div className="w-20" />
                     </div>
