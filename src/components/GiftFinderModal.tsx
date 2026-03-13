@@ -111,7 +111,7 @@ export default function GiftFinderModal({ onClose }: { onClose: () => void }) {
     };
 
     return (
-        <div className="fixed bottom-[88px] md:bottom-8 right-3 md:right-5 z-50 w-[380px] max-w-[calc(100vw-1.5rem)]
+        <div className="fixed bottom-[5.5rem] md:bottom-8 right-3 md:right-5 z-50 w-[23.75rem] max-w-[calc(100vw-1.5rem)]
                         flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-200
                         overflow-hidden"
             style={{ maxHeight: 'min(726px, calc(100vh - 3rem))' }}
@@ -195,19 +195,19 @@ export default function GiftFinderModal({ onClose }: { onClose: () => void }) {
                                             )}
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-semibold text-xs text-[#1A3C5E] truncate">{product.name}</p>
-                                                <p className="text-[11px] text-gray-500 italic mt-0.5">{reason}</p>
+                                                <p className="text-[0.6875rem] text-gray-500 italic mt-0.5">{reason}</p>
                                                 <div className="flex items-center justify-between mt-1.5 gap-2">
                                                     <p className="font-bold text-sm text-[#E8943A]">{product.price.toLocaleString()} ден</p>
                                                     <div className="flex gap-1.5">
                                                         <a
                                                             href={`/produkt/${product.slug}`}
-                                                            className="text-[11px] text-[#1A3C5E] hover:underline"
+                                                            className="text-[0.6875rem] text-[#1A3C5E] hover:underline"
                                                         >
                                                             Отвори
                                                         </a>
                                                         <button
                                                             onClick={() => handleAddToCart(product)}
-                                                            className="text-[11px] bg-[#1A3C5E] text-white px-2 py-0.5 rounded hover:bg-[#E8943A] transition-colors"
+                                                            className="text-[0.6875rem] bg-[#1A3C5E] text-white px-2 py-0.5 rounded hover:bg-[#E8943A] transition-colors"
                                                         >
                                                             Купи
                                                         </button>

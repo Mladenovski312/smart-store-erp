@@ -17,15 +17,15 @@
 }
 
 html {
-  /* clip instead of hidden — prevents horizontal scroll without creating a new
-     scroll container, which would break position:sticky on iOS Safari */
-  overflow-x: clip;
+  /* Fluid responsive root — Finsweet-style rem scaling.
+     All rem-based sizes scale proportionally with the viewport.
+     375px → 14px  |  768px → ~14.7px  |  1440px → 16px  |  1920px → 17px cap */
+  font-size: clamp(0.875rem, 0.83rem + 0.19vw, 1.0625rem);
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  overflow-x: clip;
 }
 
 /* Remove 300ms tap delay on all interactive elements */

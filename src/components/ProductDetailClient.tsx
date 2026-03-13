@@ -113,7 +113,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                         >
                             <ShoppingCart size={22} />
                             {cartCount > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-jumbo-red text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                                <span className="absolute -top-1 -right-1 bg-jumbo-red text-white text-[0.625rem] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                                     {cartCount}
                                 </span>
                             )}
@@ -133,7 +133,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                         {getCategoryLabel(product.category)}
                     </Link>
                     <ChevronRight size={14} className="text-gray-300 shrink-0" />
-                    <span className="text-gray-900 font-medium truncate min-w-0 max-w-[160px] sm:max-w-xs md:max-w-none">{product.name}</span>
+                    <span className="text-gray-900 font-medium truncate min-w-0 max-w-[10rem] sm:max-w-xs md:max-w-none">{product.name}</span>
                 </nav>
 
                 {/* Product Layout */}
@@ -203,7 +203,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                                     >
                                         <Minus size={16} />
                                     </button>
-                                    <span className="px-5 py-3 text-sm font-semibold min-w-[50px] text-center border-x border-gray-200">
+                                    <span className="px-5 py-3 text-sm font-semibold min-w-[3.125rem] text-center border-x border-gray-200">
                                         {quantity}
                                     </span>
                                     <button
@@ -314,10 +314,10 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                                     )}
                                 </div>
                                 <div className="p-3">
-                                    <p className="text-[10px] text-gray-400 mb-0.5 truncate">{getCategoryLabel(rp.category)}</p>
+                                    <p className="text-[0.625rem] text-gray-400 mb-0.5 truncate">{getCategoryLabel(rp.category)}</p>
                                     <h3 className="font-semibold text-gray-900 text-xs sm:text-sm leading-tight line-clamp-2 mb-2 min-h-[2rem] group-hover:text-jumbo-blue transition-colors">{rp.name}</h3>
                                     <span className="text-sm font-bold text-jumbo-blue">
-                                        {formatPrice(rp.sellingPrice)}<span className="text-[10px] font-normal text-gray-400 ml-0.5">ден</span>
+                                        {formatPrice(rp.sellingPrice)}<span className="text-[0.625rem] font-normal text-gray-400 ml-0.5">ден</span>
                                     </span>
                                 </div>
                             </Link>

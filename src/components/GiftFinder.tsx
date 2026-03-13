@@ -15,7 +15,7 @@ export default function GiftFinder() {
             {!open && (
                 <button
                     onClick={() => setOpen(true)}
-                    className="fixed bottom-[88px] md:bottom-8 right-3 md:right-5 z-50 bg-[#1A3C5E] hover:bg-[#E8943A]
+                    className="fixed bottom-[5.5rem] md:bottom-8 right-3 md:right-5 z-50 bg-[#1A3C5E] hover:bg-[#E8943A]
                                text-white w-14 h-14 rounded-full shadow-lg
                                transition-all duration-200 flex items-center justify-center
                                hover:scale-105 active:scale-95"

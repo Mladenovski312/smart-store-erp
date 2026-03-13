@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import { ShoppingBag, ChevronRight, ChevronDown, Truck, Plus } from 'lucide-react';
+import React from 'react';
+import { ShoppingBag, ChevronRight, ChevronDown, Truck, Plus, Car, Dices, Baby, Bike, PuzzleIcon, Backpack, Smile, Gift } from 'lucide-react';
 import { addToCart } from '@/lib/cart';
 import { Product, CATEGORIES, getCategoryLabel, formatPrice } from '@/lib/types';
 import Link from 'next/link';
@@ -69,9 +70,9 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
                                         key={cat.value}
                                         className="group relative bg-gray-50 border border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center select-none"
                                     >
-                                        <div className="text-3xl mb-3 grayscale">{getCategoryEmoji(cat.value)}</div>
+                                        <div className="mb-3 text-gray-300">{getCategoryIcon(cat.value)}</div>
                                         <h3 className="font-semibold text-gray-600 mb-1">{cat.label}</h3>
-                                        <span className="bg-gray-300 text-gray-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider mt-2">Набрзо достапно</span>
+                                        <span className="bg-gray-300 text-gray-700 text-[0.625rem] font-bold px-3 py-1 rounded-full uppercase tracking-wider mt-2">Набрзо достапно</span>
                                     </div>
                                 );
                             }
@@ -80,9 +81,9 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
                                 <Link
                                     key={cat.value}
                                     href={`/catalog?category=${encodeURIComponent(cat.value)}`}
-                                    className="group relative bg-gradient-to-br from-gray-50 to-white border border-gray-100 rounded-2xl p-6 hover:shadow-lg hover:border-jumbo-blue/20 hover:-translate-y-1 transition-all flex flex-col items-center justify-center text-center"
+                                    className="group relative bg-gradient-to-br from-gray-50 to-white border border-gray-100 rounded-2xl p-6 hover:shadow-lg hover:border-jumbo-blue/20 hover:-translate-y-1 transition-all flex flex-col items-center justify-center text-center cursor-pointer"
                                 >
-                                    <div className="text-3xl mb-3">{getCategoryEmoji(cat.value)}</div>
+                                    <div className="mb-3 text-jumbo-blue/70 group-hover:text-jumbo-blue transition-colors">{getCategoryIcon(cat.value)}</div>
                                     <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-jumbo-blue transition-colors">{cat.label}</h3>
                                     <p className="text-sm text-gray-500">{cat.count} артикли</p>
                                     <ChevronRight className="absolute top-6 right-5 w-4 h-4 text-gray-300 group-hover:text-jumbo-blue group-hover:translate-x-1 transition-all" />
@@ -106,7 +107,7 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
                                 href="/catalog"
                                 className="hidden md:flex items-center gap-1 text-jumbo-blue font-semibold hover:gap-2 transition-all"
                             >
-                                Сите →
+                                Сите <ChevronRight size={16} />
                             </Link>
                         </div>
 
@@ -116,17 +117,15 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
                             ))}
                         </div>
 
-                        {initialProducts.length > 8 && (
-                            <div className="text-center mt-10">
-                                <Link
-                                    href="/catalog"
-                                    className="inline-flex items-center gap-2 bg-jumbo-blue text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-800 transition-colors shadow-sm"
-                                >
-                                    Види ги сите артикли
-                                    <ChevronRight size={18} />
-                                </Link>
-                            </div>
-                        )}
+                        <div className="text-center mt-10">
+                            <Link
+                                href="/catalog"
+                                className="inline-flex items-center gap-2 bg-jumbo-blue text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-800 transition-colors shadow-sm"
+                            >
+                                Види ги сите артикли
+                                <ChevronRight size={18} />
+                            </Link>
+                        </div>
                     </div>
                 </section>
             )}
@@ -145,7 +144,7 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
                         <div key={copy} className="flex min-w-full shrink-0 items-center justify-around gap-20 px-8 animate-marquee group-hover:[animation-play-state:paused]" aria-hidden={copy === 2}>
                             {BRANDS.map((brand, i) => (
                                 <div key={`${brand.name}-${copy}-${i}`} className="inline-flex items-center justify-center h-28 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300">
-                                    <Image src={brand.src} alt={brand.name} width={192} height={96} className="max-h-24 max-w-[192px] object-contain" loading="lazy" />
+                                    <Image src={brand.src} alt={brand.name} width={192} height={96} className="max-h-24 max-w-[12rem] object-contain" loading="lazy" />
                                 </div>
                             ))}
                         </div>
@@ -251,18 +250,18 @@ function ProductCard({ product }: { product: Product }) {
                 )}
             </div>
             <div className={`p-2.5 sm:p-3 ${product.stockQuantity <= 0 ? 'opacity-80' : ''}`}>
-                <p className="text-[10px] text-gray-500 mb-0.5 truncate">{getCategoryLabel(product.category)}</p>
+                <p className="text-xs text-gray-500 mb-0.5 truncate">{getCategoryLabel(product.category)}</p>
                 <h3 className="font-semibold text-gray-900 text-xs sm:text-sm leading-tight line-clamp-2 mb-2 min-h-[2rem]">{product.name}</h3>
                 <div className="flex items-center justify-between mb-2 gap-1 flex-wrap">
                     <span className={`text-sm sm:text-base font-bold leading-none ${product.stockQuantity > 0 ? 'text-jumbo-blue' : 'text-gray-500'}`}>
-                        {formatPrice(product.sellingPrice)}<span className="text-[10px] font-normal text-gray-500 ml-0.5">ден</span>
+                        {formatPrice(product.sellingPrice)}<span className="text-xs font-normal text-gray-500 ml-0.5">ден</span>
                     </span>
                     {product.stockQuantity > 0 ? (
-                        <span className="text-[9px] font-medium text-green-700 bg-green-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                        <span className="text-xs font-medium text-green-700 bg-green-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                             На залиха
                         </span>
                     ) : (
-                        <span className="text-[9px] font-medium text-red-700 bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                        <span className="text-xs font-medium text-red-700 bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                             Нема залиха
                         </span>
                     )}
@@ -270,7 +269,7 @@ function ProductCard({ product }: { product: Product }) {
                 <button
                     onClick={handleAddToCart}
                     disabled={product.stockQuantity <= 0}
-                    className={`w-full flex items-center justify-center gap-1 py-2 rounded-lg text-[11px] sm:text-xs font-bold transition-all ${product.stockQuantity > 0
+                    className={`w-full flex items-center justify-center gap-1 min-h-[2.75rem] py-2.5 rounded-lg text-xs font-bold transition-all ${product.stockQuantity > 0
                         ? 'bg-jumbo-red text-white hover:bg-red-700 active:scale-95'
                         : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                         }`}
@@ -290,7 +289,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <button
                 onClick={() => setOpen(!open)}
-                className="w-full flex items-center justify-between px-6 py-5 text-left"
+                className="w-full flex items-center justify-between px-6 py-5 text-left cursor-pointer"
                 aria-expanded={open}
             >
                 <h3 className="text-base font-bold text-gray-900 pr-4">{question}</h3>
@@ -307,16 +306,16 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
     );
 }
 
-function getCategoryEmoji(category: string): string {
-    const map: Record<string, string> = {
-        'Vehicles & Ride-ons': '🚗',
-        'Dolls & Figures': '🎎',
-        'Baby & Toddler': '👶',
-        'Outdoor & Sports': '⚽',
-        'Games & Puzzles': '🧩',
-        'Clothing & School': '🎒',
-        'Играчки': '🧸',
-        'Разно (Miscellaneous)': '🎁',
+function getCategoryIcon(category: string): React.ReactNode {
+    const map: Record<string, React.ReactNode> = {
+        'Vehicles & Ride-ons': <Car className="w-7 h-7" />,
+        'Dolls & Figures': <Smile className="w-7 h-7" />,
+        'Baby & Toddler': <Baby className="w-7 h-7" />,
+        'Outdoor & Sports': <Bike className="w-7 h-7" />,
+        'Games & Puzzles': <PuzzleIcon className="w-7 h-7" />,
+        'Clothing & School': <Backpack className="w-7 h-7" />,
+        'Играчки': <Dices className="w-7 h-7" />,
+        'Разно (Miscellaneous)': <Gift className="w-7 h-7" />,
     };
-    return map[category] || '📦';
+    return map[category] ?? <ShoppingBag className="w-7 h-7" />;
 }

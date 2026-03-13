@@ -141,7 +141,7 @@ export default function OrdersPanel() {
                     >
                         {tab.label}
                         {tab.count > 0 && (
-                            <span className={`ml-2 inline-flex items-center justify-center min-w-[20px] h-[20px] px-1.5 rounded-full text-[11px] font-bold ${filter === tab.value
+                            <span className={`ml-2 inline-flex items-center justify-center min-w-[1.25rem] h-[1.25rem] px-1.5 rounded-full text-[0.6875rem] font-bold ${filter === tab.value
                                 ? 'bg-white/20 text-white'
                                 : 'bg-gray-200 text-gray-700'
                                 }`}>

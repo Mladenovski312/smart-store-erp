@@ -291,9 +291,9 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
                                         ))}
                                     </select>
                                 </div>
-                                <div className="flex-1 flex flex-col min-h-[100px]">
+                                <div className="flex-1 flex flex-col min-h-[6.25rem]">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Опис</label>
-                                    <textarea value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} className="w-full flex-1 min-h-[100px] p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue resize-y" />
+                                    <textarea value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} className="w-full flex-1 min-h-[6.25rem] p-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-jumbo-blue resize-y" />
                                 </div>
                                 <div className="grid grid-cols-3 gap-3 pt-2">
                                     <div>

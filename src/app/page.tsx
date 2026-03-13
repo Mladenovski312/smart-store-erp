@@ -187,7 +187,7 @@ function TrustBadge({ icon, title, subtitle }: { icon: React.ReactNode; title: s
             </div>
             <div className="min-w-0">
                 <div className="font-bold text-gray-900 text-xs sm:text-base leading-tight">{title}</div>
-                <div className="text-[11px] sm:text-sm text-gray-500 leading-tight mt-0.5">{subtitle}</div>
+                <div className="text-[0.6875rem] sm:text-sm text-gray-500 leading-tight mt-0.5">{subtitle}</div>
             </div>
         </div>
     );
