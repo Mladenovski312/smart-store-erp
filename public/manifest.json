@@ -1,11 +1,12 @@
 {
     "name": "Интер Стар Џамбо — Играчки",
-    "short_name": "Џамбо POS",
-    "description": "Систем за управување со залиха и продажба на играчки — Интер Стар Џамбо, Куманово",
-    "start_url": "/admin",
+    "short_name": "Џамбо",
+    "description": "Најголемиот избор на играчки во Куманово — Интер Стар Џамбо",
+    "start_url": "/",
+    "scope": "/",
     "display": "standalone",
-    "background_color": "#1e3a8a",
-    "theme_color": "#1e3a8a",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
     "orientation": "any",
     "icons": [
         {

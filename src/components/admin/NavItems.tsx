@@ -16,7 +16,7 @@ export function MobileNavItem({ icon, label, active = false, onClick }: { icon: 
   return (
     <button onClick={onClick} className={`flex flex-col items-center justify-center w-16 px-1 transition-colors ${active ? 'text-jumbo-blue font-bold scale-105 transform' : 'text-gray-500 hover:text-gray-900'}`}>
       <div className="mb-1">{icon}</div>
-      <span className="text-[10px] sm:text-xs tracking-tight">{label}</span>
+      <span className="text-[0.625rem] sm:text-xs tracking-tight">{label}</span>
     </button>
   );
 }

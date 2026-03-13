@@ -334,19 +334,19 @@ function InventorySection({ products }: { products: ProductRaw[] }) {
                 </Card>
                 <Card title="Производи со ниска залиха">
                     {lowStock.length > 0 ? (
-                        <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
-                            <table className="w-full text-sm">
+                        <div className="max-h-[18.75rem] overflow-y-auto">
+                            <table className="w-full text-sm table-fixed">
                                 <thead className="sticky top-0 bg-white">
                                     <tr className="border-b border-gray-100">
-                                        <th className="text-left px-3 py-2 text-xs font-semibold text-gray-500">Производ</th>
-                                        <th className="text-right px-3 py-2 text-xs font-semibold text-gray-500">Залиха</th>
-                                        <th className="text-right px-3 py-2 text-xs font-semibold text-gray-500">Цена</th>
+                                        <th className="text-left px-3 py-2 text-xs font-semibold text-gray-500 w-[55%]">Производ</th>
+                                        <th className="text-right px-3 py-2 text-xs font-semibold text-gray-500 w-[15%]">Залиха</th>
+                                        <th className="text-right px-3 py-2 text-xs font-semibold text-gray-500 w-[30%]">Цена</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {lowStock.map(p => (
                                         <tr key={p.id} className="hover:bg-gray-50">
-                                            <td className="px-3 py-2 font-medium text-gray-900 truncate max-w-[200px]">{p.name}</td>
+                                            <td className="px-3 py-2 font-medium text-gray-900 truncate">{p.name}</td>
                                             <td className={`px-3 py-2 text-right font-semibold ${p.stock_quantity <= 1 ? 'text-red-600' : 'text-orange-500'}`}>
                                                 {p.stock_quantity}
                                             </td>
@@ -427,15 +427,15 @@ function BrandsSection({ orders, sales, products }: { orders: OrderRaw[]; sales:
                 </Card>
                 <Card title={`${groupLabel} табела`}>
                     {brandData.length > 0 ? (
-                        <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
-                            <table className="w-full text-sm">
+                        <div className="max-h-[18.75rem] overflow-y-auto">
+                            <table className="w-full text-sm table-fixed">
                                 <thead className="sticky top-0 bg-white">
                                     <tr className="border-b border-gray-100">
-                                        <th className="text-left px-3 py-2 text-xs font-semibold text-gray-500">{groupLabel}</th>
-                                        <th className="text-right px-3 py-2 text-xs font-semibold text-gray-500">Приход</th>
-                                        <th className="text-right px-3 py-2 text-xs font-semibold text-gray-500">Единици</th>
-                                        <th className="text-right px-3 py-2 text-xs font-semibold text-gray-500">Маржа</th>
-                                        <th className="text-center px-3 py-2 text-xs font-semibold text-gray-500">Препорака</th>
+                                        <th className="text-left px-3 py-2 text-xs font-semibold text-gray-500 w-[28%]">{groupLabel}</th>
+                                        <th className="text-right px-3 py-2 text-xs font-semibold text-gray-500 w-[24%]">Приход</th>
+                                        <th className="text-right px-3 py-2 text-xs font-semibold text-gray-500 w-[14%]">Ед.</th>
+                                        <th className="text-right px-3 py-2 text-xs font-semibold text-gray-500 w-[14%]">Маржа</th>
+                                        <th className="text-center px-3 py-2 text-xs font-semibold text-gray-500 w-[20%]">Препорака</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
@@ -445,7 +445,7 @@ function BrandsSection({ orders, sales, products }: { orders: OrderRaw[]; sales:
                                                 : { t: 'Намали', c: 'text-red-600 bg-red-50' };
                                         return (
                                             <tr key={b.name} className="hover:bg-gray-50">
-                                                <td className="px-3 py-2 font-medium text-gray-900">{b.name}</td>
+                                                <td className="px-3 py-2 font-medium text-gray-900 truncate">{b.name}</td>
                                                 <td className="px-3 py-2 text-right">{formatPrice(b.revenue)} ден</td>
                                                 <td className="px-3 py-2 text-right">{b.units}</td>
                                                 <td className="px-3 py-2 text-right font-semibold">{b.margin}%</td>

@@ -120,7 +120,7 @@ export default function DashboardLayout() {
                   <InventoryList products={products} onRefresh={refresh} />
                 </ErrorBoundary>
               ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center min-h-[400px] flex flex-col items-center justify-center">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center min-h-[25rem] flex flex-col items-center justify-center">
                   <PackageSearch className="text-gray-300 w-16 h-16 mb-4" />
                   <h3 className="text-lg font-medium text-gray-900">Нема пронајдено артикли</h3>
                   <p className="text-gray-500 max-w-sm mt-2">Базата е моментално празна. Кликнете на &quot;Нов Артикл&quot; за да додадете.</p>
@@ -273,7 +273,7 @@ export default function DashboardLayout() {
                 <InventoryList products={products} onRefresh={refresh} />
               </ErrorBoundary>
             ) : (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center min-h-[400px] flex flex-col items-center justify-center">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center min-h-[25rem] flex flex-col items-center justify-center">
                 <PackageSearch className="text-gray-300 w-16 h-16 mb-4" />
                 <h3 className="text-lg font-medium text-gray-900">Нема пронајдено артикли</h3>
                 <p className="text-gray-500 max-w-sm mt-2">Базата е моментално празна. Кликнете на копчето за скенирање за да започнете со додавање на инвентар.</p>

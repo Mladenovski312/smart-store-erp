@@ -25,7 +25,7 @@ export default function CategoriesView({ products }: { products: Product[] }) {
 
   if (entries.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center min-h-[300px] flex flex-col items-center justify-center">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center min-h-[18.75rem] flex flex-col items-center justify-center">
         <Tags className="text-gray-300 w-14 h-14 mb-4" />
         <h3 className="text-lg font-medium text-gray-900">Нема категории</h3>
         <p className="text-gray-500 max-w-sm mt-2">Категориите ќе се пополнат автоматски кога ќе додадете артикли.</p>

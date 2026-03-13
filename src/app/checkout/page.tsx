@@ -189,9 +189,9 @@ export default function CheckoutPage() {
                 <div className="bg-white border-b border-gray-100">
                     <div className="max-w-3xl mx-auto px-4 py-4">
                         <div className="flex items-center justify-center gap-3 text-sm font-semibold">
-                            <span className="text-green-500">КОШНИЧКА ✓</span>
+                            <span className="text-green-500">КОШНИЧКА <Check className="inline w-3.5 h-3.5 mb-0.5" /></span>
                             <span className="text-gray-300">→</span>
-                            <span className="text-green-500">CHECKOUT ✓</span>
+                            <span className="text-green-500">CHECKOUT <Check className="inline w-3.5 h-3.5 mb-0.5" /></span>
                             <span className="text-gray-300">→</span>
                             <span className="text-jumbo-blue">ГОТОВО</span>
                         </div>
@@ -247,7 +247,7 @@ export default function CheckoutPage() {
             <div className="bg-white border-b border-gray-100">
                 <div className="max-w-3xl mx-auto px-4 py-4">
                     <div className="flex items-center justify-center gap-3 text-sm font-semibold">
-                        <span className="text-green-500">КОШНИЧКА ✓</span>
+                        <span className="text-green-500">КОШНИЧКА <Check className="inline w-3.5 h-3.5 mb-0.5" /></span>
                         <span className="text-gray-300">→</span>
                         <span className="text-jumbo-blue">CHECKOUT</span>
                         <span className="text-gray-300">→</span>
@@ -266,7 +266,7 @@ export default function CheckoutPage() {
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_23.75rem] gap-8">
                     {/* ═══ Left: Form ═══ */}
                     <div>
                         <form id="checkout-form" onSubmit={handleSubmit} className="space-y-8">
@@ -281,7 +281,8 @@ export default function CheckoutPage() {
                                             type="text"
                                             value={firstName}
                                             onChange={e => setFirstName(e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/20 focus:border-jumbo-blue transition-all outline-none"
+                                            autoComplete="given-name"
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/50 focus:border-jumbo-blue transition-all outline-none"
                                             placeholder="Вашето име"
                                         />
                                     </div>
@@ -291,7 +292,8 @@ export default function CheckoutPage() {
                                             type="text"
                                             value={lastName}
                                             onChange={e => setLastName(e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/20 focus:border-jumbo-blue transition-all outline-none"
+                                            autoComplete="family-name"
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/50 focus:border-jumbo-blue transition-all outline-none"
                                             placeholder="Вашето презиме"
                                         />
                                     </div>
@@ -303,14 +305,15 @@ export default function CheckoutPage() {
                                         type="email"
                                         value={email}
                                         onChange={e => setEmail(e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/20 focus:border-jumbo-blue transition-all outline-none"
+                                        autoComplete="email"
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/50 focus:border-jumbo-blue transition-all outline-none"
                                         placeholder="vashiot@email.mk"
                                     />
                                 </div>
 
                                 <div className="mt-4">
                                     <label className="block text-sm font-medium text-gray-700 mb-1.5">Телефон *</label>
-                                    <div className="flex rounded-xl overflow-hidden border border-gray-200 focus-within:ring-2 focus-within:ring-jumbo-blue/20 focus-within:border-jumbo-blue transition-all bg-white">
+                                    <div className="flex rounded-xl overflow-hidden border border-gray-200 focus-within:ring-2 focus-within:ring-jumbo-blue/50 focus-within:border-jumbo-blue transition-all bg-white">
                                         <div className="bg-gray-50 text-gray-500 font-medium px-4 py-3 border-r border-gray-200 flex items-center shrink-0">
                                             +389
                                         </div>
@@ -318,6 +321,7 @@ export default function CheckoutPage() {
                                             type="tel"
                                             value={phone}
                                             onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                                            autoComplete="tel-national"
                                             className="w-full px-4 py-3 text-sm outline-none bg-transparent"
                                             placeholder="7X XXX XXX"
                                         />
@@ -338,7 +342,7 @@ export default function CheckoutPage() {
                                                 setShowCityDropdown(true);
                                             }}
                                             onFocus={() => setShowCityDropdown(true)}
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/20 focus:border-jumbo-blue transition-all outline-none"
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/50 focus:border-jumbo-blue transition-all outline-none"
                                             placeholder="Пребарај град..."
                                         />
                                         {showCityDropdown && filteredCities.length > 0 && (
@@ -352,7 +356,7 @@ export default function CheckoutPage() {
                                                             setCitySearch(c);
                                                             setShowCityDropdown(false);
                                                         }}
-                                                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-jumbo-blue/5 hover:text-jumbo-blue transition-colors first:rounded-t-xl last:rounded-b-xl"
+                                                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-jumbo-blue/5 hover:text-jumbo-blue transition-colors first:rounded-t-xl last:rounded-b-xl cursor-pointer"
                                                     >
                                                         {c}
                                                     </button>
@@ -368,7 +372,8 @@ export default function CheckoutPage() {
                                         type="text"
                                         value={street}
                                         onChange={e => setStreet(e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/20 focus:border-jumbo-blue transition-all outline-none"
+                                        autoComplete="street-address"
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/50 focus:border-jumbo-blue transition-all outline-none"
                                         placeholder="Внесете ја вашата улична адреса"
                                     />
                                 </div>
@@ -379,7 +384,7 @@ export default function CheckoutPage() {
                                         value={note}
                                         onChange={e => setNote(e.target.value)}
                                         rows={3}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/20 focus:border-jumbo-blue transition-all outline-none resize-none"
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/50 focus:border-jumbo-blue transition-all outline-none resize-none"
                                         placeholder="Дополнете доколку имате забелешка"
                                     />
                                 </div>

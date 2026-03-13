@@ -250,7 +250,7 @@ export default function SettingsPanel() {
                                         <div className="font-medium text-gray-900 text-sm flex items-center gap-2">
                                             {u.display_name || u.email}
                                             {u.status === 'inactive' && (
-                                                <span className="text-[10px] uppercase font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-100">Деактивиран</span>
+                                                <span className="text-[0.625rem] uppercase font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-100">Деактивиран</span>
                                             )}
                                         </div>
                                         <div className="text-xs text-gray-400">{u.email}</div>

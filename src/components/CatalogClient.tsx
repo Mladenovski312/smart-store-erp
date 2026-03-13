@@ -102,7 +102,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                         >
                             <ShoppingCart size={22} />
                             {cartCount > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-jumbo-red text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                                <span className="absolute -top-1 -right-1 bg-jumbo-red text-white text-[0.625rem] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                                     {cartCount}
                                 </span>
                             )}
@@ -138,7 +138,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                         {/* Dropdown Filters Container */}
                         <div className="flex flex-col sm:flex-row gap-3">
                             {/* Category Dropdown */}
-                            <div className="relative min-w-[200px]">
+                            <div className="relative min-w-[12.5rem]">
                                 <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
                                 <select
                                     value={selectedCategory}
@@ -154,7 +154,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                             </div>
 
                             {/* Stock Status Dropdown */}
-                            <div className="relative min-w-[150px]">
+                            <div className="relative min-w-[9.375rem]">
                                 <CheckCircle2 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
                                 <select
                                     value={inStockOnly ? 'true' : 'false'}
@@ -168,7 +168,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                             </div>
 
                             {/* Sort Dropdown */}
-                            <div className="relative min-w-[180px]">
+                            <div className="relative min-w-[11.25rem]">
                                 <SlidersHorizontal className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
                                 <select
                                     value={sortBy}
@@ -211,7 +211,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                         {priceFilterActive && (
                             <button
                                 onClick={() => { setMinPrice(priceMin); setMaxPrice(priceMax); syncPriceToUrl(priceMin, priceMax); }}
-                                className="mt-2 text-xs text-jumbo-blue hover:underline"
+                                className="mt-2 text-xs text-jumbo-blue hover:underline cursor-pointer"
                             >
                                 Ресетирај цена
                             </button>
@@ -242,20 +242,20 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                                     </div>
                                 </Link>
                                 <div className={`p-2.5 sm:p-3 ${product.stockQuantity <= 0 ? 'opacity-80' : ''}`}>
-                                    <p className="text-[10px] text-gray-400 mb-0.5 truncate">{getCategoryLabel(product.category)}</p>
+                                    <p className="text-xs text-gray-500 mb-0.5 truncate">{getCategoryLabel(product.category)}</p>
                                     <Link href={`/produkt/${product.slug}`}>
                                         <h3 className="font-semibold text-gray-900 text-xs sm:text-sm leading-tight line-clamp-2 mb-2 min-h-[2rem] hover:text-jumbo-blue transition-colors cursor-pointer">{product.name}</h3>
                                     </Link>
                                     <div className="flex items-center justify-between mb-2 gap-1 flex-wrap">
                                         <span className={`text-sm sm:text-base font-bold leading-none ${product.stockQuantity > 0 ? 'text-jumbo-blue' : 'text-gray-500'}`}>
-                                            {formatPrice(product.sellingPrice)}<span className="text-[10px] font-normal text-gray-400 ml-0.5">ден</span>
+                                            {formatPrice(product.sellingPrice)}<span className="text-xs font-normal text-gray-500 ml-0.5">ден</span>
                                         </span>
                                         {product.stockQuantity > 0 ? (
-                                            <span className="text-[9px] font-medium text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                                                ✓ Залиха
+                                            <span className="text-xs font-medium text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                                На залиха
                                             </span>
                                         ) : (
-                                            <span className="text-[9px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                            <span className="text-xs font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                                                 Нема залиха
                                             </span>
                                         )}
@@ -263,7 +263,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                                     <button
                                         onClick={() => addToCart({ productId: product.id, name: product.name, price: product.sellingPrice, imageUrl: product.imageUrl, stock: product.stockQuantity })}
                                         disabled={product.stockQuantity <= 0}
-                                        className={`w-full flex items-center justify-center gap-1 py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition-colors ${product.stockQuantity > 0
+                                        className={`w-full flex items-center justify-center gap-1 min-h-[2.75rem] py-2.5 rounded-lg text-xs font-semibold transition-colors ${product.stockQuantity > 0
                                             ? 'bg-jumbo-red/10 text-jumbo-red hover:bg-jumbo-red hover:text-white'
                                             : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                             }`}
