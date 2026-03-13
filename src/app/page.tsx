@@ -47,7 +47,7 @@ export default async function Home() {
         <div className="min-h-screen bg-white text-gray-900">
             <NavBar products={products} />
 
-            <main>
+            <main className="relative z-0">
                 {/* Hero Section — server-rendered for fast LCP */}
                 <section className="relative overflow-hidden bg-gradient-to-br from-jumbo-blue via-blue-800 to-indigo-900">
                     <div className="absolute inset-0 opacity-10">
