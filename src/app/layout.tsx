@@ -11,6 +11,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://interstarjumbo.com"),
+  manifest: "/manifest.json",
   title: {
     default: "Интер Стар Џамбо — Играчки Куманово",
     template: "%s | Интер Стар Џамбо",
@@ -55,7 +56,6 @@ export default function RootLayout({
   return (
     <html lang="mk">
       <head>
-        <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#ffffff" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
