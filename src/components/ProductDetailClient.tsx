@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-    ChevronLeft, ChevronRight, ShoppingCart, Heart, Package,
-    Minus, Plus, Truck, Share2, ArrowUpRight, Check
+    ChevronLeft, ChevronRight, ShoppingCart, Package,
+    Minus, Plus, Truck, ArrowUpRight, Check
 } from 'lucide-react';
 import { addToCart, getCartCount } from '@/lib/cart';
 import { Product, getCategoryLabel, formatPrice } from '@/lib/types';
@@ -103,7 +103,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                                 <span className="text-sm font-medium hidden sm:inline">Назад</span>
                             </Link>
                             <Link href="/" className="bg-jumbo-blue text-white px-2.5 py-1 rounded-lg font-black text-sm tracking-tight">
-                                ИНТЕР СТАР <span className="text-red-300">ЏАМБО</span>
+                                ИНТЕР СТАР <span className="text-red-500">ЏАМБО</span>
                             </Link>
                         </div>
                         <button
@@ -124,16 +124,16 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 {/* Breadcrumbs */}
-                <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide pb-2 -mb-2">
-                    <Link href="/" className="hover:text-jumbo-blue transition-colors flex-shrink-0">Почетна</Link>
-                    <ChevronRight size={14} className="text-gray-300 flex-shrink-0" />
-                    <Link href="/catalog" className="hover:text-jumbo-blue transition-colors flex-shrink-0">Каталог</Link>
-                    <ChevronRight size={14} className="text-gray-300 flex-shrink-0" />
-                    <Link href={`/catalog?category=${encodeURIComponent(product.category)}`} className="hover:text-jumbo-blue transition-colors flex-shrink-0">
+                <nav className="flex items-center gap-1.5 flex-wrap text-sm text-gray-500 mb-8">
+                    <Link href="/" className="hover:text-jumbo-blue transition-colors shrink-0">Почетна</Link>
+                    <ChevronRight size={14} className="text-gray-300 shrink-0" />
+                    <Link href="/catalog" className="hover:text-jumbo-blue transition-colors shrink-0">Каталог</Link>
+                    <ChevronRight size={14} className="text-gray-300 shrink-0" />
+                    <Link href={`/catalog?category=${encodeURIComponent(product.category)}`} className="hover:text-jumbo-blue transition-colors shrink-0">
                         {getCategoryLabel(product.category)}
                     </Link>
-                    <ChevronRight size={14} className="text-gray-300 flex-shrink-0" />
-                    <span className="text-gray-900 font-medium truncate flex-shrink-0 max-w-[200px] md:max-w-none">{product.name}</span>
+                    <ChevronRight size={14} className="text-gray-300 shrink-0" />
+                    <span className="text-gray-900 font-medium truncate min-w-0 max-w-[160px] sm:max-w-xs md:max-w-none">{product.name}</span>
                 </nav>
 
                 {/* Product Layout */}
@@ -236,10 +236,6 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                                     )}
                                 </button>
 
-                                <button aria-label="Додај во желботека" className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-gray-200 text-gray-500 hover:text-jumbo-red hover:border-jumbo-red transition-all text-sm font-medium">
-                                    <Heart size={18} />
-                                    <span className="sm:hidden">ВО ЖЕЛБОТЕКА</span>
-                                </button>
                             </div>
                         )}
 
@@ -303,12 +299,12 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
             {relatedProducts.length > 0 && (
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
                     <h2 className="text-xl font-bold text-gray-900 mb-6">Слични производи</h2>
-                    <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide lg:grid lg:grid-cols-4 lg:overflow-visible lg:pb-0">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                         {relatedProducts.map(rp => (
                             <Link
                                 key={rp.id}
                                 href={`/produkt/${rp.slug}`}
-                                className="group flex-shrink-0 w-48 sm:w-56 lg:w-auto snap-start bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                                className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                             >
                                 <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-2 relative">
                                     {rp.imageUrl ? (
@@ -359,10 +355,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                 </div>
             )}
 
-            <div className="lg:block hidden">
-                <Footer />
-            </div>
-            <div className="lg:hidden pb-20">
+            <div className="pb-20 lg:pb-0">
                 <Footer />
             </div>
 
