@@ -88,12 +88,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         // Check active session — await fetchRole so role is set before loading clears (prevents login page flash)
         const initAuth = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-                setUser(session.user);
-                await fetchRole(session.user.id, session.user.email || '');
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.user) {
+                    setUser(session.user);
+                    await fetchRole(session.user.id, session.user.email || '');
+                }
+            } catch (err) {
+                console.error('Auth init failed:', err);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
 
         initAuth();
