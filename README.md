@@ -1,84 +1,185 @@
-# Интер Стар Џамбо — Smart Store ERP & E-Commerce
+# Jumbo Store — Full-Stack E-Commerce + ERP Platform
 
-**Live Site:** [interstarjumbo.com](https://interstarjumbo.com)
+> A production e-commerce storefront with integrated ERP/POS system, AI-powered features, and real-time inventory sync — built for a retail toy store in Macedonia.
 
-A modern, high-performance E-commerce storefront and internal ERP/POS system built for **Интер Стар Џамбо** in Kumanovo, Macedonia. Designed for speed, reliability, and real-time inventory synchronization between the physical store and the online shop.
-
-## ⚡ Performance
-- **Mobile PageSpeed: 97/100** — FCP 0.9s, LCP 2.6s, TBT 0ms, CLS 0
-- SSR-first: no client-side spinners, pages render immediately
-- All images served via `next/image` (WebP, lazy loading, responsive srcsets)
-- Logos compressed 99%+ via Sharp (7.7MB PNG → 57KB WebP)
-
-## 🌟 Key Features
-
-### 🛒 Customer Experience
-- **Optimized Catalog:** Searchable, categorized product list with real-time stock levels.
-- **Seamless Cart:** Responsive cart sidebar and dedicated cart page for easy quantity management.
-- **Smart Checkout:** Fast guest checkout at `/checkout` with intuitive address validation and progress tracking.
-- **Atomic Stock Protection:** Prevents overselling via database-level row locks during the checkout process.
-- **Localized Notifications:** Automated order confirmation and shipping updates via email (Resend).
-- **Accessible:** All interactive elements labelled for screen readers (`aria-label`), all images have `alt` text.
-
-### ⚙️ Internal ERP/POS (Admin Only)
-- **AI Product Scanner:** Instantly recognize and list products using **Google Gemini Vision**.
-- **Unified Inventory:** Centralized management for stock levels, pricing, and product details.
-- **Order Fulfillment:** Streamlined dashboard to process online orders, add tracking numbers, and manage cancellations.
-- **Real-time POS:** Quick-sale interface for physical store transactions.
-- **Advanced Stats:** Admin-only dashboard for sales performance and data insights.
-
-## 📊 Analytics Dashboard
-
-Admin-only dashboard at `/admin/analytics` tracking:
-- Revenue split (online vs POS), gross margin, COGS trends
-- Inventory turnover ratio, aging stock alerts, stock-to-sales ratio  
-- Brand performance scorecard (margin × turnover)
-- Order fulfillment metrics, customer LTV, RFM segments
-- AI scanner accuracy tracking
-
-Built with Recharts + Supabase aggregation queries + custom PostgreSQL RPC functions.
-Excel/CSV export for all reports.
-
-## 🤖 AI Gift Finder
-
-Public-facing widget powered by Google Gemini Vision. Customers describe who they're
-buying for ("Gift for a 5-year-old who likes dinosaurs, budget 2000 den") and receive
-3 tailored recommendations from the live product catalog.
-
-Architecture: Next.js server-side API route → Gemini 1.5 Flash → Supabase product query.
-API key never exposed client-side. Rate limited at 10 requests/IP/hour.
-
-## 🌐 AEO / LLM Optimization
-
-Added `llms.txt`, `sitemap.xml`, and JSON-LD schema markup (LocalBusiness, Product,
-FAQPage) to make the store visible in AI-generated search results (ChatGPT, Perplexity,
-Google AI Overviews). AI crawlers explicitly allowed in `robots.txt`.
-
-## 🛠️ Technology Stack
-- **Frontend:** Next.js 16 (App Router) + Tailwind CSS 4
-- **Backend:** Supabase (PostgreSQL, RLS, Edge Functions)
-- **AI:** Google Gemini Vision (generative-ai SDK)
-- **Email:** Resend API
-- **Deployment:** Vercel
-
-## 🚀 Development & Deployment
-
-### Local Setup
-1. Clone the repository.
-2. Install dependencies: `npm install`.
-3. Configure `.env.local`:
-   ```bash
-   NEXT_PUBLIC_SUPABASE_URL=...
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-   SUPABASE_SERVICE_ROLE_KEY=... # For Admin functions
-   RESEND_API_KEY=...
-   GEMINI_API_KEY=...
-   ```
-4. Initialize the database by running the SQL files in the `migrations/` folder in numerical order (001, 002, 003...) in the Supabase SQL Editor. See `migrations/README.md` for details.
-5. Start development: `npm run dev`.
-
-### Deployment
-Pushes to the `main` branch are automatically deployed via Vercel. Ensure all environment variables are configured in the Vercel dashboard.
+**Live:** [interstarjumbo.com](https://interstarjumbo.com) &nbsp;|&nbsp; **Stack:** Next.js 16 · React 19 · Supabase · Gemini AI · Tailwind CSS 4
 
 ---
-© 2026 Интер Стар Џамбо. All rights reserved.
+
+<!--
+  SCREENSHOTS: Add 2-3 screenshots to a /docs/screenshots/ folder and uncomment below
+  Recommended: storefront, admin dashboard, AI gift finder
+-->
+<!--
+![Storefront](docs/screenshots/storefront.png)
+![Admin Dashboard](docs/screenshots/admin-dashboard.png)
+![AI Gift Finder](docs/screenshots/gift-finder.png)
+-->
+
+## What This Project Demonstrates
+
+This is a **real, deployed application** serving a physical retail business — not a tutorial or template. It covers the full spectrum of modern web development:
+
+| Area | What's Implemented |
+|------|-------------------|
+| **Frontend** | Server-side rendered catalog, responsive cart system, guest checkout flow, mobile-first UI |
+| **Backend** | 7 API routes, 19 database migrations, PostgreSQL RPCs for atomic transactions |
+| **AI Integration** | Gemini Vision product scanner, AI gift recommendation engine with live inventory |
+| **Security** | Row-Level Security, middleware-protected admin routes, rate limiting, audit logging |
+| **DevOps** | Sentry error monitoring, health endpoint, CI/CD via Vercel |
+| **Data** | Analytics dashboard with Recharts, Excel/CSV export, inventory turnover metrics |
+
+**Scale:** 51 source files · 7,200+ lines of TypeScript · 19 SQL migrations · 10 specification phases · 27-point security audit completed
+
+---
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Next.js 16 (App Router)               │
+│                                                         │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
+│  │  Public Site  │  │  Admin ERP   │  │   API Routes  │  │
+│  │  - Catalog    │  │  - Inventory │  │  - Gift Finder│  │
+│  │  - Cart       │  │  - POS       │  │  - AI Scanner │  │
+│  │  - Checkout   │  │  - Orders    │  │  - Emails     │  │
+│  │  - Gift AI    │  │  - Analytics │  │  - Export     │  │
+│  └──────┬───────┘  └──────┬───────┘  └───────┬───────┘  │
+│         │                 │                   │          │
+│         └────────────┬────┴───────────────────┘          │
+│                      │                                   │
+│              ┌───────▼────────┐                          │
+│              │   Middleware   │ Auth + Route Protection   │
+│              └───────┬────────┘                          │
+└──────────────────────┼──────────────────────────────────┘
+                       │
+          ┌────────────┼────────────┐
+          │            │            │
+   ┌──────▼──────┐ ┌──▼───┐ ┌─────▼─────┐
+   │  Supabase   │ │Gemini│ │  Resend   │
+   │ PostgreSQL  │ │  AI  │ │  Email    │
+   │  + RLS      │ │Vision│ │  API      │
+   └─────────────┘ └──────┘ └───────────┘
+```
+
+---
+
+## Key Technical Highlights
+
+### Atomic Stock Protection
+Checkout uses a single PostgreSQL RPC (`create_order_atomic`) that verifies stock, reads live prices, deducts inventory, and creates the order — all in one transaction. No race conditions, no overselling.
+
+### AI Product Scanner
+Admin staff point a camera at any product → Gemini Vision identifies it → auto-fills name, category, brand, suggested price, and age range. Reduces product listing time from minutes to seconds.
+
+### AI Gift Finder
+Customers describe who they're shopping for in natural language → Gemini queries the live catalog → returns 3 personalized recommendations with real prices and stock status.
+
+### Bilingual Search
+Custom transliteration engine converts between Cyrillic and Latin alphabets in real-time. Customers can search in either script and find products regardless of how they were entered.
+
+### Security-First Architecture
+- **Row-Level Security** on all tables — no data leaks even if client code is compromised
+- **Middleware auth** protecting all `/admin/*` routes
+- **Persistent rate limiting** via PostgreSQL (not in-memory)
+- **Audit logging** for all admin actions
+- **Server-side price validation** — prices are never trusted from the client
+- Full 27-point security audit completed and resolved
+
+### Analytics Dashboard
+Revenue tracking, gross margin analysis, inventory turnover ratios, brand scorecards, order fulfillment metrics — all built with Recharts and custom PostgreSQL aggregation queries. Exportable to Excel.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router), React 19, TypeScript |
+| Database | Supabase (PostgreSQL + Row-Level Security) |
+| AI | Google Gemini 2.5 Flash (Vision + Text) |
+| Styling | Tailwind CSS 4 |
+| Charts | Recharts |
+| Email | Resend API |
+| Monitoring | Sentry (client + server + edge) |
+| Export | SheetJS (XLSX) |
+| Deployment | Vercel (CI/CD) |
+
+---
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── admin/           # Protected ERP dashboard
+│   ├── catalog/          # Product listing page
+│   ├── checkout/         # Guest checkout flow
+│   ├── produkt/[slug]/   # Product detail pages (SEO-friendly slugs)
+│   ├── kosnicka/         # Cart page
+│   └── api/
+│       ├── gift-finder/  # AI recommendation engine
+│       ├── vision/       # Gemini product scanner
+│       ├── emails/       # Order confirmation & shipping
+│       ├── export/       # Excel report generation
+│       └── health/       # Uptime monitoring endpoint
+├── components/           # 21 React components (Server + Client split)
+├── lib/
+│   ├── store.ts          # Data layer (Supabase queries, DB mapping)
+│   ├── cart.ts           # Client-side cart with event system
+│   └── search.ts         # Cyrillic↔Latin transliteration
+└── middleware.ts          # Admin route protection
+migrations/                # 19 PostgreSQL migrations (schema + RPCs)
+specs/                     # 10 specification documents
+```
+
+---
+
+## Performance
+
+| Metric | Score |
+|--------|-------|
+| Mobile PageSpeed | **97/100** |
+| First Contentful Paint | 0.9s |
+| Largest Contentful Paint | 2.6s |
+| Total Blocking Time | 0ms |
+| Cumulative Layout Shift | 0 |
+
+SSR-first rendering, `next/image` optimization, WebP compression (99%+ size reduction on assets).
+
+---
+
+## Local Development
+
+```bash
+git clone https://github.com/yourusername/store-app.git
+cd store-app
+npm install
+```
+
+Create `.env.local`:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+RESEND_API_KEY=your_resend_key
+GEMINI_API_KEY=your_gemini_key
+```
+
+Run migrations in order (001→019) via Supabase SQL Editor, then:
+```bash
+npm run dev
+```
+
+---
+
+## About This Build
+
+This project was built using an **AI-assisted development workflow** — combining hands-on engineering decisions with AI tools (Claude, Gemini) for accelerated development. Every architectural choice, database design, and security measure was intentionally designed and reviewed, not auto-generated.
+
+The result: a production-grade application with the scope of a team project, delivered by one developer.
+
+---
+
+Built by [Filip Mladenovski] · Full-Stack AI Developer

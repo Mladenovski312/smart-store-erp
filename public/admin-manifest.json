@@ -1,0 +1,29 @@
+{
+    "name": "Интер Стар Џамбо — Админ",
+    "short_name": "Џамбо Админ",
+    "description": "Административен панел — Интер Стар Џамбо",
+    "start_url": "/admin",
+    "scope": "/admin",
+    "display": "standalone",
+    "background_color": "#0028a3",
+    "theme_color": "#0028a3",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "/icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-192.svg",
+            "sizes": "192x192",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ],
+    "categories": [
+        "business"
+    ],
+    "lang": "mk"
+}

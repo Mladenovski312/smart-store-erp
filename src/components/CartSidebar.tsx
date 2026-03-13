@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ShoppingCart, X, Trash2, Plus, Minus } from 'lucide-react';
-import { getCart, updateCartQuantity, removeFromCart, getCartTotal, getCartCount, syncCartWithServer, CartItem } from '@/lib/cart';
+import { getCart, updateCartQuantity, removeFromCart, syncCartWithServer, CartItem } from '@/lib/cart';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/types';
@@ -67,16 +67,11 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     <div className="flex-1 overflow-y-auto p-4">
                         {items.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full text-center px-4">
-                                <div className="relative mb-6">
-                                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center">
-                                        <ShoppingCart size={36} className="text-gray-300" />
-                                    </div>
-                                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-jumbo-blue/10 rounded-full flex items-center justify-center animate-bounce" style={{ animationDuration: '2s' }}>
-                                        <span className="text-jumbo-blue text-xs font-bold">0</span>
-                                    </div>
+                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                    <ShoppingCart size={28} className="text-gray-400" />
                                 </div>
-                                <p className="text-gray-900 font-semibold text-lg mb-1">Кошничката е празна</p>
-                                <p className="text-gray-400 text-sm mb-6">Разгледајте ги нашите играчки и додадете нешто!</p>
+                                <p className="text-gray-900 font-semibold text-base mb-1">Кошничката е празна</p>
+                                <p className="text-gray-500 text-sm mb-6">Додадете производи за да продолжите.</p>
                                 <Link href="/catalog" onClick={onClose} className="inline-flex items-center gap-2 bg-jumbo-blue text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors">
                                     Кон каталогот
                                 </Link>
@@ -110,9 +105,9 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                                     }}
                                                     disabled={item.quantity <= 1}
                                                     aria-label="Намали количина"
-                                                    className={`w-7 h-7 border rounded-md flex items-center justify-center transition-colors ${item.quantity <= 1 ? 'bg-gray-50 text-gray-200 border-gray-100' : 'bg-gray-300 text-gray-800 hover:bg-gray-400 border-gray-300'}`}
+                                                    className={`w-10 h-10 border rounded-md flex items-center justify-center transition-colors ${item.quantity <= 1 ? 'bg-gray-50 text-gray-200 border-gray-100 cursor-not-allowed' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-200 cursor-pointer'}`}
                                                 >
-                                                    <Minus size={12} />
+                                                    <Minus size={14} />
                                                 </button>
                                                 <span className="text-sm font-semibold w-6 text-center">{item.quantity}</span>
                                                 <button
@@ -120,9 +115,9 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                                     disabled={item.quantity >= item.stock}
                                                     aria-label="Зголеми количина"
                                                     title={item.quantity >= item.stock ? `Достапни се само ${item.stock} ком.` : ''}
-                                                    className={`w-7 h-7 border rounded-md flex items-center justify-center transition-colors ${item.quantity >= item.stock ? 'bg-gray-50 text-gray-200 border-gray-100' : 'bg-gray-300 text-gray-800 hover:bg-gray-400 border-gray-300'}`}
+                                                    className={`w-10 h-10 border rounded-md flex items-center justify-center transition-colors ${item.quantity >= item.stock ? 'bg-gray-50 text-gray-200 border-gray-100 cursor-not-allowed' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-200 cursor-pointer'}`}
                                                 >
-                                                    <Plus size={12} />
+                                                    <Plus size={14} />
                                                 </button>
                                             </div>
                                         </div>
@@ -131,9 +126,9 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                         <button
                                             onClick={() => { removeFromCart(item.productId); refresh(); }}
                                             aria-label="Отстрани од кошничка"
-                                            className="p-1.5 text-gray-400 hover:text-red-500 transition-colors self-start"
+                                            className="p-2.5 text-gray-400 hover:text-red-500 transition-colors self-start cursor-pointer"
                                         >
-                                            <Trash2 size={14} />
+                                            <Trash2 size={16} />
                                         </button>
                                     </div>
                                 ))}
@@ -160,7 +155,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                 onClick={onClose}
                                 className="block w-full bg-jumbo-blue hover:bg-blue-800 text-white text-center py-3 rounded-xl font-bold text-sm transition-colors"
                             >
-                                ПРОВЕРКА
+                                КОН НАРАЧКА
                             </Link>
                         </div>
                     )}

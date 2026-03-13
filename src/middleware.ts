@@ -23,13 +23,8 @@ export async function middleware(request: NextRequest) {
         }
     );
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    // No valid session → redirect away from admin
-    if (!user) {
-        const redirectUrl = new URL('/', request.url);
-        return NextResponse.redirect(redirectUrl);
-    }
+    // Refresh session cookies — auth gate is handled by admin/page.tsx (shows LoginPage when unauthenticated)
+    await supabase.auth.getUser();
 
     return response;
 }

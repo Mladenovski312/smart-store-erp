@@ -86,27 +86,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
-        // Check active session
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        // Check active session — await fetchRole so role is set before loading clears (prevents login page flash)
+        const initAuth = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
             if (session?.user) {
                 setUser(session.user);
-                fetchRole(session.user.id, session.user.email || '');
+                await fetchRole(session.user.id, session.user.email || '');
             }
             setLoading(false);
-        });
+        };
 
-        // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        initAuth();
+
+        // Listen for subsequent auth changes (login/logout)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             if (session?.user) {
                 setUser(session.user);
-                fetchRole(session.user.id, session.user.email || '');
+                await fetchRole(session.user.id, session.user.email || '');
             } else {
                 setUser(null);
                 setRole(null);
                 setStatus(null);
                 setDisplayName(null);
             }
-            setLoading(false);
         });
 
         return () => subscription.unsubscribe();
