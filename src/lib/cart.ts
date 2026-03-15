@@ -18,8 +18,13 @@ const CART_KEY = 'jumbo_cart';
 
 function readCart(): CartItem[] {
     if (typeof window === 'undefined') return [];
-    const raw = localStorage.getItem(CART_KEY);
-    return raw ? JSON.parse(raw) : [];
+    try {
+        const raw = localStorage.getItem(CART_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch {
+        localStorage.removeItem(CART_KEY);
+        return [];
+    }
 }
 
 function writeCart(items: CartItem[]) {
@@ -33,6 +38,7 @@ export function getCart(): CartItem[] {
 }
 
 export function addToCart(item: Omit<CartItem, 'quantity'>, quantity = 1): void {
+    if (item.stock <= 0) return;
     const cart = readCart();
     const existing = cart.find(c => c.productId === item.productId);
     if (existing) {
@@ -42,7 +48,7 @@ export function addToCart(item: Omit<CartItem, 'quantity'>, quantity = 1): void 
         existing.stock = item.stock;
     } else {
         // Cap initial quantity at stock limit
-        const cappedQuantity = Math.min(quantity, item.stock);
+        const cappedQuantity = Math.min(Math.max(1, quantity), item.stock);
         cart.push({ ...item, quantity: cappedQuantity });
     }
     writeCart(cart);

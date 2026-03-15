@@ -105,7 +105,7 @@ export default function Scanner({ onProductSaved }: ScannerProps) {
         if (!sellingPrice || parseFloat(sellingPrice) <= 0) errors.push('Внесете валидна продажна цена.');
         if (!stockQuantity || parseInt(stockQuantity) <= 0) errors.push('Количината мора да биде најмалку 1.');
         if (parseFloat(sellingPrice) < parseFloat(purchasePrice)) {
-            errors.push('⚠️ Продажната цена е помала од набавната — нема профит!');
+            errors.push('⚠️ Продажната цена е помала од набавната, нема профит!');
         }
 
         if (errors.length > 0) {

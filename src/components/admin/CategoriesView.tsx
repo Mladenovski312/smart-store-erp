@@ -1,5 +1,5 @@
 import { Tags } from 'lucide-react';
-import { Product } from '@/lib/types';
+import { Product, formatPrice } from '@/lib/types';
 
 export default function CategoriesView({ products }: { products: Product[] }) {
   const categoryMap = new Map<string, { count: number; value: number }>();
@@ -39,7 +39,7 @@ export default function CategoriesView({ products }: { products: Product[] }) {
         <div key={cat} className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
           <h3 className="font-semibold text-gray-900 mb-1">{labels[cat] || cat}</h3>
           <div className="text-2xl font-bold text-jumbo-blue">{data.count}</div>
-          <div className="text-sm text-gray-500 mt-1">Вредност: {data.value.toLocaleString()} ден</div>
+          <div className="text-sm text-gray-500 mt-1">Вредност: {formatPrice(data.value)} ден</div>
         </div>
       ))}
     </div>

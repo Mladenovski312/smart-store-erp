@@ -603,7 +603,7 @@ function ProductsSection({ orders, sales, products }: { orders: OrderRaw[]; sale
                     ) : <NoData />}
                 </Card>
             </div>
-            <Card title={`Мртва залиха — без продажба во избраниот период (${deadStock.length} производи)`}>
+            <Card title={`Мртва залиха - без продажба во избраниот период (${deadStock.length} производи)`}>
                 {deadStock.length > 0 ? (
                     <div className="max-h-[22rem] overflow-y-auto">
                         <table className="w-full text-sm table-fixed">
@@ -697,7 +697,7 @@ function InventorySection({ products, sales, rangeDays }: { products: ProductRaw
                         </ResponsiveContainer>
                     ) : <NoData />}
                 </Card>
-                <Card title={`Ниска залиха (≤3 единици) — ${lowStock.length} производи`}>
+                <Card title={`Ниска залиха (≤3 единици) - ${lowStock.length} производи`}>
                     {lowStock.length > 0 ? (
                         <div className="max-h-[18.75rem] overflow-y-auto">
                             <table className="w-full text-sm table-fixed">

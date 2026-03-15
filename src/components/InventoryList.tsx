@@ -47,29 +47,46 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
 
     const handleEditSave = async () => {
         if (!editModal) return;
-        setIsSaving(true);
 
-        let imageUrl = editForm.imageUrl || undefined;
-
-        // Upload new image if one was selected
-        if (editImageFile) {
-            const url = await uploadProductImage(editImageFile);
-            if (url) imageUrl = url;
+        const sellingPrice = parseFloat(editForm.sellingPrice);
+        if (!sellingPrice || sellingPrice <= 0) {
+            alert('Продажната цена мора да биде поголема од 0!');
+            return;
         }
 
-        await updateProduct(editModal.id, {
-            name: editForm.name.trim(),
-            description: editForm.description.trim() || undefined,
-            category: editForm.category,
-            imageUrl,
-            purchasePrice: parseFloat(editForm.purchasePrice) || 0,
-            sellingPrice: parseFloat(editForm.sellingPrice) || 0,
-            stockQuantity: parseInt(editForm.stockQuantity) || 0,
-        });
+        setIsSaving(true);
 
-        setIsSaving(false);
-        setEditModal(null);
-        onRefresh();
+        try {
+            let imageUrl = editForm.imageUrl || undefined;
+
+            // Upload new image if one was selected
+            if (editImageFile) {
+                const url = await uploadProductImage(editImageFile);
+                if (url) imageUrl = url;
+            }
+
+            const result = await updateProduct(editModal.id, {
+                name: editForm.name.trim(),
+                description: editForm.description.trim() || undefined,
+                category: editForm.category,
+                imageUrl,
+                purchasePrice: parseFloat(editForm.purchasePrice) || 0,
+                sellingPrice,
+                stockQuantity: parseInt(editForm.stockQuantity) || 0,
+            });
+
+            if (!result) {
+                alert('Грешка при зачувување. Обидете се повторно.');
+                return;
+            }
+
+            setEditModal(null);
+            onRefresh();
+        } catch {
+            alert('Грешка при зачувување. Проверете ја врската.');
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const filtered = products.filter(p => {
@@ -78,22 +95,47 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
         return matchesSearch && matchesCategory;
     });
 
+    const [sellLoading, setSellLoading] = useState(false);
+
     const handleSell = async () => {
-        if (!sellModal) return;
+        if (!sellModal || sellLoading) return;
+        if (sellQty <= 0) {
+            alert('Количината мора да биде најмалку 1!');
+            return;
+        }
         if (sellQty > sellModal.stockQuantity) {
             alert('Нема доволно залиха!');
             return;
         }
-        await recordSale(sellModal, sellQty);
-        setSellModal(null);
-        setSellQty(1);
-        onRefresh();
+        setSellLoading(true);
+        try {
+            const result = await recordSale(sellModal, sellQty);
+            if (!result) {
+                alert('Грешка при продажба. Обидете се повторно.');
+                return;
+            }
+            setSellModal(null);
+            setSellQty(1);
+            onRefresh();
+        } catch {
+            alert('Грешка при продажба. Проверете ја врската.');
+        } finally {
+            setSellLoading(false);
+        }
     };
 
     const handleDelete = async (product: Product) => {
         if (confirm(`Дали сте сигурни дека сакате да го избришете "${product.name}"?`)) {
-            await deleteProduct(product.id);
-            onRefresh();
+            try {
+                const result = await deleteProduct(product.id);
+                if (result.error) {
+                    alert(result.error);
+                    return;
+                }
+                onRefresh();
+            } catch {
+                alert('Грешка при бришење. Проверете ја врската.');
+            }
         }
     };
 
@@ -179,6 +221,7 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
                                 </button>
                                 <button
                                     onClick={() => handleDelete(product)}
+                                    aria-label="Избриши артикл"
                                     className="flex items-center justify-center gap-1.5 px-3 py-2 border border-red-200 text-red-500 hover:bg-red-50 rounded-lg text-xs font-semibold transition-colors"
                                 >
                                     <Trash2 size={14} />
@@ -227,7 +270,10 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
                             min={1}
                             max={sellModal.stockQuantity}
                             value={sellQty}
-                            onChange={(e) => setSellQty(parseInt(e.target.value) || 1)}
+                            onChange={(e) => {
+                                const v = parseInt(e.target.value);
+                                setSellQty(isNaN(v) || v < 1 ? 1 : Math.min(v, sellModal.stockQuantity));
+                            }}
                             className="w-full p-2.5 border border-gray-200 rounded-lg mb-2 outline-none focus:ring-2 focus:ring-jumbo-red"
                         />
                         <div className="text-right text-sm text-gray-500 mb-4">
@@ -243,9 +289,10 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
                             </button>
                             <button
                                 onClick={handleSell}
-                                className="flex-1 py-2.5 bg-jumbo-red text-white rounded-lg text-sm font-bold hover:bg-red-700 transition-colors"
+                                disabled={sellLoading}
+                                className="flex-1 py-2.5 bg-jumbo-red text-white rounded-lg text-sm font-bold hover:bg-red-700 transition-colors disabled:opacity-50"
                             >
-                                Потврди продажба
+                                {sellLoading ? 'Се продава...' : 'Потврди продажба'}
                             </button>
                         </div>
                     </div>
@@ -266,7 +313,7 @@ export default function InventoryList({ products, onRefresh }: InventoryListProp
                             <div className="md:col-span-2 flex flex-col">
                                 <div className="relative w-full aspect-square bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden mb-3">
                                     {editImagePreview ? (
-                                        <Image src={editImagePreview} alt="" fill className="object-contain p-2" sizes="300px" unoptimized />
+                                        <Image src={editImagePreview} alt="Преглед на слика" fill className="object-contain p-2" sizes="300px" unoptimized />
                                     ) : (
                                         <span className="text-gray-300 text-sm">Нема слика</span>
                                     )}

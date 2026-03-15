@@ -7,8 +7,8 @@ import HomePageClient from '@/components/HomePageClient';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-    title: 'Интер Стар Џамбо — Играчки Куманово',
-    description: 'Најголемиот избор на играчки во Куманово. Lego, Barbie, Paw Patrol, возила и повеќе — со бесплатна достава.',
+    title: 'Интер Стар Џамбо | Играчки Куманово',
+    description: 'Најдобриот избор на играчки во Куманово. Lego, Barbie, Paw Patrol, возила и повеќе со бесплатна достава.',
 };
 
 export const revalidate = 60;
@@ -16,7 +16,7 @@ export const revalidate = 60;
 const faqs = [
     {
         q: "Како се плаќа при онлајн нарачка?",
-        a: "Сите онлајн нарачки се плаќаат исклучиво при достава — готовински на курирот при преземање на пратката. Не е потребна картичка ниту претплата, што ви гарантира целосно безбедно купување."
+        a: "Сите онлајн нарачки се плаќаат исклучиво при достава, готовински на курирот при преземање на пратката. Не е потребна картичка ниту претплата, што ви гарантира целосно безбедно купување."
     },
     {
         q: "Кои брендови на играчки ги продавате?",
@@ -63,10 +63,10 @@ export default async function Home() {
                             </div>
 
                             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.1] mb-6 drop-shadow-lg">
-                                Најголемиот избор на играчки во <span className="text-jumbo-red">Куманово</span>
+                                Најдобриот избор на играчки во <span className="text-jumbo-red">Куманово</span>
                             </h1>
                             <p className="text-lg md:text-xl text-blue-50 mb-10 leading-relaxed font-medium max-w-xl drop-shadow">
-                                Вашата омилена локална продавница за играчки. Нарачајте онлајн со брза достава низ цела Македонија и плаќање при достава (COD).
+                                Не сме најголемата продавница, но сме најдобриот избор. Нарачајте онлајн со брза достава низ цела Македонија и плаќање при достава.
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-4">
@@ -119,7 +119,7 @@ export default async function Home() {
                                 "@id": "https://interstarjumbo.com/#store",
                                 "name": "Интер Стар Џамбо",
                                 "alternateName": "Inter Star Jumbo",
-                                "description": "Најголемата продавница за играчки во Куманово.",
+                                "description": "Најдобриот избор на играчки во Куманово.",
                                 "image": "https://www.interstarjumbo.com/hd_logo.webp",
                                 "url": "https://interstarjumbo.com",
                                 "telephone": "+38931422656",

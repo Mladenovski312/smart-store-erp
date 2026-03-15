@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: 'Нарачка',
-    description: 'Завршете ја вашата нарачка — бесплатна достава и плаќање при достава.',
+    description: 'Завршете ја вашата нарачка. Бесплатна достава и плаќање при достава.',
 };
 
 export default function CheckoutLayout({ children }: { children: React.ReactNode }) {

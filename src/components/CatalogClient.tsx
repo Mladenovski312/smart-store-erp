@@ -189,7 +189,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                         <div className="flex items-center justify-between mb-3">
                             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Цена</span>
                             <span className="text-sm font-bold text-gray-900">
-                                {formatPrice(minPrice)} ден – {formatPrice(maxPrice)} ден
+                                {formatPrice(minPrice)} ден - {formatPrice(maxPrice)} ден
                             </span>
                         </div>
                         <Slider.Root

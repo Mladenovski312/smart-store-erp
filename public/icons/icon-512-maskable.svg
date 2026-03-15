@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Maskable icon: 10% safe zone padding (51.2px each side) -->
+  <rect width="512" height="512" fill="#1e3a8a"/>
+  <text x="256" y="190" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="76" fill="white" letter-spacing="-4">ИНТЕР</text>
+  <text x="256" y="266" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="76" fill="white" letter-spacing="-4">СТАР</text>
+  <rect x="116" y="290" width="280" height="80" rx="14" fill="white"/>
+  <text x="256" y="350" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="64" fill="#dc2626" letter-spacing="-2">ЏАМБО</text>
+</svg>
