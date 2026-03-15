@@ -145,6 +145,16 @@ export default function SettingsPanel() {
 
     const toggleRole = async (userId: string, currentRole: string) => {
         const newRole = currentRole === 'admin' ? 'employee' : 'admin';
+
+        // Prevent demoting the last admin
+        if (currentRole === 'admin') {
+            const adminCount = users.filter(u => u.role === 'admin' && u.status === 'active').length;
+            if (adminCount <= 1) {
+                setMessage({ type: 'error', text: 'Не може да го промените последниот админ во вработен!' });
+                return;
+            }
+        }
+
         const { error } = await supabase
             .from('user_roles')
             .update({ role: newRole })
@@ -274,6 +284,7 @@ export default function SettingsPanel() {
                                                 onClick={() => toggleRole(u.id, u.role)}
                                                 className="p-2 text-gray-400 hover:text-jumbo-blue hover:bg-jumbo-blue-light rounded-lg transition-colors"
                                                 title={u.role === 'admin' ? 'Промени на Вработен' : 'Промени на Админ'}
+                                                aria-label={u.role === 'admin' ? 'Промени на Вработен' : 'Промени на Админ'}
                                             >
                                                 <ShieldCheck size={14} />
                                             </button>
@@ -304,8 +315,8 @@ export default function SettingsPanel() {
             <div className="bg-jumbo-blue-light border border-blue-200 rounded-xl p-4 text-sm text-jumbo-blue">
                 <p className="font-medium mb-1">💡 Како работи?</p>
                 <ul className="text-blue-700 space-y-1 ml-5 list-disc">
-                    <li><strong>Админ</strong> — Целосен пристап: залиха, продажба, аналитика, поставки.</li>
-                    <li><strong>Вработен</strong> — Залиха, додавање артикли, продажба (POS), управување со нарачки.</li>
+                    <li><strong>Админ</strong> - Целосен пристап: залиха, продажба, аналитика, поставки.</li>
+                    <li><strong>Вработен</strong> - Залиха, додавање артикли, продажба (POS), управување со нарачки.</li>
                     <li>Админот ја поставува лозинката и му ја дава на вработениот.</li>
                 </ul>
             </div>

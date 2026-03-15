@@ -13,8 +13,9 @@ export async function GET() {
             .select('id', { count: 'exact', head: true });
 
         if (error) {
+            console.error('Health check DB error:', error.message);
             return NextResponse.json(
-                { status: 'degraded', db: 'error', error: error.message, ms: Date.now() - start },
+                { status: 'degraded', db: 'error', ms: Date.now() - start },
                 { status: 503 }
             );
         }
@@ -26,8 +27,9 @@ export async function GET() {
             ms: Date.now() - start,
         });
     } catch (err) {
+        console.error('Health check error:', err);
         return NextResponse.json(
-            { status: 'error', error: err instanceof Error ? err.message : 'unknown', ms: Date.now() - start },
+            { status: 'error', ms: Date.now() - start },
             { status: 503 }
         );
     }

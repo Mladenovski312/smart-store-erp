@@ -22,20 +22,35 @@ export default function EmployeePOS({ products, onSaleComplete }: EmployeePOSPro
         p.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const [selling, setSelling] = useState(false);
+
     const handleSell = async () => {
-        if (!sellTarget) return;
+        if (!sellTarget || selling) return;
+        if (sellQty <= 0) {
+            alert('Количината мора да биде најмалку 1!');
+            return;
+        }
         if (sellQty > sellTarget.stockQuantity) {
             alert('Нема доволно залиха!');
             return;
         }
-        await recordSale(sellTarget, sellQty);
-        setJustSold(sellTarget.name);
-        setSellTarget(null);
-        setSellQty(1);
-        onSaleComplete();
-
-        // Clear success message after 2s
-        setTimeout(() => setJustSold(null), 2000);
+        setSelling(true);
+        try {
+            const result = await recordSale(sellTarget, sellQty);
+            if (!result) {
+                alert('Грешка при продажба. Обидете се повторно.');
+                return;
+            }
+            setJustSold(sellTarget.name);
+            setSellTarget(null);
+            setSellQty(1);
+            onSaleComplete();
+            setTimeout(() => setJustSold(null), 2000);
+        } catch {
+            alert('Грешка при продажба. Проверете ја врската.');
+        } finally {
+            setSelling(false);
+        }
     };
 
     return (
@@ -113,7 +128,7 @@ export default function EmployeePOS({ products, onSaleComplete }: EmployeePOSPro
                         <div className="flex items-center gap-4 mb-4">
                             <div className="relative w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
                                 {sellTarget.imageUrl ? (
-                                    <Image src={sellTarget.imageUrl} alt="" fill className="object-contain" sizes="64px" />
+                                    <Image src={sellTarget.imageUrl} alt={sellTarget.name} fill className="object-contain" sizes="64px" />
                                 ) : (
                                     <Package className="w-8 h-8 text-gray-300" />
                                 )}
@@ -140,7 +155,10 @@ export default function EmployeePOS({ products, onSaleComplete }: EmployeePOSPro
                                 min={1}
                                 max={sellTarget.stockQuantity}
                                 value={sellQty}
-                                onChange={(e) => setSellQty(parseInt(e.target.value) || 1)}
+                                onChange={(e) => {
+                                    const v = parseInt(e.target.value);
+                                    setSellQty(isNaN(v) || v < 1 ? 1 : Math.min(v, sellTarget.stockQuantity));
+                                }}
                                 className="flex-1 text-center text-2xl font-bold p-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue"
                             />
                             <button
@@ -162,10 +180,11 @@ export default function EmployeePOS({ products, onSaleComplete }: EmployeePOSPro
                             </button>
                             <button
                                 onClick={handleSell}
-                                className="flex-1 py-3 bg-jumbo-red text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                                disabled={selling}
+                                className="flex-1 py-3 bg-jumbo-red text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 <ShoppingCart size={16} />
-                                Продај
+                                {selling ? 'Се продава...' : 'Продај'}
                             </button>
                         </div>
                     </div>

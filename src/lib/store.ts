@@ -161,13 +161,32 @@ export async function updateProductStock(productId: string, newQuantity: number)
         .eq('id', productId);
 }
 
-export async function deleteProduct(productId: string): Promise<void> {
+export async function deleteProduct(productId: string): Promise<{ error?: string }> {
     const supabase = createClient();
-    await supabase
+
+    // Check for active orders containing this product
+    const { data: activeOrders } = await supabase
+        .from('orders')
+        .select('id, items')
+        .in('status', ['pending', 'shipped']);
+
+    const hasActiveOrders = activeOrders?.some(order => {
+        const items = order.items as Array<{ productId?: string; id?: string }>;
+        return items?.some(i => (i.productId || i.id) === productId);
+    });
+
+    if (hasActiveOrders) {
+        return { error: 'Овој производ има активни нарачки (чекање/испратена). Не може да се избрише.' };
+    }
+
+    const { error } = await supabase
         .from('products')
         .delete()
         .eq('id', productId);
+
+    if (error) return { error: 'Грешка при бришење.' };
     logAdminAction('product.delete', 'product', productId);
+    return {};
 }
 
 /** Upload an image file to Supabase Storage and return its public URL. */
@@ -237,9 +256,8 @@ export async function getSales(): Promise<SaleRecord[]> {
 }
 
 export async function recordSale(product: Product, quantity: number): Promise<SaleRecord | null> {
+    if (quantity <= 0) return null;
     const supabase = createClient();
-
-    // Atomic: deduct stock + insert sale in a single DB transaction
     const { data, error } = await supabase.rpc('record_sale_atomic', {
         p_product_id: product.id,
         p_quantity: quantity,

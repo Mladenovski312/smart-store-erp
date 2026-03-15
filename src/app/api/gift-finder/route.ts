@@ -10,7 +10,7 @@ Website: interstarjumbo.com
 STORE INFORMATION (use this to answer customer questions):
 - Address: Народна Револуција 43, Куманово
 - Phone: +389 31 422 656
-- Working hours: Понеделник – Сабота: 09:00 – 21:00
+- Working hours: Понеделник - Сабота: 09:00 - 21:00
 - Payment: Само плаќање при достава (Cash on delivery only)
 - Delivery: Via logistics partner, 3-7 working days after order. Delivery fee depends on product weight.
 - Returns: 14 days from receipt. Product must be unopened, in original packaging, with receipt. Exceptions: opened board games/puzzles, used plush toys.

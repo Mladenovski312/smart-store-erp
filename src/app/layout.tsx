@@ -13,13 +13,13 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://interstarjumbo.com"),
   manifest: "/manifest.json",
   title: {
-    default: "Интер Стар Џамбо — Играчки Куманово",
+    default: "Интер Стар Џамбо | Играчки Куманово",
     template: "%s | Интер Стар Џамбо",
   },
-  description: "Најголемиот избор на играчки во Куманово. Lego, Barbie, Paw Patrol и повеќе.",
+  description: "Најдобриот избор на играчки во Куманово. Lego, Barbie, Paw Patrol и повеќе.",
   openGraph: {
-    title: "Интер Стар Џамбо — Играчки Куманово",
-    description: "Најголемиот избор на играчки во Куманово. Lego, Barbie, Paw Patrol и повеќе.",
+    title: "Интер Стар Џамбо | Играчки Куманово",
+    description: "Најдобриот избор на играчки во Куманово. Lego, Barbie, Paw Patrol и повеќе.",
     url: "https://interstarjumbo.com",
     siteName: "Интер Стар Џамбо",
     images: [
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Интер Стар Џамбо — Играчки Куманово",
+        alt: "Интер Стар Џамбо | Играчки Куманово",
       },
     ],
     locale: "mk_MK",
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Интер Стар Џамбо — Играчки Куманово",
-    description: "Најголемиот избор на играчки во Куманово. Lego, Barbie, Paw Patrol и повеќе.",
+    title: "Интер Стар Џамбо | Играчки Куманово",
+    description: "Најдобриот избор на играчки во Куманово. Lego, Barbie, Paw Patrol и повеќе.",
     images: ["/og-image.png"],
   },
   icons: {

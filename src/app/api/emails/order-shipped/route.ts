@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { OrderItem } from '@/lib/types';
 import { esc, renderItemsHtml, renderOrderSummaryHtml, EMAIL_HEADER, EMAIL_FOOTER } from '@/lib/email';
 
@@ -8,17 +8,21 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
   try {
-    const { orderId, customerName, customerEmail, deliveryCity, trackingNumber, items, subtotal } = await req.json();
+    const { orderId, trackingNumber } = await req.json();
 
-    if (!customerEmail || !orderId) {
+    if (!orderId) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Verify the order exists in the database before sending email
-    const supabase = createClient();
+    // Read ALL order data from the database — never trust request body for email content
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
     const { data: order, error: dbError } = await supabase
       .from('orders')
-      .select('id')
+      .select('*')
       .eq('id', orderId)
       .single();
 
@@ -26,8 +30,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Order not found' }, { status: 403 });
     }
 
+    const customerEmail = order.customer_email;
+    if (!customerEmail) {
+      return NextResponse.json({ error: 'No customer email on order' }, { status: 400 });
+    }
+
+    const customerName = order.customer_name;
+    const deliveryCity = order.delivery_city;
+    const items = order.items as OrderItem[];
+    const subtotal = order.subtotal;
+
     const shortId = orderId.slice(0, 8).toUpperCase();
-    const itemsHtml = items && items.length > 0 ? renderItemsHtml(items as OrderItem[]) : '';
+    const itemsHtml = items && items.length > 0 ? renderItemsHtml(items) : '';
 
     const html = `
     <!DOCTYPE html>
@@ -60,7 +74,7 @@ export async function POST(req: NextRequest) {
               </tr>
               <tr>
                 <td style="font-size: 13px; color: #888; padding: 6px 0; font-weight: 600;">Плаќање</td>
-                <td style="font-size: 14px; color: #333; padding: 6px 0; text-align: right;">При достава (COD)</td>
+                <td style="font-size: 14px; color: #333; padding: 6px 0; text-align: right;">При достава</td>
               </tr>
               ${trackingNumber ? `<tr>
                 <td style="font-size: 13px; color: #888; padding: 6px 0; font-weight: 600;">Број за следење</td>
@@ -96,7 +110,7 @@ export async function POST(req: NextRequest) {
     const { error } = await resend.emails.send({
       from: 'Интер Стар Џамбо <naracki@interstarjumbo.com>',
       to: customerEmail,
-      subject: `Нарачка #${shortId} — Испратена! | Интер Стар Џамбо`,
+      subject: `Нарачка #${shortId} - Испратена! | Интер Стар Џамбо`,
       html,
     });
 

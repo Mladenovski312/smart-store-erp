@@ -24,7 +24,7 @@ export default function OrderComplete({ orderId }: OrderCompleteProps) {
                     <div className="flex items-center justify-center gap-3 text-sm font-semibold">
                         <span className="text-green-500">КОШНИЧКА <Check className="inline w-3.5 h-3.5 mb-0.5" /></span>
                         <span className="text-gray-300">&rarr;</span>
-                        <span className="text-green-500">CHECKOUT <Check className="inline w-3.5 h-3.5 mb-0.5" /></span>
+                        <span className="text-green-500">НАРАЧКА <Check className="inline w-3.5 h-3.5 mb-0.5" /></span>
                         <span className="text-gray-300">&rarr;</span>
                         <span className="text-jumbo-blue">ГОТОВО</span>
                     </div>

@@ -48,7 +48,7 @@ export default function CartPage() {
                     <div className="flex items-center justify-center gap-3 text-sm font-semibold">
                         <span className="text-jumbo-blue">КОШНИЧКА</span>
                         <span className="text-gray-300">→</span>
-                        <span className="text-gray-400">CHECKOUT</span>
+                        <span className="text-gray-400">НАРАЧКА</span>
                         <span className="text-gray-300">→</span>
                         <span className="text-gray-400">ГОТОВО</span>
                     </div>

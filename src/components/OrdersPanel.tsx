@@ -32,6 +32,14 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
 
 const STATUSES = ['pending', 'shipped', 'delivered', 'cancelled'];
 
+// Allowed transitions: prevent backward/invalid status changes
+const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+    pending: ['shipped', 'cancelled'],
+    shipped: ['delivered', 'cancelled'],
+    delivered: [],  // terminal state
+    cancelled: [],  // terminal state
+};
+
 export default function OrdersPanel() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
@@ -60,49 +68,57 @@ export default function OrdersPanel() {
     }, []);
 
     const updateStatus = async (orderId: string, newStatus: string, trackingNum?: string) => {
+        const order = orders.find(o => o.id === orderId);
+        if (!order) return;
+
+        // Validate allowed transition
+        const allowed = ALLOWED_TRANSITIONS[order.status] || [];
+        if (!allowed.includes(newStatus)) {
+            alert(`Не може да се промени статусот од "${STATUS_CONFIG[order.status]?.label}" во "${STATUS_CONFIG[newStatus]?.label}".`);
+            return;
+        }
+
         // Restore stock when cancelling — but only if not already cancelled (prevents double restore)
-        if (newStatus === 'cancelled') {
-            const order = orders.find(o => o.id === orderId);
-            if (order && order.status !== 'cancelled') {
-                const stockItems = order.items.map(i => ({ id: i.productId, quantity: i.quantity }));
-                const { error: restoreError } = await supabase.rpc('restore_order_stock', { items: stockItems });
-                if (restoreError) {
-                    console.error('Failed to restore stock for cancelled order:', orderId, restoreError);
-                }
+        if (newStatus === 'cancelled' && order.status !== 'cancelled') {
+            const stockItems = order.items.map(i => ({ id: i.productId, quantity: i.quantity }));
+            const { error: restoreError } = await supabase.rpc('restore_order_stock', { items: stockItems });
+            if (restoreError) {
+                alert('Грешка при враќање на залиха. Обидете се повторно.');
+                console.error('Failed to restore stock for cancelled order:', orderId, restoreError);
+                return;
             }
         }
 
         const updateData: Record<string, string> = { status: newStatus };
         if (trackingNum) updateData.tracking_number = trackingNum;
 
-        await supabase
+        const { error: updateError } = await supabase
             .from('orders')
             .update(updateData)
             .eq('id', orderId);
 
-        const order2 = orders.find(o => o.id === orderId);
+        if (updateError) {
+            alert('Грешка при промена на статус. Обидете се повторно.');
+            console.error('Order status update failed:', updateError);
+            return;
+        }
+
         logAdminAction('order.status_change', 'order', orderId, {
-            from: order2?.status,
+            from: order.status,
             to: newStatus,
             ...(trackingNum ? { tracking: trackingNum } : {}),
         });
 
-        // Send email when marked as shipped
+        // Send email when marked as shipped — endpoint reads order data from DB
         if (newStatus === 'shipped') {
-            const order = orders.find(o => o.id === orderId);
-            if (order?.customer_email) {
-                fetch('/api/emails/order-shipped', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        orderId: order.id,
-                        customerName: order.customer_name,
-                        customerEmail: order.customer_email,
-                        deliveryCity: order.delivery_city,
-                        trackingNumber: trackingNum || null,
-                    }),
-                }).catch(() => { /* email failure shouldn't block status update */ });
-            }
+            fetch('/api/emails/order-shipped', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    orderId,
+                    trackingNumber: trackingNum || null,
+                }),
+            }).catch(() => { /* email failure shouldn't block status update */ });
         }
 
         fetchOrders();
@@ -248,6 +264,8 @@ export default function OrdersPanel() {
                                                 {STATUSES.map(s => {
                                                     const sc = STATUS_CONFIG[s];
                                                     const isCurrent = order.status === s;
+                                                    const isAllowed = (ALLOWED_TRANSITIONS[order.status] || []).includes(s);
+                                                    const isDisabled = isCurrent || !isAllowed;
                                                     return (
                                                         <button
                                                             key={s}
@@ -255,10 +273,12 @@ export default function OrdersPanel() {
                                                                 e.stopPropagation();
                                                                 setConfirmAction({ id: order.id, status: s, label: sc.label });
                                                             }}
-                                                            disabled={isCurrent}
+                                                            disabled={isDisabled}
                                                             className={`flex flex-col items-center justify-center gap-2 p-3 md:p-4 rounded-xl border-2 transition-all duration-200 ${isCurrent
                                                                 ? sc.color + ' border-transparent shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] cursor-default ring-4 ring-white ring-offset-1'
-                                                                : 'bg-white border-gray-200 text-gray-600 shadow-sm hover:border-jumbo-blue hover:text-jumbo-blue hover:shadow-md hover:-translate-y-1'
+                                                                : isDisabled
+                                                                    ? 'bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed'
+                                                                    : 'bg-white border-gray-200 text-gray-600 shadow-sm hover:border-jumbo-blue hover:text-jumbo-blue hover:shadow-md hover:-translate-y-1'
                                                                 }`}
                                                         >
                                                             {s === 'pending' && <Package size={isCurrent ? 24 : 20} className={isCurrent ? 'opacity-100' : 'opacity-70'} />}

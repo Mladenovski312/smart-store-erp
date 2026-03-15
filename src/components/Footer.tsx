@@ -17,7 +17,7 @@ export default function Footer() {
                             </div>
                         </Link>
                         <p className="text-gray-400 text-sm leading-relaxed">
-                            Најголемиот избор на играчки во Куманово. Квалитетни производи за секоја возраст.
+                            Најдобриот избор на играчки во Куманово. Квалитетни производи за секоја возраст.
                         </p>
                         <div className="flex gap-3 mt-4 justify-center md:justify-start">
                             <a href="https://www.facebook.com/InterStarJumbo/" target="_blank" rel="noopener noreferrer" aria-label="Интер Стар Џамбо на Facebook" className="w-9 h-9 bg-white/10 hover:bg-jumbo-blue rounded-lg flex items-center justify-center transition-colors">
@@ -45,7 +45,7 @@ export default function Footer() {
                             <li className="flex items-start gap-2.5 text-gray-400">
                                 <Clock size={16} className="text-jumbo-red mt-0.5 shrink-0" />
                                 <div>
-                                    <p>Пон – Саб: 09:00 – 21:00</p>
+                                    <p>Пон - Саб: 09:00 - 21:00</p>
                                     <p>Недела: Затворено</p>
                                 </div>
                             </li>

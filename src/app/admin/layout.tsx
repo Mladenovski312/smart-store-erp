@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AdminSW } from "./AdminSW";
 
 export const metadata: Metadata = {
   title: "Админ Панел | Интер Стар Џамбо",
@@ -9,5 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      {children}
+      <AdminSW />
+    </>
+  );
 }

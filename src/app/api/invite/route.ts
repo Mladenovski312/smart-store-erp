@@ -71,7 +71,8 @@ export async function POST(req: NextRequest) {
             if (createError.message.includes('already been registered') || createError.message.includes('already exists')) {
                 return NextResponse.json({ error: 'Овој email е веќе регистриран во системот.' }, { status: 400 });
             }
-            return NextResponse.json({ error: 'Грешка при креирање: ' + createError.message }, { status: 500 });
+            console.error('User creation error:', createError.message);
+            return NextResponse.json({ error: 'Грешка при креирање на корисникот.' }, { status: 500 });
         }
 
         // Add user_roles entry
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
                 .insert({
                     user_id: createData.user.id,
                     email: email.toLowerCase(),
-                    role: role || 'employee',
+                    role: (role === 'admin' || role === 'employee') ? role : 'employee',
                     display_name: displayName || email.split('@')[0],
                 });
 

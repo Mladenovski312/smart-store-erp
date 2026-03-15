@@ -4,7 +4,7 @@ import CatalogClient from '@/components/CatalogClient';
 
 export const metadata: Metadata = {
     title: 'Каталог',
-    description: 'Пребарувајте го целиот асортиман на играчки во Интер Стар Џамбо — филтрирајте по категорија, цена и возраст.',
+    description: 'Пребарувајте го целиот асортиман на играчки во Интер Стар Џамбо. Филтрирајте по категорија, цена и возраст.',
 };
 
 export default async function CatalogPage({

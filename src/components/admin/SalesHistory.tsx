@@ -1,5 +1,5 @@
 import { BarChart3 } from 'lucide-react';
-import { SaleRecord } from '@/lib/types';
+import { SaleRecord, formatPrice } from '@/lib/types';
 
 export default function SalesHistory({ sales }: { sales: SaleRecord[] }) {
   const sorted = [...sales].sort((a, b) => new Date(b.soldAt).getTime() - new Date(a.soldAt).getTime());
@@ -31,8 +31,8 @@ export default function SalesHistory({ sales }: { sales: SaleRecord[] }) {
             <tr key={sale.id} className="hover:bg-gray-50 transition-colors">
               <td className="px-4 py-3 text-sm font-medium text-gray-900 truncate">{sale.productName}</td>
               <td className="px-3 py-3 text-sm text-center text-gray-600">{sale.quantitySold}</td>
-              <td className="px-3 py-3 text-sm text-right text-gray-900 font-semibold">{sale.soldPrice.toLocaleString()} ден</td>
-              <td className="px-3 py-3 text-sm text-right text-green-600 font-semibold">+{sale.profit.toLocaleString()} ден</td>
+              <td className="px-3 py-3 text-sm text-right text-gray-900 font-semibold">{formatPrice(sale.soldPrice)} ден</td>
+              <td className="px-3 py-3 text-sm text-right text-green-600 font-semibold">+{formatPrice(sale.profit)} ден</td>
               <td className="px-4 py-3 text-sm text-right text-gray-500">
                 {new Date(sale.soldAt).toLocaleDateString('mk-MK', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
               </td>

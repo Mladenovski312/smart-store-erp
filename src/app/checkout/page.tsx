@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, Check } from 'lucide-react';
-import { getCart, getCartTotal, clearCart, CartItem } from '@/lib/cart';
+import { getCart, getCartTotal, clearCart, syncCartWithServer, CartItem } from '@/lib/cart';
 import { MK_CITIES } from '@/lib/cities';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
@@ -54,7 +54,11 @@ export default function CheckoutPage() {
             } catch { /* ignore */ }
         }
 
-        window.addEventListener('cart-updated', () => setItems(getCart()));
+        // Sync cart with server to verify stock before checkout
+        syncCartWithServer().then(() => setItems(getCart()));
+
+        const handleCartUpdate = () => setItems(getCart());
+        window.addEventListener('cart-updated', handleCartUpdate);
 
         // Close city dropdown on outside click
         const handleClick = (e: MouseEvent) => {
@@ -63,7 +67,10 @@ export default function CheckoutPage() {
             }
         };
         document.addEventListener('mousedown', handleClick);
-        return () => document.removeEventListener('mousedown', handleClick);
+        return () => {
+            document.removeEventListener('mousedown', handleClick);
+            window.removeEventListener('cart-updated', handleCartUpdate);
+        };
     }, []);
 
     const filteredCities = MK_CITIES.filter(c =>
@@ -74,12 +81,13 @@ export default function CheckoutPage() {
 
     const validate = (): string[] => {
         const errs: string[] = [];
-        if (!firstName.trim()) errs.push('Внесете го вашето име.');
-        if (!lastName.trim()) errs.push('Внесете го вашето презиме.');
-        if (!email.trim() || !email.includes('@')) errs.push('Внесете валидна е-маил адреса.');
-        if (phone.length !== 8) errs.push('Внесете валиден телефонски број (8 цифри по +389).');
+        if (!firstName.trim() || firstName.trim().length > 50) errs.push('Внесете го вашето име (макс. 50 карактери).');
+        if (!lastName.trim() || lastName.trim().length > 50) errs.push('Внесете го вашето презиме (макс. 50 карактери).');
+        if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) errs.push('Внесете валидна е-маил адреса.');
+        if (!/^\d{8}$/.test(phone)) errs.push('Внесете валиден телефонски број (8 цифри по +389).');
         if (!city.trim()) errs.push('Одберете град/општина.');
-        if (!street.trim()) errs.push('Внесете ја вашата улица.');
+        if (!street.trim() || street.trim().length > 200) errs.push('Внесете ја вашата улица (макс. 200 карактери).');
+        if (note.length > 500) errs.push('Забелешката е предолга (макс. 500 карактери).');
         if (!acceptTerms) errs.push('Мора да ги прифатите условите.');
         if (items.length === 0) errs.push('Кошничката е празна.');
         return errs;
@@ -111,7 +119,7 @@ export default function CheckoutPage() {
 
             // Atomic checkout: deduct stock + verify prices + create order in one DB transaction
             const generatedOrderId = crypto.randomUUID();
-            const { data: orderResult, error: orderError } = await supabase.rpc('create_order_atomic', {
+            const { error: orderError } = await supabase.rpc('create_order_atomic', {
                 p_order_id: generatedOrderId,
                 p_items: items.map(i => ({ id: i.productId, quantity: i.quantity, name: i.name, imageUrl: i.imageUrl })),
                 p_customer_name: `${firstName.trim()} ${lastName.trim()}`,
@@ -135,30 +143,17 @@ export default function CheckoutPage() {
                 return;
             }
 
-            // The RPC returns verified items and subtotal (with real DB prices)
-            const verifiedItems: { productId: string; name: string; price: number; quantity: number; imageUrl?: string }[] =
-                orderResult?.items || items.map(i => ({ productId: i.productId, name: i.name, price: i.price, quantity: i.quantity }));
-            const verifiedSubtotal: number = orderResult?.subtotal || subtotal;
-
             setOrderId(generatedOrderId);
             clearCart();
             setOrderComplete(true);
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // Send confirmation email (fire-and-forget) — uses verified prices
+            // Send confirmation email (fire-and-forget) — endpoint reads order data from DB
             if (generatedOrderId) {
                 fetch('/api/emails/order-confirmation', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        orderId: generatedOrderId,
-                        customerName: `${firstName.trim()} ${lastName.trim()}`,
-                        customerEmail: email.trim().toLowerCase(),
-                        items: verifiedItems.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
-                        subtotal: verifiedSubtotal,
-                        deliveryAddress: street.trim(),
-                        deliveryCity: city.trim(),
-                    }),
+                    body: JSON.stringify({ orderId: generatedOrderId }),
                 }).catch(() => { /* email failure shouldn't affect order */ });
             }
         } catch (err) {
@@ -200,7 +195,7 @@ export default function CheckoutPage() {
                     <div className="flex items-center justify-center gap-3 text-sm font-semibold">
                         <span className="text-green-500">КОШНИЧКА <Check className="inline w-3.5 h-3.5 mb-0.5" /></span>
                         <span className="text-gray-300">&rarr;</span>
-                        <span className="text-jumbo-blue">CHECKOUT</span>
+                        <span className="text-jumbo-blue">НАРАЧКА</span>
                         <span className="text-gray-300">&rarr;</span>
                         <span className="text-gray-400">ГОТОВО</span>
                     </div>
@@ -220,7 +215,7 @@ export default function CheckoutPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_23.75rem] gap-8">
                     {/* ═══ Left: Form ═══ */}
                     <div>
-                        <form id="checkout-form" onSubmit={handleSubmit} className="space-y-8">
+                        <form id="checkout-form" onSubmit={handleSubmit} noValidate className="space-y-8">
                             {/* Personal Info */}
                             <section className="bg-white rounded-2xl border border-gray-100 p-6">
                                 <h2 className="text-lg font-bold text-gray-900 mb-5">ПЛАЌАЊЕ & ИСПОРАКА</h2>
@@ -235,6 +230,7 @@ export default function CheckoutPage() {
                                             autoComplete="given-name"
                                             className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/50 focus:border-jumbo-blue transition-all outline-none"
                                             placeholder="Вашето име"
+                                            maxLength={50}
                                         />
                                     </div>
                                     <div>
@@ -246,6 +242,7 @@ export default function CheckoutPage() {
                                             autoComplete="family-name"
                                             className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/50 focus:border-jumbo-blue transition-all outline-none"
                                             placeholder="Вашето презиме"
+                                            maxLength={50}
                                         />
                                     </div>
                                 </div>
@@ -326,6 +323,7 @@ export default function CheckoutPage() {
                                         autoComplete="street-address"
                                         className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/50 focus:border-jumbo-blue transition-all outline-none"
                                         placeholder="Внесете ја вашата улична адреса"
+                                        maxLength={200}
                                     />
                                 </div>
 
@@ -337,6 +335,7 @@ export default function CheckoutPage() {
                                         rows={3}
                                         className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-jumbo-blue/50 focus:border-jumbo-blue transition-all outline-none resize-none"
                                         placeholder="Дополнете доколку имате забелешка"
+                                        maxLength={500}
                                     />
                                 </div>
                             </section>

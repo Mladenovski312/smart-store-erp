@@ -11,7 +11,6 @@ interface AuthState {
     displayName: string | null;
     loading: boolean;
     signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-    signUp: (email: string, password: string) => Promise<{ error: string | null }>;
     signOut: () => Promise<void>;
 }
 
@@ -22,7 +21,6 @@ const AuthContext = createContext<AuthState>({
     displayName: null,
     loading: true,
     signIn: async () => ({ error: null }),
-    signUp: async () => ({ error: null }),
     signOut: async () => { },
 });
 
@@ -125,11 +123,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: error?.message || null };
     };
 
-    const signUp = async (email: string, password: string) => {
-        const { error } = await supabase.auth.signUp({ email, password });
-        return { error: error?.message || null };
-    };
-
     const signOut = async () => {
         await supabase.auth.signOut();
         setUser(null);
@@ -139,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, role, status, displayName, loading, signIn, signUp, signOut }}>
+        <AuthContext.Provider value={{ user, role, status, displayName, loading, signIn, signOut }}>
             {children}
         </AuthContext.Provider>
     );

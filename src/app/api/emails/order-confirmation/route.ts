@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { OrderItem } from '@/lib/types';
 import { esc, renderItemsHtml, renderOrderSummaryHtml, EMAIL_HEADER, EMAIL_FOOTER } from '@/lib/email';
 
@@ -8,17 +8,22 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
   try {
-    const { orderId, customerName, customerEmail, items, subtotal, deliveryAddress, deliveryCity } = await req.json();
+    const { orderId } = await req.json();
 
-    if (!customerEmail || !orderId) {
+    if (!orderId) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Verify the order exists in the database before sending email
-    const supabase = createClient();
+    // Read ALL order data from the database — never trust request body for email content
+    // Use service role to read order data server-side (no cookies needed)
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
     const { data: order, error: dbError } = await supabase
       .from('orders')
-      .select('id')
+      .select('*')
       .eq('id', orderId)
       .single();
 
@@ -26,8 +31,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Order not found' }, { status: 403 });
     }
 
+    // Don't send if no email on file or already sent
+    const customerEmail = order.customer_email;
+    if (!customerEmail) {
+      return NextResponse.json({ error: 'No customer email on order' }, { status: 400 });
+    }
+
+    if (order.confirmation_sent) {
+      return NextResponse.json({ error: 'Confirmation already sent' }, { status: 409 });
+    }
+
+    const customerName = order.customer_name;
+    const items = order.items as OrderItem[];
+    const subtotal = order.subtotal;
+    const deliveryAddress = order.delivery_address;
+    const deliveryCity = order.delivery_city;
+
     const shortId = orderId.slice(0, 8).toUpperCase();
-    const itemsHtml = renderItemsHtml(items as OrderItem[]);
+    const itemsHtml = renderItemsHtml(items);
 
     const html = `
     <!DOCTYPE html>
@@ -65,7 +86,7 @@ export async function POST(req: NextRequest) {
           </div>
           <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 16px; text-align: center;">
             <p style="margin: 0; font-size: 14px; color: #1e40af; font-weight: 600;">
-              💰 Плаќање при достава (COD)
+              💰 Плаќање при достава
             </p>
           </div>
           <p style="margin: 24px 0 0; font-size: 13px; color: #888; text-align: center; line-height: 1.5;">
@@ -81,7 +102,7 @@ export async function POST(req: NextRequest) {
     const { error } = await resend.emails.send({
       from: 'Интер Стар Џамбо <naracki@interstarjumbo.com>',
       to: customerEmail,
-      subject: `Нарачка #${shortId} — Потврда | Интер Стар Џамбо`,
+      subject: `Нарачка #${shortId} - Потврда | Интер Стар Џамбо`,
       html,
     });
 
@@ -89,6 +110,9 @@ export async function POST(req: NextRequest) {
       console.error('Resend error:', error);
       return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
     }
+
+    // Mark as sent to prevent duplicate emails
+    await supabase.from('orders').update({ confirmation_sent: true }).eq('id', orderId);
 
     return NextResponse.json({ success: true });
   } catch (err) {
