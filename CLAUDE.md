@@ -26,10 +26,15 @@ E-commerce storefront + internal ERP/POS for **Интер Стар Џамбо** 
 - **Search:** Bidirectional Cyrillic↔Latin transliteration (`src/lib/search.ts`). Latin input matches Cyrillic product names and vice versa.
 
 ## Development Roadmap (The 10 Specs) — ALL DONE
-All 10 spec phases complete and deployed. See `/specs` folder for historical reference.
+All 10 spec phases complete and deployed.
 
 ## Technical Audit — ALL DONE
-All 27 findings from the March 2026 audit resolved across 4 sprints. See `AUDIT.md` for full details.
+All 27 findings from the March 2026 audit resolved across 4 sprints.
+
+## Shared Modules
+- **AI:** `src/lib/ai.ts` — shared Gemini init (used by gift-finder + vision routes).
+- **Email:** `src/lib/email.ts` — shared templates and utilities for order emails.
+- **Atomic RPCs:** `create_order_atomic` (checkout), `record_sale_atomic` (POS) — both SECURITY DEFINER.
 
 ## Commands
 - `npm run dev`: Local development.

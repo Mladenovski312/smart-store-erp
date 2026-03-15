@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ShoppingCart, X, Trash2, Plus, Minus } from 'lucide-react';
 import { getCart, updateCartQuantity, removeFromCart, syncCartWithServer, CartItem } from '@/lib/cart';
 import Link from 'next/link';
@@ -13,24 +13,23 @@ interface CartSidebarProps {
 }
 
 export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
-    const [items, setItems] = useState<CartItem[]>([]);
+    const [items, setItems] = useState<CartItem[]>(() => getCart());
+    const prevOpen = useRef(isOpen);
 
     const refresh = () => {
         setItems(getCart());
     };
 
     useEffect(() => {
-        setTimeout(() => setItems(getCart()), 0);
         window.addEventListener('cart-updated', refresh);
         return () => window.removeEventListener('cart-updated', refresh);
     }, []);
 
     useEffect(() => {
-        if (isOpen) {
-            syncCartWithServer().then(() => {
-                setItems(getCart());
-            });
+        if (isOpen && !prevOpen.current) {
+            syncCartWithServer().then(refresh);
         }
+        prevOpen.current = isOpen;
     }, [isOpen]);
 
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);

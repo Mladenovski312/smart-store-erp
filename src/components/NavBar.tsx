@@ -11,14 +11,13 @@ import CartSidebar from '@/components/CartSidebar';
 
 export default function NavBar({ products }: { products: Product[] }) {
     const [cartOpen, setCartOpen] = useState(false);
-    const [cartCount, setCartCount] = useState(0);
+    const [cartCount, setCartCount] = useState(() => getCartCount());
     const [navSearchOpen, setNavSearchOpen] = useState(false);
     const pathname = usePathname();
 
     const refreshCartCount = () => setCartCount(getCartCount());
 
     useEffect(() => {
-        refreshCartCount();
         const openCart = () => setCartOpen(true);
         window.addEventListener('cart-updated', refreshCartCount);
         window.addEventListener('cart-item-added', openCart);

@@ -238,27 +238,27 @@ export async function getSales(): Promise<SaleRecord[]> {
 
 export async function recordSale(product: Product, quantity: number): Promise<SaleRecord | null> {
     const supabase = createClient();
-    const profit = (product.sellingPrice - product.purchasePrice) * quantity;
 
-    const { data, error } = await supabase
-        .from('sales')
-        .insert({
-            product_id: product.id,
-            product_name: product.name,
-            quantity_sold: quantity,
-            sold_price: product.sellingPrice * quantity,
-            profit: profit,
-        })
-        .select()
-        .single();
+    // Atomic: deduct stock + insert sale in a single DB transaction
+    const { data, error } = await supabase.rpc('record_sale_atomic', {
+        p_product_id: product.id,
+        p_quantity: quantity,
+    });
 
     if (error || !data) return null;
 
-    // Decrease stock
-    await updateProductStock(product.id, product.stockQuantity - quantity);
+    const sale: SaleRecord = {
+        id: data.id,
+        productId: data.product_id,
+        productName: data.product_name,
+        quantitySold: data.quantity_sold,
+        soldPrice: data.sold_price,
+        profit: data.profit,
+        soldAt: new Date().toISOString(),
+    };
 
-    logAdminAction('sale.pos', 'product', product.id, { name: product.name, quantity, total: product.sellingPrice * quantity });
-    return dbToSale(data);
+    logAdminAction('sale.pos', 'product', product.id, { name: data.product_name, quantity, total: data.sold_price });
+    return sale;
 }
 
 // ─── Audit Logging ───────────────────────────────────
@@ -279,8 +279,9 @@ export async function logAdminAction(
             target_id: targetId,
             details,
         });
-    } catch {
-        // Audit log should never break the main operation
+    } catch (err) {
+        // Audit log should never break the main operation, but report the failure
+        console.error('Audit log failed:', action, targetType, targetId, err);
     }
 }
 

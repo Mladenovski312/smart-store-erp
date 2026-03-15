@@ -15,16 +15,16 @@ import Footer from '@/components/Footer';
 export default function ProductDetailClient({ product, relatedProducts = [] }: { product: Product; relatedProducts?: Product[] }) {
     const [quantity, setQuantity] = useState(1);
     const [cartOpen, setCartOpen] = useState(false);
-    const [cartCount, setCartCount] = useState(0);
+    const [cartCount, setCartCount] = useState(() => getCartCount());
     const [copied, setCopied] = useState(false);
     const [addedToCart, setAddedToCart] = useState(false);
-    const [shareUrl, setShareUrl] = useState(`https://interstarjumbo.com/produkt/${product.slug}`);
+    const [shareUrl] = useState(() =>
+        typeof window !== 'undefined' ? window.location.href : `https://interstarjumbo.com/produkt/${product.slug}`
+    );
 
     const refreshCartCount = () => setCartCount(getCartCount());
 
     useEffect(() => {
-        setShareUrl(window.location.href);
-        refreshCartCount();
         const openCart = () => setCartOpen(true);
         window.addEventListener('cart-updated', refreshCartCount);
         window.addEventListener('cart-item-added', openCart);

@@ -179,7 +179,7 @@ export default function AnalyticsDashboard() {
             {tab === 'revenue' && <RevenueSection orders={fo} sales={fs} products={products} prevOrders={pfo} prevSales={pfs} />}
             {tab === 'profit' && <ProfitSection orders={fo} sales={fs} products={products} prevOrders={pfo} prevSales={pfs} />}
             {tab === 'products' && <ProductsSection orders={fo} sales={fs} products={products} />}
-            {tab === 'inventory' && <InventorySection products={products} sales={fs} allSales={sales} rangeDays={rangeDays} />}
+            {tab === 'inventory' && <InventorySection products={products} sales={fs} rangeDays={rangeDays} />}
             {tab === 'brands' && <BrandsSection orders={fo} sales={fs} products={products} />}
             {tab === 'orders' && <OrdersSection orders={fo} prevOrders={pfo} />}
             {tab === 'customers' && <CustomersSection orders={fo} />}
@@ -385,11 +385,11 @@ function ProfitSection({ orders, sales, products, prevOrders, prevSales }: {
         .map(([d, v]) => ({ date: fmtDate(d), Приход: Math.round(v.revenue), Профит: Math.round(v.profit), COGS: Math.round(v.cogs) }));
 
     // Cumulative profit
-    let cumProfit = 0;
-    const cumData = timeData.map(d => {
-        cumProfit += d['Профит'];
-        return { date: d.date, Кумулативен: Math.round(cumProfit) };
-    });
+    const cumData = timeData.reduce<{ date: string; Кумулативен: number }[]>((acc, d) => {
+        const prev = acc.length > 0 ? acc[acc.length - 1].Кумулативен : 0;
+        acc.push({ date: d.date, Кумулативен: Math.round(prev + d['Профит']) });
+        return acc;
+    }, []);
 
     // Profit by category
     const catProfit = new Map<string, { revenue: number; cost: number; profit: number }>();
@@ -637,7 +637,7 @@ function ProductsSection({ orders, sales, products }: { orders: OrderRaw[]; sale
 
 // ── Inventory Tab ──────────────────────────────────────
 
-function InventorySection({ products, sales, allSales, rangeDays }: { products: ProductRaw[]; sales: SaleRaw[]; allSales: SaleRaw[]; rangeDays: number }) {
+function InventorySection({ products, sales, rangeDays }: { products: ProductRaw[]; sales: SaleRaw[]; rangeDays: number }) {
     const inStock = products.filter(p => p.stock_quantity > 0);
     const outOfStock = products.filter(p => p.stock_quantity === 0);
     const totalUnits = products.reduce((s, p) => s + p.stock_quantity, 0);

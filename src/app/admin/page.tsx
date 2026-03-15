@@ -38,7 +38,8 @@ export default function DashboardLayout() {
   }, []);
 
   useEffect(() => {
-    refresh();
+    const load = async () => { await refresh(); };
+    load();
   }, [refresh]);
 
   const handleLogout = () => { setShowLogoutConfirm(false); signOut(); };
