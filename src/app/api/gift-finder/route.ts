@@ -1,17 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
+import { getAI } from '@/lib/ai';
 import { createClient } from '@/lib/supabase';
-
-// Lazy-init so the build doesn't crash when env vars are missing
-let _ai: GoogleGenAI | null = null;
-function getAI() {
-    if (!_ai) {
-        const key = process.env.GEMINI_API_KEY;
-        if (!key) throw new Error('GEMINI_API_KEY is not set');
-        _ai = new GoogleGenAI({ apiKey: key });
-    }
-    return _ai;
-}
 
 // ── Rate limiter (persistent via Supabase) ──────
 
@@ -100,8 +89,8 @@ export async function POST(req: NextRequest) {
         price: p.selling_price,
         age_range: p.age_range,
     }));
-    // Sanitize: strip characters that could be used for prompt injection framing
-    const sanitized = query.trim().replace(/["""«»{}[\]\n\r]/g, ' ').slice(0, 300);
+    // Sanitize: allow only Cyrillic, Latin, digits, spaces, basic punctuation
+    const sanitized = query.trim().replace(/[^a-zA-Z0-9а-яА-ЯѐЁёЂђЃѓЄєЅѕІіЇїЈјЉљЊњЋћЌќЍѝЎўЏџ\s.,!?\-()]/g, ' ').replace(/\s{2,}/g, ' ').slice(0, 300);
     const userPrompt = `Customer message: "${sanitized}"\n\nAvailable products (${catalog.length} in stock):\n${JSON.stringify(catalog)}`;
 
     let rawResponse = '';

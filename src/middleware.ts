@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-    let response = NextResponse.next({ request: { headers: request.headers } });
+    const response = NextResponse.next({ request: { headers: request.headers } });
 
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,8 +23,15 @@ export async function middleware(request: NextRequest) {
         }
     );
 
-    // Refresh session cookies — auth gate is handled by admin/page.tsx (shows LoginPage when unauthenticated)
-    await supabase.auth.getUser();
+    // Verify user is authenticated — block unauthenticated access to /admin routes
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        // Return the response with refreshed cookies but redirect to home
+        // Admin page.tsx will show LoginPage, but this blocks API/SSR data leaks
+        const loginUrl = new URL('/admin', request.url);
+        loginUrl.searchParams.set('unauthorized', '1');
+        return NextResponse.rewrite(loginUrl, { headers: response.headers });
+    }
 
     return response;
 }

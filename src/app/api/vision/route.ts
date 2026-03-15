@@ -1,17 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
+import { getAI } from '@/lib/ai';
 import { createClient } from '@/lib/supabase';
-
-// Lazy-init so the build doesn't crash when env vars are missing
-let _ai: GoogleGenAI | null = null;
-function getAI() {
-    if (!_ai) {
-        const key = process.env.GEMINI_API_KEY;
-        if (!key) throw new Error('GEMINI_API_KEY is not set');
-        _ai = new GoogleGenAI({ apiKey: key });
-    }
-    return _ai;
-}
 
 export async function POST(req: NextRequest) {
     try {

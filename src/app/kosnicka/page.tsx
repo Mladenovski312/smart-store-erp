@@ -2,21 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { Minus, Plus, Trash2, ShoppingBag, ChevronLeft, ShoppingCart } from 'lucide-react';
-import { getCart, updateCartQuantity, removeFromCart, getCartTotal, getCartCount, syncCartWithServer, CartItem } from '@/lib/cart';
+import { getCart, updateCartQuantity, removeFromCart, getCartTotal, syncCartWithServer, CartItem } from '@/lib/cart';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/types';
 import Footer from '@/components/Footer';
 
 export default function CartPage() {
-    const [items, setItems] = useState<CartItem[]>([]);
+    const [items, setItems] = useState<CartItem[]>(() => getCart());
 
     const refresh = () => {
         setItems(getCart());
     };
 
     useEffect(() => {
-        refresh();
         syncCartWithServer();
         window.addEventListener('cart-updated', refresh);
         return () => window.removeEventListener('cart-updated', refresh);

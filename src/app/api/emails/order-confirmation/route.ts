@@ -2,12 +2,9 @@ import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase';
 import { OrderItem } from '@/lib/types';
+import { esc, renderItemsHtml, renderOrderSummaryHtml, EMAIL_HEADER, EMAIL_FOOTER } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-
-function esc(text: string | number): string {
-  return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,23 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     const shortId = orderId.slice(0, 8).toUpperCase();
-
-    const itemsHtml = (items as OrderItem[]).map(item => `
-      <tr>
-        <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: #333;">
-          ${esc(item.name)}
-        </td>
-        <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #666; text-align: center;">
-          ${esc(item.quantity)}
-        </td>
-        <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #666; text-align: right; white-space: nowrap;">
-          ${(item.price).toLocaleString('de-DE')} ден
-        </td>
-        <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; font-weight: 500; color: #333; text-align: right; white-space: nowrap;">
-          ${(item.price * item.quantity).toLocaleString('de-DE')} ден
-        </td>
-      </tr>
-    `).join('');
+    const itemsHtml = renderItemsHtml(items as OrderItem[]);
 
     const html = `
     <!DOCTYPE html>
@@ -54,66 +35,25 @@ export async function POST(req: NextRequest) {
     <head><meta charset="utf-8"></head>
     <body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
       <div style="max-width: 560px; margin: 0 auto; padding: 40px 20px;">
-        
-        <!-- Header -->
-        <div style="text-align: center; margin-bottom: 32px;">
-          <div style="display: inline-block; background-color: #1e3a5f; color: white; padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 16px; letter-spacing: -0.5px;">
-            ИНТЕР СТАР <span style="color: #dc2626;">ЏАМБО</span>
-          </div>
-        </div>
-
-        <!-- Card -->
+        ${EMAIL_HEADER}
         <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
-          
-          <!-- Success Icon -->
           <div style="text-align: center; margin-bottom: 24px;">
             <div style="display: inline-block; width: 56px; height: 56px; background-color: #dcfce7; border-radius: 50%; line-height: 56px; font-size: 28px;">
               ✓
             </div>
           </div>
-
           <h1 style="margin: 0 0 8px; font-size: 22px; font-weight: 700; color: #111; text-align: center;">
             Нарачката е примена!
           </h1>
           <p style="margin: 0 0 24px; font-size: 14px; color: #666; text-align: center;">
             Ви благодариме, ${esc(customerName)}. Вашата нарачка #${shortId} е успешно регистрирана.
           </p>
-
-          <!-- Order Details -->
           <div style="background: #f9fafb; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
             <h3 style="margin: 0 0 12px; font-size: 13px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px;">
               Нарачани артикли
             </h3>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
-              <thead>
-                <tr>
-                  <th style="padding: 0 0 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 12px; font-weight: 600; color: #6b7280; text-align: left; text-transform: uppercase;">Артикл</th>
-                  <th style="padding: 0 0 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 12px; font-weight: 600; color: #6b7280; text-align: center; text-transform: uppercase;">Кол.</th>
-                  <th style="padding: 0 0 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 12px; font-weight: 600; color: #6b7280; text-align: right; text-transform: uppercase;">Цена/ком</th>
-                  <th style="padding: 0 0 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 12px; font-weight: 600; color: #6b7280; text-align: right; text-transform: uppercase;">Вкупно</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${itemsHtml}
-              </tbody>
-            </table>
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr>
-                <td style="font-size: 14px; color: #666; padding: 4px 0;">Меѓузбир</td>
-                <td style="font-size: 14px; font-weight: 500; color: #333; text-align: right;">${Number(subtotal).toLocaleString('de-DE')} ден</td>
-              </tr>
-              <tr>
-                <td style="font-size: 14px; color: #666; padding: 4px 0;">Испорака</td>
-                <td style="font-size: 13px; color: #999; text-align: right; font-style: italic;">По договор</td>
-              </tr>
-              <tr>
-                <td style="font-size: 15px; font-weight: 700; color: #111; padding: 12px 0 4px 0; border-top: 1px solid #e5e7eb; margin-top: 8px;">Вкупно</td>
-                <td style="font-size: 16px; font-weight: 800; color: #1e40af; text-align: right; padding: 12px 0 4px 0; border-top: 1px solid #e5e7eb; margin-top: 8px;">${Number(subtotal).toLocaleString('de-DE')} ден</td>
-              </tr>
-            </table>
+            ${renderOrderSummaryHtml(itemsHtml, subtotal)}
           </div>
-
-          <!-- Delivery -->
           <div style="background: #f9fafb; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
             <h3 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px;">
               Адреса за испорака
@@ -123,25 +63,16 @@ export async function POST(req: NextRequest) {
               ${esc(deliveryCity)}
             </p>
           </div>
-
-          <!-- Payment -->
           <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 16px; text-align: center;">
             <p style="margin: 0; font-size: 14px; color: #1e40af; font-weight: 600;">
               💰 Плаќање при достава (COD)
             </p>
           </div>
-
           <p style="margin: 24px 0 0; font-size: 13px; color: #888; text-align: center; line-height: 1.5;">
             Ќе ве контактираме наскоро за потврда на нарачката и детали за испораката.
           </p>
         </div>
-
-        <!-- Footer -->
-        <div style="text-align: center; margin-top: 32px; font-size: 12px; color: #999; line-height: 1.6;">
-          <p style="margin: 0;">ИНТЕР СТАР ЏАМБО</p>
-          <p style="margin: 4px 0;">Народна Револуција 43, Куманово</p>
-          <p style="margin: 4px 0;">📞 +389 31 422 656</p>
-        </div>
+        ${EMAIL_FOOTER}
       </div>
     </body>
     </html>

@@ -28,7 +28,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
     const [inStockOnly, setInStockOnly] = useState(false);
     const [sortBy, setSortBy] = useState('newest');
     const [cartOpen, setCartOpen] = useState(false);
-    const [cartCount, setCartCount] = useState(0);
+    const [cartCount, setCartCount] = useState(() => getCartCount());
 
     // Compute price bounds from products
     const { priceMin, priceMax } = useMemo(() => {
@@ -58,7 +58,6 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
     const refreshCartCount = () => setCartCount(getCartCount());
 
     useEffect(() => {
-        refreshCartCount();
         const openCart = () => setCartOpen(true);
         window.addEventListener('cart-updated', refreshCartCount);
         window.addEventListener('cart-item-added', openCart);
@@ -68,7 +67,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
         };
     }, []);
 
-    const filtered = products
+    const filtered = useMemo(() => products
         .filter(p => matchesSearch(p.name, searchTerm))
         .filter(p => !selectedCategory || p.category === selectedCategory)
         .filter(p => !inStockOnly || p.stockQuantity > 0)
@@ -78,7 +77,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
             if (sortBy === 'price-desc') return b.sellingPrice - a.sellingPrice;
             if (sortBy === 'name') return a.name.localeCompare(b.name);
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        });
+        }), [products, searchTerm, selectedCategory, inStockOnly, minPrice, maxPrice, sortBy]);
 
     return (
         <div className="min-h-screen bg-gray-50">
