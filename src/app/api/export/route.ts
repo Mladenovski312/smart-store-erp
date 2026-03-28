@@ -26,6 +26,13 @@ export async function GET(req: NextRequest) {
     const from = searchParams.get('from');
     const to = searchParams.get('to');
 
+    const isValidDate = (d: string) => /^\d{4}-\d{2}-\d{2}/.test(d) && !isNaN(Date.parse(d));
+    if (from && !isValidDate(from)) return NextResponse.json({ error: 'Invalid from date' }, { status: 400 });
+    if (to && !isValidDate(to)) return NextResponse.json({ error: 'Invalid to date' }, { status: 400 });
+
+    const safeFrom = from ? from.slice(0, 10).replace(/[^0-9-]/g, '') : null;
+    const safeTo = to ? to.slice(0, 10).replace(/[^0-9-]/g, '') : null;
+
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     let filename = 'export.xlsx';
 
@@ -36,8 +43,8 @@ export async function GET(req: NextRequest) {
             .neq('status', 'cancelled')
             .order('created_at', { ascending: false });
 
-        if (from) query = query.gte('created_at', from);
-        if (to) query = query.lte('created_at', to);
+        if (safeFrom) query = query.gte('created_at', safeFrom);
+        if (safeTo) query = query.lte('created_at', safeTo);
 
         const { data } = await query;
 
@@ -57,7 +64,7 @@ export async function GET(req: NextRequest) {
         const ws = XLSX.utils.json_to_sheet(rows);
         ws['!cols'] = [12, 12, 20, 15, 50, 14, 22, 15].map(w => ({ wch: w }));
         XLSX.utils.book_append_sheet(wb, ws, 'Продажби');
-        filename = `prodazbi-${from ? from.slice(0, 10) : 'all'}.xlsx`;
+        filename = `prodazbi-${safeFrom ?? 'all'}.xlsx`;
 
     } else if (type === 'inventory') {
         const { data: products } = await supabase
@@ -118,13 +125,13 @@ export async function GET(req: NextRequest) {
             .from('sales')
             .select('*');
 
-        if (from) {
-            orderQuery = orderQuery.gte('created_at', from);
-            salesQuery = salesQuery.gte('sold_at', from);
+        if (safeFrom) {
+            orderQuery = orderQuery.gte('created_at', safeFrom);
+            salesQuery = salesQuery.gte('sold_at', safeFrom);
         }
-        if (to) {
-            orderQuery = orderQuery.lte('created_at', to);
-            salesQuery = salesQuery.lte('sold_at', to);
+        if (safeTo) {
+            orderQuery = orderQuery.lte('created_at', safeTo);
+            salesQuery = salesQuery.lte('sold_at', safeTo);
         }
 
         const [{ data: orders }, { data: posSales }, { data: products }] = await Promise.all([
@@ -190,7 +197,7 @@ export async function GET(req: NextRequest) {
         const ws = XLSX.utils.json_to_sheet(rows);
         ws['!cols'] = [10, 15, 12, 20, 12, 18, 15, 24, 26].map(w => ({ wch: w }));
         XLSX.utils.book_append_sheet(wb, ws, 'Извештај');
-        filename = `mesecen-izvestaj-${from ? from.slice(0, 4) : new Date().getFullYear()}.xlsx`;
+        filename = `mesecen-izvestaj-${safeFrom ? safeFrom.slice(0, 4) : new Date().getFullYear()}.xlsx`;
     }
 
     const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
