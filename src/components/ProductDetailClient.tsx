@@ -178,20 +178,12 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                             </div>
                         )}
 
-                        {/* Stock Status */}
-                        <div className="flex items-center gap-2 mb-6">
-                            {product.stockQuantity > 0 ? (
-                                <>
-                                    <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
-                                    <span className="text-sm font-medium text-green-700">НА ЗАЛИХА</span>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                                    <span className="text-sm font-medium text-red-700">НЕМА НА ЗАЛИХА</span>
-                                </>
-                            )}
-                        </div>
+                        {product.stockQuantity <= 0 && (
+                            <div className="flex items-center gap-2 mb-6">
+                                <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                                <span className="text-sm font-medium text-red-700">НЕМА НА ЗАЛИХА</span>
+                            </div>
+                        )}
 
                         {/* Quantity & Add to Cart */}
                         {product.stockQuantity > 0 && (
@@ -231,7 +223,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                                     {SHOP_DISABLED ? (
                                         <>
                                             <ShoppingCart size={18} />
-                                            ПРИВРЕМЕНО НЕДОСТАПНО
+                                            СÈ УШТЕ НЕДОСТАПНО
                                         </>
                                     ) : addedToCart ? (
                                         <>
@@ -358,7 +350,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                         {SHOP_DISABLED ? (
                             <>
                                 <ShoppingCart size={16} />
-                                Недостапно
+                                Сè уште недостапно
                             </>
                         ) : addedToCart ? (
                             <>

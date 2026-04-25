@@ -210,7 +210,7 @@ export default function GiftFinderModal({ onClose }: { onClose: () => void }) {
                                                             disabled={SHOP_DISABLED}
                                                             className={`text-[0.6875rem] px-2 py-0.5 rounded transition-colors ${SHOP_DISABLED ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-[#1A3C5E] text-white hover:bg-[#E8943A]'}`}
                                                         >
-                                                            {SHOP_DISABLED ? 'Недостапно' : 'Купи'}
+                                                            {SHOP_DISABLED ? 'Сè уште недостапно' : 'Купи'}
                                                         </button>
                                                     </div>
                                                 </div>

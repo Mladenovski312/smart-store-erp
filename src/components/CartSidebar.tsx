@@ -153,7 +153,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                             </Link>
                             {SHOP_DISABLED ? (
                                 <div className="block w-full bg-gray-200 text-gray-500 text-center py-3 rounded-xl font-bold text-sm cursor-not-allowed">
-                                    ПРИВРЕМЕНО НЕДОСТАПНО
+                                    СÈ УШТЕ НЕДОСТАПНО
                                 </div>
                             ) : (
                                 <Link

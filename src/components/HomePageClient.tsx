@@ -101,8 +101,8 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex items-end justify-between mb-12">
                             <div>
-                                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">На залиха</h2>
-                                <p className="text-gray-500">Моментално достапни играчки во нашата продавница.</p>
+                                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Избрани производи</h2>
+                                <p className="text-gray-500">Дел од асортиманот што го подготвуваме за онлајн каталогот.</p>
                             </div>
                             <Link
                                 href="/catalog"
@@ -257,11 +257,7 @@ function ProductCard({ product }: { product: Product }) {
                     <span className={`text-sm sm:text-base font-bold leading-none ${product.stockQuantity > 0 ? 'text-jumbo-blue' : 'text-gray-500'}`}>
                         {formatPrice(product.sellingPrice)}<span className="text-xs font-normal text-gray-500 ml-0.5">ден</span>
                     </span>
-                    {product.stockQuantity > 0 ? (
-                        <span className="text-xs font-medium text-green-700 bg-green-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                            На залиха
-                        </span>
-                    ) : (
+                    {product.stockQuantity <= 0 && (
                         <span className="text-xs font-medium text-red-700 bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                             Нема залиха
                         </span>
@@ -279,7 +275,7 @@ function ProductCard({ product }: { product: Product }) {
                         }`}
                 >
                     <Plus size={13} />
-                    {SHOP_DISABLED ? 'Привремено недостапно' : product.stockQuantity > 0 ? 'Додај во кошничка' : 'Нема залиха'}
+                    {SHOP_DISABLED ? 'Сè уште недостапно' : product.stockQuantity > 0 ? 'Додај во кошничка' : 'Нема залиха'}
                 </button>
             </div>
         </Link>

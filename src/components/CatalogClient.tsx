@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Search, SlidersHorizontal, ChevronLeft, Package, ShoppingCart, Plus, CheckCircle2, ChevronDown } from 'lucide-react';
+import { Search, SlidersHorizontal, ChevronLeft, Package, ShoppingCart, Plus, ChevronDown } from 'lucide-react';
 import { addToCart, getCartCount, SHOP_DISABLED } from '@/lib/cart';
 import { Product, CATEGORIES, getCategoryLabel, formatPrice } from '@/lib/types';
 import Link from 'next/link';
@@ -26,7 +26,6 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
     const [products] = useState<Product[]>(initialProducts);
     const [searchTerm, setSearchTerm] = useState(initialQuery);
     const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-    const [inStockOnly, setInStockOnly] = useState(false);
     const [sortBy, setSortBy] = useState('newest');
     const [cartOpen, setCartOpen] = useState(false);
     const [cartCount, setCartCount] = useState(() => getCartCount());
@@ -71,14 +70,13 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
     const filtered = useMemo(() => products
         .filter(p => matchesSearch(p.name, searchTerm))
         .filter(p => !selectedCategory || p.category === selectedCategory)
-        .filter(p => !inStockOnly || p.stockQuantity > 0)
         .filter(p => p.sellingPrice >= minPrice && p.sellingPrice <= maxPrice)
         .sort((a, b) => {
             if (sortBy === 'price-asc') return a.sellingPrice - b.sellingPrice;
             if (sortBy === 'price-desc') return b.sellingPrice - a.sellingPrice;
             if (sortBy === 'name') return a.name.localeCompare(b.name);
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        }), [products, searchTerm, selectedCategory, inStockOnly, minPrice, maxPrice, sortBy]);
+        }), [products, searchTerm, selectedCategory, minPrice, maxPrice, sortBy]);
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -149,20 +147,6 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                                     {CATEGORIES.map(c => (
                                         <option key={c.value} value={c.value}>{c.label}</option>
                                     ))}
-                                </select>
-                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
-                            </div>
-
-                            {/* Stock Status Dropdown */}
-                            <div className="relative min-w-[9.375rem]">
-                                <CheckCircle2 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
-                                <select
-                                    value={inStockOnly ? 'true' : 'false'}
-                                    onChange={(e) => setInStockOnly(e.target.value === 'true')}
-                                    className="w-full pl-9 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue text-sm font-medium appearance-none cursor-pointer hover:bg-white transition-all"
-                                >
-                                    <option value="false">Сите артикли</option>
-                                    <option value="true">На залиха</option>
                                 </select>
                                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
                             </div>
@@ -250,11 +234,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                                         <span className={`text-sm sm:text-base font-bold leading-none ${product.stockQuantity > 0 ? 'text-jumbo-blue' : 'text-gray-500'}`}>
                                             {formatPrice(product.sellingPrice)}<span className="text-xs font-normal text-gray-500 ml-0.5">ден</span>
                                         </span>
-                                        {product.stockQuantity > 0 ? (
-                                            <span className="text-xs font-medium text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                                                На залиха
-                                            </span>
-                                        ) : (
+                                        {product.stockQuantity <= 0 && (
                                             <span className="text-xs font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                                                 Нема залиха
                                             </span>
@@ -272,7 +252,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                                             }`}
                                     >
                                         <Plus size={13} />
-                                        {SHOP_DISABLED ? 'Привремено недостапно' : product.stockQuantity > 0 ? 'Додај во кошничка' : 'Нема залиха'}
+                                        {SHOP_DISABLED ? 'Сè уште недостапно' : product.stockQuantity > 0 ? 'Додај во кошничка' : 'Нема залиха'}
                                     </button>
                                 </div>
                             </div>
