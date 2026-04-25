@@ -32,7 +32,7 @@ export default function Footer() {
                         <ul className="space-y-4 text-sm inline-block text-left text-gray-300">
                             <li className="flex items-start gap-2.5 text-gray-400">
                                 <MapPin size={16} className="text-jumbo-red mt-0.5 shrink-0" />
-                                <span>Продавница: Народна Револуција 43, Куманово</span>
+                                <span>Продавница: Народна Револуција 30-4, Куманово</span>
                             </li>
                             <li className="flex items-center gap-2.5 text-gray-400">
                                 <Phone size={16} className="text-jumbo-red shrink-0" />

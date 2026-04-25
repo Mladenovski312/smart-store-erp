@@ -101,7 +101,7 @@ export default function AboutPage() {
                             <MapPin size={18} className="text-jumbo-red shrink-0 mt-0.5" />
                             <div>
                                 <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-0.5">Физичка продавница</p>
-                                <p className="text-gray-900">ул. Народна Револуција 43, Куманово</p>
+                                <p className="text-gray-900">ул. Народна Револуција 30-4, Куманово</p>
                             </div>
                         </li>
                         <li className="flex items-start gap-3">

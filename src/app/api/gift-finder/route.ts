@@ -8,7 +8,7 @@ const SYSTEM_PROMPT = `You are a friendly assistant for Интер Стар Џа
 Website: interstarjumbo.com
 
 STORE INFORMATION (use this to answer customer questions):
-- Address: Народна Револуција 43, Куманово
+- Address: Народна Револуција 30-4, Куманово
 - Phone: +389 31 422 656
 - Working hours: Понеделник - Сабота: 09:00 - 21:00
 - Payment: Само плаќање при достава (Cash on delivery only)

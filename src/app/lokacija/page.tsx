@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
     title: 'Локација',
-    description: 'Најдете нè на Народна Револуција 43, Куманово. Работно време: Пон-Саб 09:00-21:00.',
+    description: 'Најдете нè на Народна Револуција 30-4, Куманово. Работно време: Пон-Саб 09:00-21:00.',
 };
 
 export default function LocationPage() {
@@ -37,7 +37,7 @@ export default function LocationPage() {
                             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                                 <span className="flex items-center gap-1.5">
                                     <MapPin size={14} className="text-jumbo-red" />
-                                    Народна Револуција 43, Куманово
+                                    Народна Револуција 30-4, Куманово
                                 </span>
                                 <span className="flex items-center gap-1.5">
                                     <Phone size={14} className="text-jumbo-red" />

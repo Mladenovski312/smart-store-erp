@@ -37,7 +37,7 @@ export const EMAIL_HEADER = `
 export const EMAIL_FOOTER = `
   <div style="text-align: center; margin-top: 32px; font-size: 12px; color: #999; line-height: 1.6;">
     <p style="margin: 0;">ИНТЕР СТАР ЏАМБО</p>
-    <p style="margin: 4px 0;">Народна Револуција 43, Куманово</p>
+    <p style="margin: 4px 0;">Народна Револуција 30-4, Куманово</p>
     <p style="margin: 4px 0;">📞 +389 31 422 656</p>
   </div>`;
 
