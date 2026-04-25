@@ -32,7 +32,7 @@ export default function Footer() {
                         <ul className="space-y-4 text-sm inline-block text-left text-gray-300">
                             <li className="flex items-start gap-2.5 text-gray-400">
                                 <MapPin size={16} className="text-jumbo-red mt-0.5 shrink-0" />
-                                <span>Народна Револуција 43, Куманово</span>
+                                <span>Продавница: Народна Револуција 43, Куманово</span>
                             </li>
                             <li className="flex items-center gap-2.5 text-gray-400">
                                 <Phone size={16} className="text-jumbo-red shrink-0" />
@@ -58,10 +58,27 @@ export default function Footer() {
                         <ul className="space-y-4 text-sm flex flex-col items-center md:items-start text-gray-300">
                             <li><Link href="/" className="text-gray-400 hover:text-white transition-colors">Почетна</Link></li>
                             <li><Link href="/catalog" className="text-gray-400 hover:text-white transition-colors">Каталог</Link></li>
+                            <li><Link href="/za-nas" className="text-gray-400 hover:text-white transition-colors">За нас</Link></li>
                             <li><Link href="/uslovi-za-isporaka" className="text-gray-400 hover:text-white transition-colors">Услови за испорака</Link></li>
                             <li><Link href="/politika-za-vrakanje" className="text-gray-400 hover:text-white transition-colors">Политика за враќање</Link></li>
                         </ul>
                     </div>
+                </div>
+            </div>
+
+            {/* Legal Info */}
+            <div className="border-t border-white/10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-xs text-gray-500 leading-relaxed text-center md:text-left space-y-1">
+                    <p>
+                        <span className="text-gray-400 font-semibold">Интер Стар ДОО — Куманово</span>
+                        {' • '}ЕМБС: <span className="font-mono">5742170</span>
+                        {' • '}ДДВ: <span className="font-mono">MK4017003143931</span>
+                        {' • '}Седиште: ул. Љупчо Арсовски Табак бр. 1, Куманово
+                    </p>
+                    <p>
+                        Сите цени се изразени во денари (МКД) со вклучен ДДВ. Трошоците за испорака не се вклучени.{' '}
+                        <Link href="/za-nas" className="underline hover:text-white transition-colors">Повеќе информации</Link>
+                    </p>
                 </div>
             </div>
 

@@ -2,6 +2,7 @@ import { ShoppingBag } from 'lucide-react';
 import { CartItem } from '@/lib/cart';
 import { formatPrice } from '@/lib/types';
 import Image from 'next/image';
+import { DELIVERY_DISCLOSURE_TEXT, PRICE_DISCLOSURE_TEXT } from '@/components/PriceDisclosure';
 
 interface OrderSummaryProps {
     items: CartItem[];
@@ -51,8 +52,11 @@ export default function OrderSummary({ items, subtotal, submitting }: OrderSumma
                     </div>
                     <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Испорака</span>
-                        <span className="text-xs text-gray-400 italic">По договор</span>
+                        <span className="text-xs text-gray-400 italic">Не е вклучена</span>
                     </div>
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                        {PRICE_DISCLOSURE_TEXT} {DELIVERY_DISCLOSURE_TEXT}
+                    </p>
                 </div>
 
                 <div className="border-t border-gray-200 pt-4 mt-4 flex justify-between items-baseline">

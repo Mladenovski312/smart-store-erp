@@ -6,6 +6,7 @@ import { getCart, updateCartQuantity, removeFromCart, syncCartWithServer, CartIt
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/types';
+import PriceDisclosure from '@/components/PriceDisclosure';
 
 interface CartSidebarProps {
     isOpen: boolean;
@@ -142,6 +143,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                 <span className="text-gray-500 font-medium">Меѓузбир:</span>
                                 <span className="text-xl font-bold text-gray-900">{formatPrice(total)} ден</span>
                             </div>
+                            <PriceDisclosure />
                             <Link
                                 href="/kosnicka"
                                 onClick={onClose}

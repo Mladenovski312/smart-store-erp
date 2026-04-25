@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { formatPrice } from '@/lib/types';
 import Footer from '@/components/Footer';
 import SiteUnderConstruction from '@/components/SiteUnderConstruction';
+import { DELIVERY_DISCLOSURE_TEXT, PRICE_DISCLOSURE_TEXT } from '@/components/PriceDisclosure';
 
 export default function CartPage() {
     const [items, setItems] = useState<CartItem[]>(() => getCart());
@@ -164,7 +165,7 @@ export default function CartPage() {
                                 <span className="text-xl font-bold text-gray-900">{formatPrice(subtotal)} ден</span>
                             </div>
                             <p className="text-xs text-gray-400 mb-5">
-                                *Цената за испорака ќе биде одредена од доставувачката компанија.
+                                {PRICE_DISCLOSURE_TEXT} {DELIVERY_DISCLOSURE_TEXT}
                             </p>
                             <div className="flex flex-col sm:flex-row gap-3">
                                 <Link

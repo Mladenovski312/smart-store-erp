@@ -43,7 +43,7 @@ export default function NavBar({ products }: { products: Product[] }) {
                             <Link href="/catalog" className={`text-sm font-medium transition-colors ${pathname === '/catalog' ? 'text-jumbo-blue font-semibold' : 'text-gray-600 hover:text-jumbo-blue'}`}>Каталог</Link>
                             <a href="#products" className="text-sm font-medium text-gray-600 hover:text-jumbo-blue transition-colors">Продукти</a>
                             <a href="#categories" className="text-sm font-medium text-gray-600 hover:text-jumbo-blue transition-colors">Категории</a>
-                            <a href="#about" className="text-sm font-medium text-gray-600 hover:text-jumbo-blue transition-colors">За нас</a>
+                            <Link href="/za-nas" className={`text-sm font-medium transition-colors ${pathname === '/za-nas' ? 'text-jumbo-blue font-semibold' : 'text-gray-600 hover:text-jumbo-blue'}`}>За нас</Link>
                         </div>
 
                         <div className="flex items-center gap-2 flex-1 justify-end sm:flex-none sm:justify-start">

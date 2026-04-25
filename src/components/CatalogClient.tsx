@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import * as Slider from '@radix-ui/react-slider';
 import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
+import PriceDisclosure from '@/components/PriceDisclosure';
 import { matchesSearch } from '@/lib/search';
 
 interface CatalogClientProps {
@@ -259,6 +260,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                                             </span>
                                         )}
                                     </div>
+                                    <PriceDisclosure className="mb-2" />
                                     <button
                                         onClick={() => addToCart({ productId: product.id, name: product.name, price: product.sellingPrice, imageUrl: product.imageUrl, stock: product.stockQuantity })}
                                         disabled={SHOP_DISABLED || product.stockQuantity <= 0}

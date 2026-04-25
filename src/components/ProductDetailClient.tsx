@@ -11,6 +11,7 @@ import { addToCart, getCartCount, SHOP_DISABLED } from '@/lib/cart';
 import { Product, getCategoryLabel, formatPrice } from '@/lib/types';
 import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
+import PriceDisclosure from '@/components/PriceDisclosure';
 
 export default function ProductDetailClient({ product, relatedProducts = [] }: { product: Product; relatedProducts?: Product[] }) {
     const [quantity, setQuantity] = useState(1);
@@ -163,6 +164,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                         <p className="text-3xl font-bold text-jumbo-blue mb-6">
                             {formatPrice(product.sellingPrice)} <span className="text-base font-normal text-gray-500">ден</span>
                         </p>
+                        <PriceDisclosure className="-mt-4 mb-6" />
 
                         {/* Description */}
                         {product.description && (
@@ -327,6 +329,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                                     <span className="text-sm font-bold text-jumbo-blue">
                                         {formatPrice(rp.sellingPrice)}<span className="text-[0.625rem] font-normal text-gray-400 ml-0.5">ден</span>
                                     </span>
+                                    <PriceDisclosure className="mt-1" />
                                 </div>
                             </Link>
                         ))}
@@ -340,6 +343,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                     <div className="flex-1 min-w-0">
                         <p className="text-xs text-gray-500 truncate" title={product.name}>{product.name}</p>
                         <p className="text-lg font-bold text-jumbo-blue truncate">{formatPrice(product.sellingPrice)} ден</p>
+                        <p className="text-[0.625rem] text-gray-500 leading-tight">со вклучен ДДВ</p>
                     </div>
                     <button
                         onClick={handleAddToCart}

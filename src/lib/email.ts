@@ -42,7 +42,7 @@ export const EMAIL_FOOTER = `
   </div>`;
 
 /** Common items + subtotal table section for emails. */
-export function renderOrderSummaryHtml(itemsHtml: string, subtotal: number, deliveryLabel = 'По договор'): string {
+export function renderOrderSummaryHtml(itemsHtml: string, subtotal: number, deliveryLabel = 'Не е вклучена'): string {
     return `
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
         <thead>

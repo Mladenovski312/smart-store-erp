@@ -8,7 +8,7 @@ import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
     title: 'Интер Стар Џамбо | Играчки Куманово',
-    description: 'Најдобриот избор на играчки во Куманово. Lego, Barbie, Paw Patrol, возила и повеќе со бесплатна достава.',
+    description: 'Најдобриот избор на играчки во Куманово. Lego, Barbie, Paw Patrol, возила и повеќе со достава низ Македонија.',
 };
 
 export const revalidate = 60;
@@ -66,7 +66,7 @@ export default async function Home() {
                                 Најдобриот избор на играчки во <span className="text-jumbo-red">Куманово</span>
                             </h1>
                             <p className="text-lg md:text-xl text-blue-50 mb-10 leading-relaxed font-medium max-w-xl drop-shadow">
-                                Не сме најголемата продавница, но сме најдобриот избор. Нарачајте онлајн со брза достава низ цела Македонија и плаќање при достава.
+                                Не сме најголемата продавница, но сме најдобриот избор. Разгледајте го каталогот со достава низ цела Македонија и плаќање при достава.
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-4">

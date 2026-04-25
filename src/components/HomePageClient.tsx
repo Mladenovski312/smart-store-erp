@@ -7,6 +7,7 @@ import { addToCart, SHOP_DISABLED } from '@/lib/cart';
 import { Product, CATEGORIES, getCategoryLabel, formatPrice } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
+import PriceDisclosure from '@/components/PriceDisclosure';
 
 const BRANDS = [
     { name: 'LEGO', src: '/brands/lego.png' },
@@ -266,6 +267,7 @@ function ProductCard({ product }: { product: Product }) {
                         </span>
                     )}
                 </div>
+                <PriceDisclosure className="mb-2" />
                 <button
                     onClick={handleAddToCart}
                     disabled={SHOP_DISABLED || product.stockQuantity <= 0}

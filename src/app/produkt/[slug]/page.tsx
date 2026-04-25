@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const title = product.name;
     const description = product.description
-        || `Купи ${product.name} во Интер Стар Џамбо Куманово. Цена: ${formatPrice(product.sellingPrice)} ден. Брза достава низ цела Македонија.`;
+        || `Купи ${product.name} во Интер Стар Џамбо Куманово. Цена: ${formatPrice(product.sellingPrice)} ден со вклучен ДДВ. Достава низ цела Македонија.`;
 
     return {
         title,
@@ -63,7 +63,7 @@ export default async function ProductDetailPage({ params }: Props) {
                         "@type": "Product",
                         "name": product.name,
                         "image": product.imageUrl || "https://www.interstarjumbo.com/hd_logo.webp",
-                        "description": product.description || `Купи ${product.name} во Интер Стар Џамбо Куманово. Најдобра цена и брза достава низ цела Македонија.`,
+                        "description": product.description || `Купи ${product.name} во Интер Стар Џамбо Куманово. Цена со вклучен ДДВ и достава низ цела Македонија.`,
                         "sku": product.barcode || product.id,
                         "brand": {
                             "@type": "Brand",
