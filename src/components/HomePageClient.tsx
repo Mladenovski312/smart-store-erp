@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import React from 'react';
 import { ShoppingBag, ChevronRight, ChevronDown, Truck, Plus, Car, Dices, Baby, Bike, PuzzleIcon, Backpack, Smile, Gift } from 'lucide-react';
-import { addToCart } from '@/lib/cart';
+import { addToCart, SHOP_DISABLED } from '@/lib/cart';
 import { Product, CATEGORIES, getCategoryLabel, formatPrice } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -268,14 +268,16 @@ function ProductCard({ product }: { product: Product }) {
                 </div>
                 <button
                     onClick={handleAddToCart}
-                    disabled={product.stockQuantity <= 0}
-                    className={`w-full flex items-center justify-center gap-1 min-h-[2.75rem] py-2.5 rounded-lg text-xs font-bold transition-all ${product.stockQuantity > 0
-                        ? 'bg-jumbo-red text-white hover:bg-red-700 active:scale-95'
-                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    disabled={SHOP_DISABLED || product.stockQuantity <= 0}
+                    className={`w-full flex items-center justify-center gap-1 min-h-[2.75rem] py-2.5 rounded-lg text-xs font-bold transition-all ${SHOP_DISABLED
+                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                        : product.stockQuantity > 0
+                            ? 'bg-jumbo-red text-white hover:bg-red-700 active:scale-95'
+                            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                         }`}
                 >
                     <Plus size={13} />
-                    {product.stockQuantity > 0 ? 'Додај во кошничка' : 'Нема залиха'}
+                    {SHOP_DISABLED ? 'Привремено недостапно' : product.stockQuantity > 0 ? 'Додај во кошничка' : 'Нема залиха'}
                 </button>
             </div>
         </Link>

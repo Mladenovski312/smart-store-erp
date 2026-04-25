@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { ShoppingCart, X, Trash2, Plus, Minus } from 'lucide-react';
-import { getCart, updateCartQuantity, removeFromCart, syncCartWithServer, CartItem } from '@/lib/cart';
+import { getCart, updateCartQuantity, removeFromCart, syncCartWithServer, CartItem, SHOP_DISABLED } from '@/lib/cart';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/types';
@@ -149,13 +149,19 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                             >
                                 ПОГЛЕДНИ КОШНИЧКА
                             </Link>
-                            <Link
-                                href="/checkout"
-                                onClick={onClose}
-                                className="block w-full bg-jumbo-blue hover:bg-blue-800 text-white text-center py-3 rounded-xl font-bold text-sm transition-colors"
-                            >
-                                КОН НАРАЧКА
-                            </Link>
+                            {SHOP_DISABLED ? (
+                                <div className="block w-full bg-gray-200 text-gray-500 text-center py-3 rounded-xl font-bold text-sm cursor-not-allowed">
+                                    ПРИВРЕМЕНО НЕДОСТАПНО
+                                </div>
+                            ) : (
+                                <Link
+                                    href="/checkout"
+                                    onClick={onClose}
+                                    className="block w-full bg-jumbo-blue hover:bg-blue-800 text-white text-center py-3 rounded-xl font-bold text-sm transition-colors"
+                                >
+                                    КОН НАРАЧКА
+                                </Link>
+                            )}
                         </div>
                     )}
                 </div>

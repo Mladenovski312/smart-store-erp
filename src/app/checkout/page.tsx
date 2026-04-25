@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, Check } from 'lucide-react';
-import { getCart, getCartTotal, clearCart, syncCartWithServer, CartItem } from '@/lib/cart';
+import { getCart, getCartTotal, clearCart, syncCartWithServer, CartItem, SHOP_DISABLED } from '@/lib/cart';
 import { MK_CITIES } from '@/lib/cities';
 import { createClient } from '@/lib/supabase';
 import Link from 'next/link';
@@ -10,6 +10,7 @@ import Footer from '@/components/Footer';
 import { latinToCyrillic } from '@/lib/search';
 import OrderComplete from '@/components/checkout/OrderComplete';
 import OrderSummary from '@/components/checkout/OrderSummary';
+import SiteUnderConstruction from '@/components/SiteUnderConstruction';
 
 export default function CheckoutPage() {
     const [items, setItems] = useState<CartItem[]>(() => getCart());
@@ -164,6 +165,27 @@ export default function CheckoutPage() {
             setSubmitting(false);
         }
     };
+
+    // ═══ Site Under Construction — checkout disabled ═══
+    if (SHOP_DISABLED) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col">
+                <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex items-center justify-between h-16">
+                            <Link href="/" className="bg-jumbo-blue text-white px-2.5 py-1 rounded-lg font-black text-sm tracking-tight">
+                                ИНТЕР СТАР <span className="text-red-300">ЏАМБО</span>
+                            </Link>
+                        </div>
+                    </div>
+                </nav>
+                <div className="flex-1">
+                    <SiteUnderConstruction />
+                </div>
+                <Footer />
+            </div>
+        );
+    }
 
     // ═══ Order Complete State ═══
     if (orderComplete) {

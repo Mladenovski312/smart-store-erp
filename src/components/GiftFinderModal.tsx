@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { addToCart } from '@/lib/cart';
+import { addToCart, SHOP_DISABLED } from '@/lib/cart';
 
 const SESSION_LIMIT = 10;
 const SESSION_KEY = 'gf_count';
@@ -207,9 +207,10 @@ export default function GiftFinderModal({ onClose }: { onClose: () => void }) {
                                                         </a>
                                                         <button
                                                             onClick={() => handleAddToCart(product)}
-                                                            className="text-[0.6875rem] bg-[#1A3C5E] text-white px-2 py-0.5 rounded hover:bg-[#E8943A] transition-colors"
+                                                            disabled={SHOP_DISABLED}
+                                                            className={`text-[0.6875rem] px-2 py-0.5 rounded transition-colors ${SHOP_DISABLED ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-[#1A3C5E] text-white hover:bg-[#E8943A]'}`}
                                                         >
-                                                            Купи
+                                                            {SHOP_DISABLED ? 'Недостапно' : 'Купи'}
                                                         </button>
                                                     </div>
                                                 </div>

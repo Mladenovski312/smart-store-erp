@@ -7,7 +7,7 @@ import {
     ChevronLeft, ChevronRight, ShoppingCart, Package,
     Minus, Plus, Truck, ArrowUpRight, Check
 } from 'lucide-react';
-import { addToCart, getCartCount } from '@/lib/cart';
+import { addToCart, getCartCount, SHOP_DISABLED } from '@/lib/cart';
 import { Product, getCategoryLabel, formatPrice } from '@/lib/types';
 import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
@@ -218,12 +218,20 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
 
                                 <button
                                     onClick={handleAddToCart}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-8 rounded-xl font-semibold text-sm transition-all duration-300 ${addedToCart
-                                        ? 'bg-green-600 text-white'
-                                        : 'bg-jumbo-red text-white hover:bg-red-700 hover:shadow-lg'
+                                    disabled={SHOP_DISABLED}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-8 rounded-xl font-semibold text-sm transition-all duration-300 ${SHOP_DISABLED
+                                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                        : addedToCart
+                                            ? 'bg-green-600 text-white'
+                                            : 'bg-jumbo-red text-white hover:bg-red-700 hover:shadow-lg'
                                         }`}
                                 >
-                                    {addedToCart ? (
+                                    {SHOP_DISABLED ? (
+                                        <>
+                                            <ShoppingCart size={18} />
+                                            ПРИВРЕМЕНО НЕДОСТАПНО
+                                        </>
+                                    ) : addedToCart ? (
                                         <>
                                             <Check size={18} />
                                             ДОДАДЕНО!
@@ -335,12 +343,20 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                     </div>
                     <button
                         onClick={handleAddToCart}
-                        className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all ${addedToCart
-                            ? 'bg-green-600 text-white'
-                            : 'bg-jumbo-red text-white hover:bg-red-700'
+                        disabled={SHOP_DISABLED}
+                        className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all ${SHOP_DISABLED
+                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                            : addedToCart
+                                ? 'bg-green-600 text-white'
+                                : 'bg-jumbo-red text-white hover:bg-red-700'
                             }`}
                     >
-                        {addedToCart ? (
+                        {SHOP_DISABLED ? (
+                            <>
+                                <ShoppingCart size={16} />
+                                Недостапно
+                            </>
+                        ) : addedToCart ? (
                             <>
                                 <Check size={16} />
                                 Додадено

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Search, SlidersHorizontal, ChevronLeft, Package, ShoppingCart, Plus, CheckCircle2, ChevronDown } from 'lucide-react';
-import { addToCart, getCartCount } from '@/lib/cart';
+import { addToCart, getCartCount, SHOP_DISABLED } from '@/lib/cart';
 import { Product, CATEGORIES, getCategoryLabel, formatPrice } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -261,14 +261,16 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                                     </div>
                                     <button
                                         onClick={() => addToCart({ productId: product.id, name: product.name, price: product.sellingPrice, imageUrl: product.imageUrl, stock: product.stockQuantity })}
-                                        disabled={product.stockQuantity <= 0}
-                                        className={`w-full flex items-center justify-center gap-1 min-h-[2.75rem] py-2.5 rounded-lg text-xs font-semibold transition-colors ${product.stockQuantity > 0
-                                            ? 'bg-jumbo-red/10 text-jumbo-red hover:bg-jumbo-red hover:text-white'
-                                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                        disabled={SHOP_DISABLED || product.stockQuantity <= 0}
+                                        className={`w-full flex items-center justify-center gap-1 min-h-[2.75rem] py-2.5 rounded-lg text-xs font-semibold transition-colors ${SHOP_DISABLED
+                                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                            : product.stockQuantity > 0
+                                                ? 'bg-jumbo-red/10 text-jumbo-red hover:bg-jumbo-red hover:text-white'
+                                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                             }`}
                                     >
                                         <Plus size={13} />
-                                        {product.stockQuantity > 0 ? 'Додај во кошничка' : 'Нема залиха'}
+                                        {SHOP_DISABLED ? 'Привремено недостапно' : product.stockQuantity > 0 ? 'Додај во кошничка' : 'Нема залиха'}
                                     </button>
                                 </div>
                             </div>

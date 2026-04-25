@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { Minus, Plus, Trash2, ShoppingBag, ChevronLeft, ShoppingCart } from 'lucide-react';
-import { getCart, updateCartQuantity, removeFromCart, getCartTotal, syncCartWithServer, CartItem } from '@/lib/cart';
+import { getCart, updateCartQuantity, removeFromCart, getCartTotal, syncCartWithServer, CartItem, SHOP_DISABLED } from '@/lib/cart';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/types';
 import Footer from '@/components/Footer';
+import SiteUnderConstruction from '@/components/SiteUnderConstruction';
 
 export default function CartPage() {
     const [items, setItems] = useState<CartItem[]>(() => getCart());
@@ -16,12 +17,33 @@ export default function CartPage() {
     };
 
     useEffect(() => {
+        if (SHOP_DISABLED) return;
         syncCartWithServer();
         window.addEventListener('cart-updated', refresh);
         return () => window.removeEventListener('cart-updated', refresh);
     }, []);
 
     const subtotal = getCartTotal();
+
+    if (SHOP_DISABLED) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col">
+                <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex items-center justify-between h-16">
+                            <Link href="/" className="bg-jumbo-blue text-white px-2.5 py-1 rounded-lg font-black text-sm tracking-tight">
+                                ИНТЕР СТАР <span className="text-red-300">ЏАМБО</span>
+                            </Link>
+                        </div>
+                    </div>
+                </nav>
+                <div className="flex-1">
+                    <SiteUnderConstruction />
+                </div>
+                <Footer />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
