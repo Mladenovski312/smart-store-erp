@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
-import GiftFinder from "@/components/GiftFinder";
 import UnderConstructionBanner from "@/components/UnderConstructionBanner";
 
 const inter = Inter({
@@ -66,7 +65,6 @@ export default function RootLayout({
         <AuthProvider>
           <UnderConstructionBanner />
           {children}
-          <GiftFinder />
         </AuthProvider>
       </body>
     </html>
