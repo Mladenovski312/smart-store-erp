@@ -28,8 +28,7 @@ export default function TermsPage() {
             </nav>
 
             <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">Општи услови</h1>
-                <p className="text-sm text-gray-500 mb-10">Последно ажурирање: 27.04.2026</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-10">Општи услови</h1>
 
                 <div className="bg-white rounded-2xl border border-gray-100 p-8 md:p-10 space-y-8 text-gray-700 leading-relaxed">
                     <section className="rounded-xl border border-blue-100 bg-blue-50 p-5">
