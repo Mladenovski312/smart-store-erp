@@ -89,9 +89,6 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                             <Link href="/" className="bg-jumbo-blue text-white px-2.5 py-1 rounded-lg font-black text-sm tracking-tight">
                                 ИНТЕР СТАР <span className="text-red-500">ЏАМБО</span>
                             </Link>
-                            <Link href="/za-nas" className="inline-flex text-sm font-medium text-gray-600 hover:text-jumbo-blue transition-colors">
-                                За нас
-                            </Link>
                         </div>
                         <button
                             onClick={() => setCartOpen(true)}
