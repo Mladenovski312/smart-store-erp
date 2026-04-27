@@ -406,8 +406,11 @@ export default function CheckoutPage() {
                                     />
                                     <span className="text-xs text-gray-600 leading-relaxed">
                                         Со прифаќање на{' '}
-                                        <Link href="/uslovi-za-isporaka" className="text-jumbo-blue font-semibold hover:underline" target="_blank">
+                                        <Link href="/opsti-uslovi" className="text-jumbo-blue font-semibold hover:underline" target="_blank">
                                             правила и услови
+                                        </Link>{' '}и{' '}
+                                        <Link href="/politika-za-privatnost" className="text-jumbo-blue font-semibold hover:underline" target="_blank">
+                                            политика за приватност
                                         </Link>{' '}и{' '}
                                         <Link href="/politika-za-vrakanje" className="text-jumbo-blue font-semibold hover:underline" target="_blank">
                                             политика за враќање

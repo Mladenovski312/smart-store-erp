@@ -1,36 +1,20 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-    ChevronLeft, ChevronRight, ShoppingCart, Package,
+    ChevronLeft, ChevronRight, Package,
     Truck, ArrowUpRight, Check
 } from 'lucide-react';
-import { getCartCount } from '@/lib/cart';
 import { Product, getCategoryLabel } from '@/lib/types';
-import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
 
 export default function ProductDetailClient({ product, relatedProducts = [] }: { product: Product; relatedProducts?: Product[] }) {
-    const [cartOpen, setCartOpen] = useState(false);
-    const [cartCount, setCartCount] = useState(() => getCartCount());
     const [copied, setCopied] = useState(false);
     const [shareUrl] = useState(() =>
         typeof window !== 'undefined' ? window.location.href : `https://interstarjumbo.com/produkt/${product.slug}`
     );
-
-    const refreshCartCount = () => setCartCount(getCartCount());
-
-    useEffect(() => {
-        const openCart = () => setCartOpen(true);
-        window.addEventListener('cart-updated', refreshCartCount);
-        window.addEventListener('cart-item-added', openCart);
-        return () => {
-            window.removeEventListener('cart-updated', refreshCartCount);
-            window.removeEventListener('cart-item-added', openCart);
-        };
-    }, []);
 
     const getShareUrl = () => shareUrl;
 
@@ -90,18 +74,6 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                                 ИНТЕР СТАР <span className="text-red-500">ЏАМБО</span>
                             </Link>
                         </div>
-                        <button
-                            onClick={() => setCartOpen(true)}
-                            aria-label="Отвори кошничка"
-                            className="relative p-2 text-gray-600 hover:text-jumbo-blue transition-colors"
-                        >
-                            <ShoppingCart size={22} />
-                            {cartCount > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-jumbo-red text-white text-[0.625rem] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                                    {cartCount}
-                                </span>
-                            )}
-                        </button>
                     </div>
                 </div>
             </nav>
@@ -258,8 +230,6 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
             <div>
                 <Footer />
             </div>
-
-            <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
         </div>
     );
 }

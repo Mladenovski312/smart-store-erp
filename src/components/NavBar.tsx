@@ -1,30 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, ShoppingCart } from 'lucide-react';
-import { getCartCount } from '@/lib/cart';
+import { Search } from 'lucide-react';
 import { Product } from '@/lib/types';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import SearchDropdown from '@/components/SearchDropdown';
-import CartSidebar from '@/components/CartSidebar';
 
 export default function NavBar({ products }: { products: Product[] }) {
-    const [cartOpen, setCartOpen] = useState(false);
-    const [cartCount, setCartCount] = useState(() => getCartCount());
     const [navSearchOpen, setNavSearchOpen] = useState(false);
     const pathname = usePathname();
 
-    const refreshCartCount = () => setCartCount(getCartCount());
-
     useEffect(() => {
-        const openCart = () => setCartOpen(true);
-        window.addEventListener('cart-updated', refreshCartCount);
-        window.addEventListener('cart-item-added', openCart);
-        return () => {
-            window.removeEventListener('cart-updated', refreshCartCount);
-            window.removeEventListener('cart-item-added', openCart);
-        };
+        const closeSearch = () => setNavSearchOpen(false);
+        window.addEventListener('cart-item-added', closeSearch);
+        return () => window.removeEventListener('cart-item-added', closeSearch);
     }, []);
 
     return (
@@ -79,24 +69,10 @@ export default function NavBar({ products }: { products: Product[] }) {
                                     <span className="hidden sm:inline">Пребарај</span>
                                 </button>
                             )}
-                            <button
-                                onClick={() => setCartOpen(true)}
-                                aria-label="Отвори кошничка"
-                                className="relative p-2 text-gray-600 hover:text-jumbo-blue transition-colors shrink-0"
-                            >
-                                <ShoppingCart size={22} />
-                                {cartCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-jumbo-red text-white text-[0.625rem] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                                        {cartCount}
-                                    </span>
-                                )}
-                            </button>
                         </div>
                     </div>
                 </div>
             </nav>
-
-            <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
         </>
     );
 }

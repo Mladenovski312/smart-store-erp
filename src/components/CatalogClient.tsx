@@ -1,12 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
-import { Search, SlidersHorizontal, ChevronLeft, Package, ShoppingCart, ChevronDown } from 'lucide-react';
-import { getCartCount } from '@/lib/cart';
+import { useState, useMemo } from 'react';
+import { Search, SlidersHorizontal, ChevronLeft, Package, ChevronDown } from 'lucide-react';
 import { Product, CATEGORIES, getCategoryLabel } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
-import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
 import { matchesSearch } from '@/lib/search';
 
@@ -23,20 +21,6 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
     const [searchTerm, setSearchTerm] = useState(initialQuery);
     const [selectedCategory, setSelectedCategory] = useState(initialCategory);
     const [sortBy, setSortBy] = useState('newest');
-    const [cartOpen, setCartOpen] = useState(false);
-    const [cartCount, setCartCount] = useState(() => getCartCount());
-
-    const refreshCartCount = () => setCartCount(getCartCount());
-
-    useEffect(() => {
-        const openCart = () => setCartOpen(true);
-        window.addEventListener('cart-updated', refreshCartCount);
-        window.addEventListener('cart-item-added', openCart);
-        return () => {
-            window.removeEventListener('cart-updated', refreshCartCount);
-            window.removeEventListener('cart-item-added', openCart);
-        };
-    }, []);
 
     const filtered = useMemo(() => products
         .filter(p => matchesSearch(p.name, searchTerm))
@@ -61,18 +45,6 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                                 ИНТЕР СТАР <span className="text-red-300">ЏАМБО</span>
                             </Link>
                         </div>
-                        <button
-                            onClick={() => setCartOpen(true)}
-                            aria-label="Отвори кошничка"
-                            className="relative p-2 text-gray-600 hover:text-jumbo-blue transition-colors"
-                        >
-                            <ShoppingCart size={22} />
-                            {cartCount > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-jumbo-red text-white text-[0.625rem] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                                    {cartCount}
-                                </span>
-                            )}
-                        </button>
                     </div>
                 </div>
             </nav>
@@ -204,8 +176,6 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
             </div>
 
             <Footer />
-
-            <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
         </div>
     );
 }

@@ -59,6 +59,9 @@ export default function Footer() {
                             <li><Link href="/" className="text-gray-400 hover:text-white transition-colors">Почетна</Link></li>
                             <li><Link href="/catalog" className="text-gray-400 hover:text-white transition-colors">Каталог</Link></li>
                             <li><Link href="/za-nas" className="text-gray-400 hover:text-white transition-colors">За нас</Link></li>
+                            <li><Link href="/opsti-uslovi" className="text-gray-400 hover:text-white transition-colors">Општи услови</Link></li>
+                            <li><Link href="/politika-za-privatnost" className="text-gray-400 hover:text-white transition-colors">Политика за приватност</Link></li>
+                            <li><Link href="/kolacinja" className="text-gray-400 hover:text-white transition-colors">Колачиња</Link></li>
                             <li><Link href="/uslovi-za-isporaka" className="text-gray-400 hover:text-white transition-colors">Услови за испорака</Link></li>
                             <li><Link href="/politika-za-vrakanje" className="text-gray-400 hover:text-white transition-colors">Политика за враќање</Link></li>
                         </ul>
