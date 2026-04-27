@@ -40,7 +40,7 @@ export default function Footer() {
                             </li>
                             <li className="flex items-center gap-2.5 text-gray-400">
                                 <Mail size={16} className="text-jumbo-red shrink-0" />
-                                <a href="mailto:info@interstarjumbo.mk" className="hover:text-white transition-colors">info@interstarjumbo.mk</a>
+                                <a href="mailto:interstarmak@yahoo.com" className="hover:text-white transition-colors">interstarmak@yahoo.com</a>
                             </li>
                             <li className="flex items-start gap-2.5 text-gray-400">
                                 <Clock size={16} className="text-jumbo-red mt-0.5 shrink-0" />

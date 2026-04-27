@@ -17,7 +17,7 @@ export interface CartItem {
 const CART_KEY = 'jumbo_cart';
 
 export const SHOP_DISABLED: boolean = true;
-export const SHOP_DISABLED_MESSAGE = 'Сајтот е во изработка. Онлајн нарачките се привремено оневозможени. За нарачки контактирајте нé на 031 422 656 или info@interstarjumbo.mk.';
+export const SHOP_DISABLED_MESSAGE = 'Сајтот е во изработка. Онлајн нарачките се привремено оневозможени. За контакт јавете се на 031 422 656 или пишете на interstarmak@yahoo.com.';
 
 function readCart(): CartItem[] {
     if (typeof window === 'undefined') return [];

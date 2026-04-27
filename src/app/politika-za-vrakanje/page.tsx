@@ -73,8 +73,8 @@ export default function ReturnsPolicyPage() {
                         <h2 className="text-lg font-bold text-gray-900 mb-3">Процедура</h2>
                         <p>
                             Контактирајте не на{' '}
-                            <a href="mailto:info@interstarjumbo.mk" className="text-jumbo-blue font-semibold hover:underline">
-                                info@interstarjumbo.mk
+                            <a href="mailto:interstarmak@yahoo.com" className="text-jumbo-blue font-semibold hover:underline">
+                                interstarmak@yahoo.com
                             </a>
                             {' '}или јавете се на{' '}
                             <a href="tel:+38931422656" className="text-jumbo-blue font-semibold hover:underline">

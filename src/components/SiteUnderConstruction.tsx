@@ -22,10 +22,10 @@ export default function SiteUnderConstruction() {
                         031 422 656
                     </a>
                     <a
-                        href="mailto:info@interstarjumbo.mk"
+                        href="mailto:interstarmak@yahoo.com"
                         className="inline-flex items-center justify-center gap-2 bg-gray-100 text-gray-800 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
                     >
-                        info@interstarjumbo.mk
+                        interstarmak@yahoo.com
                     </a>
                 </div>
                 <Link

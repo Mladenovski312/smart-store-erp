@@ -123,7 +123,7 @@ export default async function Home() {
                                 "image": "https://www.interstarjumbo.com/hd_logo.webp",
                                 "url": "https://interstarjumbo.com",
                                 "telephone": "+38931422656",
-                                "email": "info@interstarjumbo.mk",
+                                "email": "interstarmak@yahoo.com",
                                 "foundingDate": "2004",
                                 "address": {
                                     "@type": "PostalAddress",
