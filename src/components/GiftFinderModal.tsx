@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { addToCart, SHOP_DISABLED } from '@/lib/cart';
 
 const SESSION_LIMIT = 10;
 const SESSION_KEY = 'gf_count';
@@ -21,7 +20,6 @@ interface Recommendation {
         id: string;
         name: string;
         category: string;
-        price: number;
         image_url: string | null;
         slug: string;
         stock: number;
@@ -97,17 +95,6 @@ export default function GiftFinderModal({ onClose }: { onClose: () => void }) {
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleAddToCart = (product: Recommendation['product']) => {
-        addToCart({
-            productId: product.id,
-            name: product.name,
-            price: product.price,
-            imageUrl: product.image_url ?? undefined,
-            stock: product.stock,
-        });
-        onClose();
     };
 
     return (
@@ -197,7 +184,7 @@ export default function GiftFinderModal({ onClose }: { onClose: () => void }) {
                                                 <p className="font-semibold text-xs text-[#1A3C5E] truncate">{product.name}</p>
                                                 <p className="text-[0.6875rem] text-gray-500 italic mt-0.5">{reason}</p>
                                                 <div className="flex items-center justify-between mt-1.5 gap-2">
-                                                    <p className="font-bold text-sm text-[#E8943A]">{product.price.toLocaleString()} ден</p>
+                                                    <p className="font-bold text-sm text-[#E8943A]">Цена во подготовка</p>
                                                     <div className="flex gap-1.5">
                                                         <a
                                                             href={`/produkt/${product.slug}`}
@@ -205,13 +192,6 @@ export default function GiftFinderModal({ onClose }: { onClose: () => void }) {
                                                         >
                                                             Отвори
                                                         </a>
-                                                        <button
-                                                            onClick={() => handleAddToCart(product)}
-                                                            disabled={SHOP_DISABLED}
-                                                            className={`text-[0.6875rem] px-2 py-0.5 rounded transition-colors ${SHOP_DISABLED ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-[#1A3C5E] text-white hover:bg-[#E8943A]'}`}
-                                                        >
-                                                            {SHOP_DISABLED ? 'Сè уште недостапно' : 'Купи'}
-                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>

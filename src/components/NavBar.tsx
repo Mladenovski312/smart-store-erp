@@ -49,12 +49,20 @@ export default function NavBar({ products }: { products: Product[] }) {
                         <div className="flex items-center gap-2 flex-1 justify-end sm:flex-none sm:justify-start">
                             {/* Mobile-always-visible catalog link */}
                             {!navSearchOpen && (
-                                <Link
-                                    href="/catalog"
-                                    className="md:hidden text-sm font-semibold text-jumbo-blue border border-jumbo-blue/30 px-3 py-1.5 rounded-lg hover:bg-jumbo-blue hover:text-white transition-colors whitespace-nowrap"
-                                >
-                                    Каталог
-                                </Link>
+                                <>
+                                    <Link
+                                        href="/catalog"
+                                        className="md:hidden text-sm font-semibold text-jumbo-blue border border-jumbo-blue/30 px-3 py-1.5 rounded-lg hover:bg-jumbo-blue hover:text-white transition-colors whitespace-nowrap"
+                                    >
+                                        Каталог
+                                    </Link>
+                                    <Link
+                                        href="/za-nas"
+                                        className="md:hidden text-sm font-semibold text-gray-600 border border-gray-200 px-3 py-1.5 rounded-lg hover:border-jumbo-blue/30 hover:text-jumbo-blue transition-colors whitespace-nowrap"
+                                    >
+                                        За нас
+                                    </Link>
+                                </>
                             )}
 
                             {navSearchOpen ? (

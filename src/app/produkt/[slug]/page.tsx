@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import { getProductBySlug, getRelatedProducts } from '@/lib/store';
-import { formatPrice } from '@/lib/types';
 import ProductDetailClient from '@/components/ProductDetailClient';
 import type { Metadata } from 'next';
 
@@ -18,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const title = product.name;
     const description = product.description
-        || `Купи ${product.name} во Интер Стар Џамбо Куманово. Цена: ${formatPrice(product.sellingPrice)} ден со вклучен ДДВ. Достава низ цела Македонија.`;
+        || `${product.name} во каталогот на Интер Стар Џамбо Куманово. Цените и онлајн нарачките се во подготовка.`;
 
     return {
         title,
@@ -48,8 +47,6 @@ export default async function ProductDetailPage({ params }: Props) {
     if (!product) notFound();
 
     const relatedProducts = await getRelatedProducts(product);
-    const productUrl = `https://interstarjumbo.com/produkt/${slug}`;
-
     return (
         <>
             <ProductDetailClient product={product} relatedProducts={relatedProducts} />
@@ -63,22 +60,11 @@ export default async function ProductDetailPage({ params }: Props) {
                         "@type": "Product",
                         "name": product.name,
                         "image": product.imageUrl || "https://www.interstarjumbo.com/hd_logo.webp",
-                        "description": product.description || `Купи ${product.name} во Интер Стар Џамбо Куманово. Цена со вклучен ДДВ и достава низ цела Македонија.`,
+                        "description": product.description || `${product.name} во каталогот на Интер Стар Џамбо Куманово. Цените и онлајн нарачките се во подготовка.`,
                         "sku": product.barcode || product.id,
                         "brand": {
                             "@type": "Brand",
                             "name": "Interstar Jumbo"
-                        },
-                        "offers": {
-                            "@type": "Offer",
-                            "url": productUrl,
-                            "priceCurrency": "MKD",
-                            "price": product.sellingPrice,
-                            "availability": product.stockQuantity > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-                            "seller": {
-                                "@type": "Organization",
-                                "name": "Интер Стар Џамбо"
-                            }
                         }
                     })
                 }}

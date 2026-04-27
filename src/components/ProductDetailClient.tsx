@@ -5,20 +5,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
     ChevronLeft, ChevronRight, ShoppingCart, Package,
-    Minus, Plus, Truck, ArrowUpRight, Check
+    Truck, ArrowUpRight, Check
 } from 'lucide-react';
-import { addToCart, getCartCount, SHOP_DISABLED } from '@/lib/cart';
-import { Product, getCategoryLabel, formatPrice } from '@/lib/types';
+import { getCartCount } from '@/lib/cart';
+import { Product, getCategoryLabel } from '@/lib/types';
 import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
-import PriceDisclosure from '@/components/PriceDisclosure';
 
 export default function ProductDetailClient({ product, relatedProducts = [] }: { product: Product; relatedProducts?: Product[] }) {
-    const [quantity, setQuantity] = useState(1);
     const [cartOpen, setCartOpen] = useState(false);
     const [cartCount, setCartCount] = useState(() => getCartCount());
     const [copied, setCopied] = useState(false);
-    const [addedToCart, setAddedToCart] = useState(false);
     const [shareUrl] = useState(() =>
         typeof window !== 'undefined' ? window.location.href : `https://interstarjumbo.com/produkt/${product.slug}`
     );
@@ -34,20 +31,6 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
             window.removeEventListener('cart-item-added', openCart);
         };
     }, []);
-
-    const handleAddToCart = () => {
-        for (let i = 0; i < quantity; i++) {
-            addToCart({
-                productId: product.id,
-                name: product.name,
-                price: product.sellingPrice,
-                imageUrl: product.imageUrl,
-                stock: product.stockQuantity,
-            });
-        }
-        setAddedToCart(true);
-        setTimeout(() => setAddedToCart(false), 2000);
-    };
 
     const getShareUrl = () => shareUrl;
 
@@ -106,6 +89,9 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                             <Link href="/" className="bg-jumbo-blue text-white px-2.5 py-1 rounded-lg font-black text-sm tracking-tight">
                                 ИНТЕР СТАР <span className="text-red-500">ЏАМБО</span>
                             </Link>
+                            <Link href="/za-nas" className="inline-flex text-sm font-medium text-gray-600 hover:text-jumbo-blue transition-colors">
+                                За нас
+                            </Link>
                         </div>
                         <button
                             onClick={() => setCartOpen(true)}
@@ -161,10 +147,12 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                             {product.name}
                         </h1>
 
-                        <p className="text-3xl font-bold text-jumbo-blue mb-6">
-                            {formatPrice(product.sellingPrice)} <span className="text-base font-normal text-gray-500">ден</span>
-                        </p>
-                        <PriceDisclosure className="-mt-4 mb-6" />
+                        <div className="mb-6 rounded-xl border border-blue-100 bg-blue-50 p-4">
+                            <p className="text-lg font-bold text-jumbo-blue">Цена во подготовка</p>
+                            <p className="mt-1 text-sm text-gray-600">
+                                Цените и онлајн нарачките се во подготовка додека ги усогласуваме сите правни информации.
+                            </p>
+                        </div>
 
                         {/* Description */}
                         {product.description && (
@@ -185,67 +173,11 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                             </div>
                         )}
 
-                        {/* Quantity & Add to Cart */}
-                        {product.stockQuantity > 0 && (
-                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
-                                <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
-                                    <button
-                                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                        disabled={quantity <= 1}
-                                        aria-label="Намали количина"
-                                        className={`p-3 transition-colors ${quantity <= 1 ? 'bg-gray-50 text-gray-200' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
-                                    >
-                                        <Minus size={16} />
-                                    </button>
-                                    <span className="px-5 py-3 text-sm font-semibold min-w-[3.125rem] text-center border-x border-gray-200">
-                                        {quantity}
-                                    </span>
-                                    <button
-                                        onClick={() => setQuantity(Math.min(product.stockQuantity, quantity + 1))}
-                                        disabled={quantity >= product.stockQuantity}
-                                        aria-label="Зголеми количина"
-                                        className={`p-3 transition-colors ${quantity >= product.stockQuantity ? 'bg-gray-50 text-gray-200' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
-                                    >
-                                        <Plus size={16} />
-                                    </button>
-                                </div>
-
-                                <button
-                                    onClick={handleAddToCart}
-                                    disabled={SHOP_DISABLED}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-8 rounded-xl font-semibold text-sm transition-all duration-300 ${SHOP_DISABLED
-                                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                        : addedToCart
-                                            ? 'bg-green-600 text-white'
-                                            : 'bg-jumbo-red text-white hover:bg-red-700 hover:shadow-lg'
-                                        }`}
-                                >
-                                    {SHOP_DISABLED ? (
-                                        <>
-                                            <ShoppingCart size={18} />
-                                            СÈ УШТЕ НЕДОСТАПНО
-                                        </>
-                                    ) : addedToCart ? (
-                                        <>
-                                            <Check size={18} />
-                                            ДОДАДЕНО!
-                                        </>
-                                    ) : (
-                                        <>
-                                            <ShoppingCart size={18} />
-                                            ДОДАЈ ВО КОШНИЧКА
-                                        </>
-                                    )}
-                                </button>
-
-                            </div>
-                        )}
-
                         {/* Delivery Info */}
                         <div className="flex items-center gap-3 bg-blue-50 p-4 rounded-xl mb-6">
                             <Truck size={20} className="text-jumbo-blue shrink-0" />
                             <p className="text-sm text-gray-700">
-                                Вообичаен период на достава: <strong>3 - 7 дена</strong>
+                                Условите за достава ќе бидат објавени пред активирање на онлајн нарачките.
                             </p>
                         </div>
 
@@ -318,10 +250,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                                 <div className="p-3">
                                     <p className="text-[0.625rem] text-gray-400 mb-0.5 truncate">{getCategoryLabel(rp.category)}</p>
                                     <h3 className="font-semibold text-gray-900 text-xs sm:text-sm leading-tight line-clamp-2 mb-2 min-h-[2rem] group-hover:text-jumbo-blue transition-colors">{rp.name}</h3>
-                                    <span className="text-sm font-bold text-jumbo-blue">
-                                        {formatPrice(rp.sellingPrice)}<span className="text-[0.625rem] font-normal text-gray-400 ml-0.5">ден</span>
-                                    </span>
-                                    <PriceDisclosure className="mt-1" />
+                                    <p className="text-sm font-bold text-jumbo-blue">Цена во подготовка</p>
                                 </div>
                             </Link>
                         ))}
@@ -329,45 +258,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: {
                 </div>
             )}
 
-            {/* Sticky Mobile Add to Cart Bar */}
-            {product.stockQuantity > 0 && (
-                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex items-center gap-3 lg:hidden z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
-                    <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-500 truncate" title={product.name}>{product.name}</p>
-                        <p className="text-lg font-bold text-jumbo-blue truncate">{formatPrice(product.sellingPrice)} ден</p>
-                        <p className="text-[0.625rem] text-gray-500 leading-tight">со вклучен ДДВ</p>
-                    </div>
-                    <button
-                        onClick={handleAddToCart}
-                        disabled={SHOP_DISABLED}
-                        className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all ${SHOP_DISABLED
-                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                            : addedToCart
-                                ? 'bg-green-600 text-white'
-                                : 'bg-jumbo-red text-white hover:bg-red-700'
-                            }`}
-                    >
-                        {SHOP_DISABLED ? (
-                            <>
-                                <ShoppingCart size={16} />
-                                Сè уште недостапно
-                            </>
-                        ) : addedToCart ? (
-                            <>
-                                <Check size={16} />
-                                Додадено
-                            </>
-                        ) : (
-                            <>
-                                <ShoppingCart size={16} />
-                                Додај
-                            </>
-                        )}
-                    </button>
-                </div>
-            )}
-
-            <div className="pb-20 lg:pb-0">
+            <div>
                 <Footer />
             </div>
 

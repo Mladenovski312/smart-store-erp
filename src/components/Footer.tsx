@@ -70,14 +70,14 @@ export default function Footer() {
             <div className="border-t border-white/10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-xs text-gray-500 leading-relaxed text-center md:text-left space-y-1">
                     <p>
-                        <span className="text-gray-400 font-semibold">Интер Стар ДОО — Куманово</span>
-                        {' • '}ЕМБС: <span className="font-mono">5742170</span>
-                        {' • '}ДДВ: <span className="font-mono">MK4017003143931</span>
-                        {' • '}Седиште: ул. Љупчо Арсовски Табак бр. 1, Куманово
+                        <span className="text-gray-400 font-semibold">Интер Стар ДОО - Куманово</span>
+                        {' • '}
+                        <Link href="/za-nas" className="underline hover:text-white transition-colors">
+                            Правни информации: седиште, ЕМБС, ДДВ и контакт
+                        </Link>
                     </p>
                     <p>
-                        Сите цени се изразени во денари (МКД) со вклучен ДДВ. Трошоците за испорака не се вклучени.{' '}
-                        <Link href="/za-nas" className="underline hover:text-white transition-colors">Повеќе информации</Link>
+                        Цените и онлајн нарачките се во подготовка.
                     </p>
                 </div>
             </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, X } from 'lucide-react';
-import { Product, formatPrice } from '@/lib/types';
+import { Product } from '@/lib/types';
 import { matchesSearch } from '@/lib/search';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -117,8 +117,8 @@ export default function SearchDropdown({ products, onClose, autoFocus = false }:
                                         <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
                                         <p className="text-xs text-gray-400">{product.category}</p>
                                     </div>
-                                    <span className="text-sm font-bold text-jumbo-blue whitespace-nowrap">
-                                        {formatPrice(product.sellingPrice)} ден
+                                    <span className="text-xs font-semibold text-jumbo-blue whitespace-nowrap">
+                                        Во подготовка
                                     </span>
                                 </Link>
                             ))}

@@ -2,12 +2,10 @@
 
 import { useState } from 'react';
 import React from 'react';
-import { ShoppingBag, ChevronRight, ChevronDown, Truck, Plus, Car, Dices, Baby, Bike, PuzzleIcon, Backpack, Smile, Gift } from 'lucide-react';
-import { addToCart, SHOP_DISABLED } from '@/lib/cart';
-import { Product, CATEGORIES, getCategoryLabel, formatPrice } from '@/lib/types';
+import { ShoppingBag, ChevronRight, ChevronDown, Truck, Car, Dices, Baby, Bike, PuzzleIcon, Backpack, Smile, Gift } from 'lucide-react';
+import { Product, CATEGORIES, getCategoryLabel } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
-import PriceDisclosure from '@/components/PriceDisclosure';
 
 const BRANDS = [
     { name: 'LEGO', src: '/brands/lego.png' },
@@ -22,7 +20,7 @@ const BRANDS = [
 const faqs = [
     {
         q: "Како се плаќа при онлајн нарачка?",
-        a: "Сите онлајн нарачки се плаќаат исклучиво при достава, готовински на курирот при преземање на пратката. Не е потребна картичка ниту претплата, што ви гарантира целосно безбедно купување."
+        a: "Онлајн нарачките сè уште не се активни. Каталогот е во подготовка додека ги усогласуваме правните информации и процесот за нарачување."
     },
     {
         q: "Кои брендови на играчки ги продавате?",
@@ -42,7 +40,7 @@ const faqs = [
     },
     {
         q: "Како да нарачам играчки онлајн?",
-        a: "Изберете ги саканите производи од нашиот онлајн каталог, додадете ги во кошничката и пополнете ги податоците за достава. Нарачувате брзо и едноставно, 24 часа на ден."
+        a: "Онлајн нарачките се во подготовка. Производите моментално може да се разгледуваат како каталог, а нарачување ќе биде овозможено откако ќе бидат објавени сите потребни услови и правни информации."
     }
 ];
 
@@ -160,11 +158,11 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
                         <div className="text-center md:text-left">
                             <div className="inline-flex items-center gap-2 bg-white/15 text-white px-4 py-1.5 rounded-full text-sm font-medium mb-3 backdrop-blur-sm">
                                 <Truck size={16} />
-                                Нарачај онлајн
+                                Каталог во подготовка
                             </div>
                             <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Достава низ цела Македонија</h3>
                             <p className="text-blue-200 max-w-lg">
-                                Нарачајте ја вашата омилена играчка и ние ќе ви ја испорачаме на вашата адреса. Плаќање при достава.
+                                Цените, условите за достава и онлајн нарачките се во подготовка.
                             </p>
                         </div>
                         <div className="flex gap-3">
@@ -173,7 +171,7 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
                                 className="inline-flex items-center gap-2 bg-white text-jumbo-blue px-6 py-3 rounded-xl font-bold text-sm hover:bg-gray-100 transition-colors shadow-lg"
                             >
                                 <ShoppingBag size={18} />
-                                Купувај онлајн
+                                Разгледај каталог
                             </Link>
                             <Link
                                 href="/uslovi-za-isporaka"
@@ -225,17 +223,6 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
 // Sub-components
 
 function ProductCard({ product }: { product: Product }) {
-    const handleAddToCart = (e: React.MouseEvent) => {
-        e.preventDefault();
-        addToCart({
-            productId: product.id,
-            name: product.name,
-            price: product.sellingPrice,
-            imageUrl: product.imageUrl,
-            stock: product.stockQuantity,
-        });
-    };
-
     return (
         <Link href={`/produkt/${product.slug}`} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
             <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden p-2 relative">
@@ -253,30 +240,10 @@ function ProductCard({ product }: { product: Product }) {
             <div className={`p-2.5 sm:p-3 ${product.stockQuantity <= 0 ? 'opacity-80' : ''}`}>
                 <p className="text-xs text-gray-500 mb-0.5 truncate">{getCategoryLabel(product.category)}</p>
                 <h3 className="font-semibold text-gray-900 text-xs sm:text-sm leading-tight line-clamp-2 mb-2 min-h-[2rem]">{product.name}</h3>
-                <div className="flex items-center justify-between mb-2 gap-1 flex-wrap">
-                    <span className={`text-sm sm:text-base font-bold leading-none ${product.stockQuantity > 0 ? 'text-jumbo-blue' : 'text-gray-500'}`}>
-                        {formatPrice(product.sellingPrice)}<span className="text-xs font-normal text-gray-500 ml-0.5">ден</span>
-                    </span>
-                    {product.stockQuantity <= 0 && (
-                        <span className="text-xs font-medium text-red-700 bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                            Нема залиха
-                        </span>
-                    )}
-                </div>
-                <PriceDisclosure className="mb-2" />
-                <button
-                    onClick={handleAddToCart}
-                    disabled={SHOP_DISABLED || product.stockQuantity <= 0}
-                    className={`w-full flex items-center justify-center gap-1 min-h-[2.75rem] py-2.5 rounded-lg text-xs font-bold transition-all ${SHOP_DISABLED
-                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                        : product.stockQuantity > 0
-                            ? 'bg-jumbo-red text-white hover:bg-red-700 active:scale-95'
-                            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                        }`}
-                >
-                    <Plus size={13} />
-                    {SHOP_DISABLED ? 'Сè уште недостапно' : product.stockQuantity > 0 ? 'Додај во кошничка' : 'Нема залиха'}
-                </button>
+                <p className="mb-2 text-sm font-semibold text-jumbo-blue">Цена во подготовка</p>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                    Цените и онлајн нарачките се во подготовка.
+                </p>
             </div>
         </Link>
     );

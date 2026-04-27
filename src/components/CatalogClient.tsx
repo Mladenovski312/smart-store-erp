@@ -1,16 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Search, SlidersHorizontal, ChevronLeft, Package, ShoppingCart, Plus, ChevronDown } from 'lucide-react';
-import { addToCart, getCartCount, SHOP_DISABLED } from '@/lib/cart';
-import { Product, CATEGORIES, getCategoryLabel, formatPrice } from '@/lib/types';
+import { useState, useEffect, useMemo } from 'react';
+import { Search, SlidersHorizontal, ChevronLeft, Package, ShoppingCart, ChevronDown } from 'lucide-react';
+import { getCartCount } from '@/lib/cart';
+import { Product, CATEGORIES, getCategoryLabel } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import * as Slider from '@radix-ui/react-slider';
 import CartSidebar from '@/components/CartSidebar';
 import Footer from '@/components/Footer';
-import PriceDisclosure from '@/components/PriceDisclosure';
 import { matchesSearch } from '@/lib/search';
 
 interface CatalogClientProps {
@@ -21,39 +18,13 @@ interface CatalogClientProps {
     initialMax?: number;
 }
 
-export default function CatalogClient({ initialProducts, initialCategory, initialQuery = '', initialMin, initialMax }: CatalogClientProps) {
-    const router = useRouter();
+export default function CatalogClient({ initialProducts, initialCategory, initialQuery = '' }: CatalogClientProps) {
     const [products] = useState<Product[]>(initialProducts);
     const [searchTerm, setSearchTerm] = useState(initialQuery);
     const [selectedCategory, setSelectedCategory] = useState(initialCategory);
     const [sortBy, setSortBy] = useState('newest');
     const [cartOpen, setCartOpen] = useState(false);
     const [cartCount, setCartCount] = useState(() => getCartCount());
-
-    // Compute price bounds from products
-    const { priceMin, priceMax } = useMemo(() => {
-        if (products.length === 0) return { priceMin: 0, priceMax: 10000 };
-        const prices = products.map(p => p.sellingPrice);
-        return {
-            priceMin: Math.floor(Math.min(...prices) / 100) * 100,
-            priceMax: Math.ceil(Math.max(...prices) / 100) * 100,
-        };
-    }, [products]);
-
-    const [minPrice, setMinPrice] = useState(initialMin ?? priceMin);
-    const [maxPrice, setMaxPrice] = useState(initialMax ?? priceMax);
-    const priceFilterActive = minPrice > priceMin || maxPrice < priceMax;
-
-    // Sync price filter to URL
-    const syncPriceToUrl = useCallback((min: number, max: number) => {
-        const params = new URLSearchParams(window.location.search);
-        if (min > priceMin) params.set('min', String(min));
-        else params.delete('min');
-        if (max < priceMax) params.set('max', String(max));
-        else params.delete('max');
-        const qs = params.toString();
-        router.replace(`/catalog${qs ? `?${qs}` : ''}`, { scroll: false });
-    }, [priceMin, priceMax, router]);
 
     const refreshCartCount = () => setCartCount(getCartCount());
 
@@ -70,13 +41,10 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
     const filtered = useMemo(() => products
         .filter(p => matchesSearch(p.name, searchTerm))
         .filter(p => !selectedCategory || p.category === selectedCategory)
-        .filter(p => p.sellingPrice >= minPrice && p.sellingPrice <= maxPrice)
         .sort((a, b) => {
-            if (sortBy === 'price-asc') return a.sellingPrice - b.sellingPrice;
-            if (sortBy === 'price-desc') return b.sellingPrice - a.sellingPrice;
             if (sortBy === 'name') return a.name.localeCompare(b.name);
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        }), [products, searchTerm, selectedCategory, minPrice, maxPrice, sortBy]);
+        }), [products, searchTerm, selectedCategory, sortBy]);
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -91,6 +59,9 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                             </Link>
                             <Link href="/" className="bg-jumbo-blue text-white px-2.5 py-1 rounded-lg font-black text-sm tracking-tight">
                                 ИНТЕР СТАР <span className="text-red-300">ЏАМБО</span>
+                            </Link>
+                            <Link href="/za-nas" className="inline-flex text-sm font-medium text-gray-600 hover:text-jumbo-blue transition-colors">
+                                За нас
                             </Link>
                         </div>
                         <button
@@ -114,7 +85,7 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Каталог на играчки - Интер Стар Џамбо</h1>
                     <p className="text-gray-500">
-                        Најголем асортиман на квалитетни играчки достапни во нашата продавница во Куманово и онлајн со достава низ цела Македонија.
+                        Каталогот е во подготовка. Цените и онлајн нарачките се во подготовка додека ги усогласуваме сите правни информации.
                     </p>
                 </div>
 
@@ -160,8 +131,6 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                                     className="w-full pl-9 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-jumbo-blue text-sm font-medium appearance-none cursor-pointer hover:bg-white transition-all"
                                 >
                                     <option value="newest">Најнови</option>
-                                    <option value="price-asc">Цена: Ниска до Висока</option>
-                                    <option value="price-desc">Цена: Висока до Ниска</option>
                                     <option value="name">Име А-Ш</option>
                                 </select>
                                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
@@ -169,38 +138,9 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                         </div>
                     </div>
 
-                    {/* Price Range Slider */}
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                        <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Цена</span>
-                            <span className="text-sm font-bold text-gray-900">
-                                {formatPrice(minPrice)} ден - {formatPrice(maxPrice)} ден
-                            </span>
-                        </div>
-                        <Slider.Root
-                            className="relative flex items-center select-none touch-none h-5 w-full"
-                            min={priceMin}
-                            max={priceMax}
-                            step={100}
-                            value={[minPrice, maxPrice]}
-                            onValueChange={([min, max]) => { setMinPrice(min); setMaxPrice(max); }}
-                            onValueCommit={([min, max]) => syncPriceToUrl(min, max)}
-                        >
-                            <Slider.Track className="bg-gray-200 relative grow rounded-full h-1.5">
-                                <Slider.Range className="absolute bg-jumbo-blue rounded-full h-full" />
-                            </Slider.Track>
-                            <Slider.Thumb aria-label="Минимална цена" className="block w-5 h-5 bg-white border-2 border-jumbo-blue rounded-full shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-jumbo-blue/30 transition-shadow cursor-grab active:cursor-grabbing" />
-                            <Slider.Thumb aria-label="Максимална цена" className="block w-5 h-5 bg-white border-2 border-jumbo-blue rounded-full shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-jumbo-blue/30 transition-shadow cursor-grab active:cursor-grabbing" />
-                        </Slider.Root>
-                        {priceFilterActive && (
-                            <button
-                                onClick={() => { setMinPrice(priceMin); setMaxPrice(priceMax); syncPriceToUrl(priceMin, priceMax); }}
-                                className="mt-2 text-xs text-jumbo-blue hover:underline cursor-pointer"
-                            >
-                                Ресетирај цена
-                            </button>
-                        )}
-                    </div>
+                    <p className="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-500">
+                        Цените и онлајн нарачките се во подготовка.
+                    </p>
                 </div>
 
                 {/* Product Grid */}
@@ -230,30 +170,10 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                                     <Link href={`/produkt/${product.slug}`}>
                                         <h3 className="font-semibold text-gray-900 text-xs sm:text-sm leading-tight line-clamp-2 mb-2 min-h-[2rem] hover:text-jumbo-blue transition-colors cursor-pointer">{product.name}</h3>
                                     </Link>
-                                    <div className="flex items-center justify-between mb-2 gap-1 flex-wrap">
-                                        <span className={`text-sm sm:text-base font-bold leading-none ${product.stockQuantity > 0 ? 'text-jumbo-blue' : 'text-gray-500'}`}>
-                                            {formatPrice(product.sellingPrice)}<span className="text-xs font-normal text-gray-500 ml-0.5">ден</span>
-                                        </span>
-                                        {product.stockQuantity <= 0 && (
-                                            <span className="text-xs font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                                                Нема залиха
-                                            </span>
-                                        )}
-                                    </div>
-                                    <PriceDisclosure className="mb-2" />
-                                    <button
-                                        onClick={() => addToCart({ productId: product.id, name: product.name, price: product.sellingPrice, imageUrl: product.imageUrl, stock: product.stockQuantity })}
-                                        disabled={SHOP_DISABLED || product.stockQuantity <= 0}
-                                        className={`w-full flex items-center justify-center gap-1 min-h-[2.75rem] py-2.5 rounded-lg text-xs font-semibold transition-colors ${SHOP_DISABLED
-                                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                            : product.stockQuantity > 0
-                                                ? 'bg-jumbo-red/10 text-jumbo-red hover:bg-jumbo-red hover:text-white'
-                                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                            }`}
-                                    >
-                                        <Plus size={13} />
-                                        {SHOP_DISABLED ? 'Сè уште недостапно' : product.stockQuantity > 0 ? 'Додај во кошничка' : 'Нема залиха'}
-                                    </button>
+                                    <p className="mb-2 text-sm font-semibold text-jumbo-blue">Цена во подготовка</p>
+                                    <p className="text-xs text-gray-500 leading-relaxed">
+                                        Цените и онлајн нарачките се во подготовка.
+                                    </p>
                                 </div>
                             </div>
                         ))}
@@ -274,9 +194,9 @@ export default function CatalogClient({ initialProducts, initialCategory, initia
                                 ? `Не пронајдовме артикли за „${searchTerm}". Обидете се со друг термин.`
                                 : 'Моментално нема артикли во оваа категорија. Проверете повторно наскоро!'}
                         </p>
-                        {(searchTerm || selectedCategory || priceFilterActive) && (
+                        {(searchTerm || selectedCategory) && (
                             <button
-                                onClick={() => { setSearchTerm(''); setSelectedCategory(''); setMinPrice(priceMin); setMaxPrice(priceMax); }}
+                                onClick={() => { setSearchTerm(''); setSelectedCategory(''); }}
                                 className="inline-flex items-center gap-2 bg-jumbo-blue text-white px-6 py-2.5 rounded-xl font-medium text-sm hover:bg-blue-700 transition-colors"
                             >
                                 Покажи ги сите играчки

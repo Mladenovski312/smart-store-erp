@@ -5,8 +5,6 @@ import { ShoppingCart, X, Trash2, Plus, Minus } from 'lucide-react';
 import { getCart, updateCartQuantity, removeFromCart, syncCartWithServer, CartItem, SHOP_DISABLED } from '@/lib/cart';
 import Link from 'next/link';
 import Image from 'next/image';
-import { formatPrice } from '@/lib/types';
-import PriceDisclosure from '@/components/PriceDisclosure';
 
 interface CartSidebarProps {
     isOpen: boolean;
@@ -32,8 +30,6 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         }
         prevOpen.current = isOpen;
     }, [isOpen]);
-
-    const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     return (
         <>
@@ -92,7 +88,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                         {/* Details */}
                                         <div className="flex-1 min-w-0">
                                             <h4 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-tight">{item.name}</h4>
-                                            <p className="text-sm font-bold text-jumbo-blue mt-1">{formatPrice(item.price)} ден</p>
+                                            <p className="text-sm font-bold text-jumbo-blue mt-1">Цена во подготовка</p>
 
                                             {/* Quantity Controls */}
                                             <div className="flex items-center gap-2 mt-2">
@@ -139,11 +135,9 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     {/* Footer */}
                     {items.length > 0 && (
                         <div className="border-t border-gray-100 p-4 space-y-3">
-                            <div className="flex justify-between items-center">
-                                <span className="text-gray-500 font-medium">Меѓузбир:</span>
-                                <span className="text-xl font-bold text-gray-900">{formatPrice(total)} ден</span>
-                            </div>
-                            <PriceDisclosure />
+                            <p className="text-sm text-gray-500">
+                                Цените и онлајн нарачките се во подготовка.
+                            </p>
                             <Link
                                 href="/kosnicka"
                                 onClick={onClose}
