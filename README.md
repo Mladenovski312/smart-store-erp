@@ -2,7 +2,7 @@
 
 > A production e-commerce storefront with integrated ERP/POS system, AI-powered features, and real-time inventory sync — built for a retail toy store in Macedonia.
 
-**Live:** [interstarjumbo.com](https://interstarjumbo.com) &nbsp;|&nbsp; **Stack:** Next.js 16 · React 19 · Supabase · Gemini AI · Tailwind CSS 4
+**Stack:** Next.js 16 · React 19 · Supabase · Gemini AI · Tailwind CSS 4
 
 ---
 
